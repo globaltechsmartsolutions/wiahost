@@ -48,6 +48,12 @@ Estas tablas no activan IA automaticamente. Su objetivo es guardar datos limpios
 
 La estrategia IA canonica esta en `AI.md`.
 
+## Auditoria operativa
+
+La tabla `operational_events` ya tiene modulo web en `/audit` y API REST en `/api/audit-events`. Permite registrar eventos manuales o de sistema con `event_name`, `entity_type`, entidad vinculada, fuente, actor y `metadata`.
+
+Esta capa sirve para soporte, investigacion de incidencias, debugging funcional y datasets futuros de automatizacion/IA sin guardar informacion innecesaria.
+
 ## Storage
 
 Buckets preparados:

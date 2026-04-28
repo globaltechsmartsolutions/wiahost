@@ -2,6 +2,7 @@ import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
 const protectedRoutes = [
+  "/audit",
   "/automations",
   "/calendar",
   "/dashboard",
@@ -123,6 +124,7 @@ export async function proxy(request: NextRequest) {
 
 export const config = {
   matcher: [
+    "/audit/:path*",
     "/calendar/:path*",
     "/automations/:path*",
     "/dashboard/:path*",

@@ -20,6 +20,7 @@ import {
 } from "./validators";
 
 const uuid = "11111111-1111-4111-8111-111111111111";
+const seededUuid = "40000000-0000-0000-0000-000000000001";
 
 describe("auth validators", () => {
   it("accepts a valid login payload", () => {
@@ -268,6 +269,19 @@ describe("ai foundation validators", () => {
       reservationId: uuid,
       source: "web",
       metadata: { channel: "direct" },
+    });
+
+    expect(parsed.success).toBe(true);
+  });
+
+  it("accepts Supabase seed UUIDs used by deterministic local data", () => {
+    const parsed = operationalEventSchema.safeParse({
+      entityId: seededUuid,
+      entityType: "reservation",
+      eventName: "reservation.updated",
+      propertyId: "20000000-0000-0000-0000-000000000001",
+      reservationId: seededUuid,
+      source: "e2e",
     });
 
     expect(parsed.success).toBe(true);

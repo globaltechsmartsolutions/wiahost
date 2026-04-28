@@ -7,45 +7,54 @@ import {
   aiPredictionStatuses,
   qualityAuditAreas,
   qualityAuditStatuses,
-  severities
+  severities,
 } from "../constants";
 
 const metadataSchema = z.record(z.string(), z.unknown()).default({});
 
 export const operationalEventSchema = z.object({
-  actorProfileId: z.uuid().optional(),
+  actorProfileId: z.guid().optional(),
   actorType: z.enum(aiActorTypes).default("user"),
   eventName: z.string().trim().min(3).max(120),
   entityType: z.string().trim().min(2).max(80),
-  entityId: z.uuid().optional(),
-  propertyId: z.uuid().optional(),
-  reservationId: z.uuid().optional(),
-  conversationId: z.uuid().optional(),
-  taskId: z.uuid().optional(),
-  incidentId: z.uuid().optional(),
+  entityId: z.guid().optional(),
+  propertyId: z.guid().optional(),
+  reservationId: z.guid().optional(),
+  conversationId: z.guid().optional(),
+  taskId: z.guid().optional(),
+  incidentId: z.guid().optional(),
   source: z.string().trim().min(2).max(80).default("app"),
   occurredAt: z.iso.datetime().optional(),
-  metadata: metadataSchema
+  metadata: metadataSchema,
 });
 
 export const messageLabelSchema = z
   .object({
-    conversationId: z.uuid(),
-    messageId: z.uuid().optional(),
-    labeledBy: z.uuid().optional(),
+    conversationId: z.guid(),
+    messageId: z.guid().optional(),
+    labeledBy: z.guid().optional(),
     source: z.enum(aiLabelSources).default("human"),
     category: z.string().trim().min(2).max(80).optional(),
     urgency: z.enum(severities).optional(),
-    sentiment: z.enum(["positive", "neutral", "negative", "mixed", "unknown"]).optional(),
+    sentiment: z
+      .enum(["positive", "neutral", "negative", "mixed", "unknown"])
+      .optional(),
     intent: z.string().trim().min(2).max(120).optional(),
     language: z.string().trim().min(2).max(12).optional(),
     confidence: z.coerce.number().min(0).max(1).optional(),
     rationale: z.string().trim().max(1000).optional(),
-    metadata: metadataSchema
+    metadata: metadataSchema,
   })
   .refine(
-    (value) => Boolean(value.category || value.urgency || value.sentiment || value.intent || value.language),
-    "La etiqueta debe incluir al menos categoria, urgencia, sentimiento, intencion o idioma."
+    (value) =>
+      Boolean(
+        value.category ||
+        value.urgency ||
+        value.sentiment ||
+        value.intent ||
+        value.language,
+      ),
+    "La etiqueta debe incluir al menos categoria, urgencia, sentimiento, intencion o idioma.",
   );
 
 export const modelPredictionSchema = z.object({
@@ -53,30 +62,30 @@ export const modelPredictionSchema = z.object({
   modelName: z.string().trim().min(2).max(120),
   modelVersion: z.string().trim().min(1).max(80),
   entityType: z.string().trim().min(2).max(80),
-  entityId: z.uuid().optional(),
-  propertyId: z.uuid().optional(),
-  reservationId: z.uuid().optional(),
-  conversationId: z.uuid().optional(),
-  taskId: z.uuid().optional(),
-  incidentId: z.uuid().optional(),
+  entityId: z.guid().optional(),
+  propertyId: z.guid().optional(),
+  reservationId: z.guid().optional(),
+  conversationId: z.guid().optional(),
+  taskId: z.guid().optional(),
+  incidentId: z.guid().optional(),
   inputHash: z.string().trim().min(12).max(160),
   inputSummary: metadataSchema,
   output: metadataSchema,
   explanation: metadataSchema,
   confidence: z.coerce.number().min(0).max(1).optional(),
   status: z.enum(aiPredictionStatuses).default("suggested"),
-  createdBy: z.uuid().optional()
+  createdBy: z.guid().optional(),
 });
 
 export const modelPredictionReviewSchema = z.object({
   status: z.enum(aiPredictionStatuses),
-  reviewedBy: z.uuid().optional(),
-  feedback: z.enum(aiFeedbackValues).optional()
+  reviewedBy: z.guid().optional(),
+  feedback: z.enum(aiFeedbackValues).optional(),
 });
 
 export const aiAuditLogSchema = z.object({
-  predictionId: z.uuid().optional(),
-  actorProfileId: z.uuid().optional(),
+  predictionId: z.guid().optional(),
+  actorProfileId: z.guid().optional(),
   action: z.string().trim().min(3).max(120),
   provider: z.string().trim().min(2).max(80).optional(),
   modelName: z.string().trim().min(2).max(120).optional(),
@@ -85,8 +94,8 @@ export const aiAuditLogSchema = z.object({
   responseSummary: metadataSchema,
   riskLevel: z.enum(severities).default("low"),
   containsPersonalData: z.boolean().default(false),
-  approvedBy: z.uuid().optional(),
-  metadata: metadataSchema
+  approvedBy: z.guid().optional(),
+  metadata: metadataSchema,
 });
 
 export const qualityAuditMemorySchema = z.object({
@@ -98,7 +107,7 @@ export const qualityAuditMemorySchema = z.object({
   description: z.string().trim().min(10).max(2000),
   severity: z.enum(severities).default("medium"),
   status: z.enum(qualityAuditStatuses).default("open"),
-  metadata: metadataSchema
+  metadata: metadataSchema,
 });
 
 export type OperationalEventInput = z.infer<typeof operationalEventSchema>;

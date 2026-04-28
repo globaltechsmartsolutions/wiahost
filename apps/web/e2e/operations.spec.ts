@@ -607,4 +607,55 @@ test.describe("operations flows with Supabase @critical @data", () => {
     await page.goto("/documents");
     await expect(page.getByText(updatedTitle)).not.toBeVisible();
   });
+
+  test("creates and deletes audit events through API routes", async ({
+    page,
+  }) => {
+    const existingEventsResponse = await page.request.get("/api/audit-events");
+    if (existingEventsResponse.ok()) {
+      const existingEvents = (await existingEventsResponse.json()) as {
+        data: Array<{ id: string; title: string }>;
+      };
+
+      for (const event of existingEvents.data.filter((item) =>
+        item.title.startsWith("e2e.audit."),
+      )) {
+        await page.request.delete(`/api/audit-events/${event.id}`);
+      }
+    }
+
+    const eventName = `e2e.audit.${Date.now()}`;
+    const note = uniqueName("Evento auditado por Playwright");
+    const eventResponse = await page.request.post("/api/audit-events", {
+      data: {
+        entityId: seedIds.reservationId,
+        entityType: "reservation",
+        eventName,
+        metadata: { note },
+        propertyId: seedIds.propertyId,
+        reservationId: seedIds.reservationId,
+        source: "e2e-web",
+      },
+    });
+    expect(eventResponse.status()).toBe(201);
+
+    const eventBody = (await eventResponse.json()) as {
+      data: { id: string };
+    };
+
+    await page.goto("/audit");
+    await expect(
+      page.getByRole("heading", { name: /auditoria operativa/i }),
+    ).toBeVisible();
+    await expect(page.getByText(eventName)).toBeVisible();
+    await expect(page.getByText(`note: ${note}`)).toBeVisible();
+
+    const eventDeleteResponse = await page.request.delete(
+      `/api/audit-events/${eventBody.data.id}`,
+    );
+    expect(eventDeleteResponse.status()).toBe(200);
+
+    await page.goto("/audit");
+    await expect(page.getByText(eventName)).not.toBeVisible();
+  });
 });

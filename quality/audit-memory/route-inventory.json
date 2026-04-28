@@ -25,6 +25,12 @@
       "tests": ["smoke", "visual", "a11y"]
     },
     {
+      "path": "/audit",
+      "auth": "protected",
+      "primaryCheck": "Operational audit events can be created, listed and deleted through API/UI context",
+      "tests": ["critical", "data", "a11y", "visual"]
+    },
+    {
       "path": "/automations",
       "auth": "protected",
       "primaryCheck": "Automation rules can be created, edited, paused and deleted through API/UI",

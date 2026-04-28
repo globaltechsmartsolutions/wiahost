@@ -13,6 +13,7 @@ import {
   KeyRound,
   Landmark,
   MessageSquareWarning,
+  ScrollText,
   Search,
   Settings,
   Users,
@@ -46,6 +47,7 @@ const navSections = [
     items: [
       { label: "Propietarios", href: "/owners", icon: Landmark },
       { label: "Automatizaciones", href: "/automations", icon: Bot },
+      { label: "Auditoria", href: "/audit", icon: ScrollText },
       { label: "Documentos", href: "/documents", icon: FileText },
       { label: "Pagos", href: "/payments", icon: CreditCard },
       { label: "Ajustes", href: "/settings", icon: Settings },

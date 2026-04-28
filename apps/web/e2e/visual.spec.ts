@@ -311,6 +311,7 @@ test.describe("visual regression baseline @visual", () => {
     await signInAsDemoOperator(page);
 
     for (const route of [
+      "/audit",
       "/automations",
       "/documents",
       "/owners",

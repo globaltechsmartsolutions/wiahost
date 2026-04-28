@@ -21,8 +21,8 @@ Ya existe:
 - Test inicial de configuracion Supabase.
 - `playwright.config.ts` formal en `apps/web`.
 - Tests E2E versionados para smoke publico/auth, login demo, creacion/edicion de reserva UI/API, owners/settings, guest list/detail/edit, calendar blocks y mutaciones API completas de tareas, incidencias e inbox.
-- Auditoria de accesibilidad con `@axe-core/playwright` sobre rutas publicas, protegidas, calendario, guests, documentos, detalle, edicion de operaciones, owners y settings.
-- Baseline visual inicial para landing/auth y check de overflow/alineacion del dashboard, operaciones, editores, calendar/guests, documentos, owners y settings.
+- Auditoria de accesibilidad con `@axe-core/playwright` sobre rutas publicas, protegidas, audit, calendario, guests, documentos, detalle, edicion de operaciones, owners y settings.
+- Baseline visual inicial para landing/auth y check de overflow/alineacion del dashboard, operaciones, editores, audit, calendar/guests, documentos, owners y settings.
 - Memoria versionada en `quality/audit-memory`.
 - Lighthouse CI configurado para landing/login/register con budgets iniciales, reportes en filesystem y wrapper local para estabilizar Chrome en Windows.
 - CI inicial con typecheck, lint, unit tests y build web.
@@ -352,7 +352,7 @@ Un cambio no deberia entrar si:
 - Hecho: check de dashboard sin overflow horizontal y con calendario/cola prioritaria alineados.
 - Hecho: check visual de rutas operativas `/reservations`, `/tasks`, `/incidents` e `/inbox` sin overflow en desktop portatil y con filtros visibles.
 - Hecho: check visual de rutas detalle/edicion de reservas, tareas e incidencias sin overflow en desktop portatil.
-- Hecho: check visual de automations/documents/owners/payments/settings sin overflow en desktop portatil.
+- Hecho: check visual de audit/automations/documents/owners/payments/settings sin overflow en desktop portatil.
 - Hecho: check visual de calendar/guests sin overflow en desktop portatil.
 - Hecho: desactivar animaciones en modo test.
 
