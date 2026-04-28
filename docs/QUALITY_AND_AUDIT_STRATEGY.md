@@ -24,12 +24,13 @@ Ya existe:
 - Auditoria de accesibilidad con `@axe-core/playwright` sobre rutas publicas y protegidas.
 - Baseline visual inicial para landing/auth y check de overflow/alineacion del dashboard.
 - Memoria versionada en `quality/audit-memory`.
+- Lighthouse CI configurado para landing/login/register con budgets iniciales, reportes en filesystem y wrapper local para estabilizar Chrome en Windows.
 - CI inicial con typecheck, lint, unit tests y build web.
 
 Falta:
 
-- Lighthouse CI con budgets.
-- Workflow CI de calidad con artefactos Playwright/Lighthouse cuando activemos esas suites en CI.
+- Endurecer Lighthouse CI cuando haya historico estable.
+- Workflow CI de calidad con artefactos Playwright cuando activemos esas suites en CI.
 
 ## Piramide de calidad propuesta
 
@@ -148,7 +149,7 @@ Budgets iniciales recomendados:
 - LCP landing < 2.5 s en CI.
 - CLS < 0.1.
 
-En local ya vimos Lighthouse 100/100/100/100 en landing desktop sin throttling. Debe convertirse en gate de CI con condiciones reproducibles.
+En local ya vimos Lighthouse 100/100/100/100 en landing desktop sin throttling. La primera version automatizada audita `/`, `/login` y `/register` en desktop, guarda reportes en `quality/reports/lighthouse` y corre en CI como paso no bloqueante. Cuando tengamos historico estable, subiremos budgets y lo convertiremos en gate bloqueante.
 
 ## Auditor inteligente con memoria
 
@@ -333,6 +334,7 @@ Un cambio no deberia entrar si:
 - Hecho: crear `apps/web/e2e/visual.spec.ts`.
 - Hecho: baseline desktop/mobile para landing y pantallas auth.
 - Hecho: check de dashboard sin overflow horizontal y con calendario/cola prioritaria alineados.
+- Hecho: check visual de rutas operativas `/reservations`, `/tasks`, `/incidents` e `/inbox` sin overflow en desktop portatil y con filtros visibles.
 - Hecho: desactivar animaciones en modo test.
 
 ### Paso 3
@@ -343,10 +345,11 @@ Un cambio no deberia entrar si:
 
 ### Paso 4
 
-- Instalar Lighthouse CI.
-- Crear `.lighthouserc.cjs`.
-- Anadir budgets.
-- Publicar reportes como artefactos en GitHub Actions.
+- Hecho: instalar Lighthouse CI.
+- Hecho: crear `.lighthouserc.cjs`.
+- Hecho: anadir budgets iniciales para performance, accesibilidad, best practices, SEO, FCP, LCP y CLS.
+- Hecho: publicar reportes como artefactos en GitHub Actions.
+- Pendiente: endurecer budgets y activar dashboard autenticado cuando tengamos un login estable para Lighthouse.
 
 ### Paso 5
 

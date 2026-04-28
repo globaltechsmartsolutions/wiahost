@@ -10,6 +10,7 @@ Current baseline strategy:
 - Dashboard responsive desktop sizes are tested at 1366, 1440, 1536 and 1920 pixels to prevent zoom-like cramped layouts and internal calendar scrollbars.
 - Laptop scale is tested directly: hero title size is capped and the four metric cards must remain in one row on standard desktop laptop widths.
 - First viewport density is tested by checking that calendar context starts early enough on laptop desktop widths.
+- Lighthouse CI writes public-route reports to `quality/reports/lighthouse` and runs in CI as a non-blocking early warning until we have enough history to make it a hard gate.
 
 Promotion rule:
 

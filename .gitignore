@@ -5,11 +5,13 @@ node_modules
 # builds
 .next
 .turbo
+.lighthouseci
 dist
 build
 coverage
 playwright-report
 test-results
+quality/reports/lighthouse
 
 # env
 .env

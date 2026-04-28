@@ -37,3 +37,15 @@ jobs:
 
       - name: Build web
         run: pnpm build:web
+
+      - name: Lighthouse CI
+        continue-on-error: true
+        run: pnpm lighthouse
+
+      - name: Upload Lighthouse reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lighthouse-reports
+          path: quality/reports/lighthouse
+          if-no-files-found: ignore
