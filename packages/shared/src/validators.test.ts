@@ -10,6 +10,7 @@ import {
   messageLabelSchema,
   modelPredictionSchema,
   operationalEventSchema,
+  paymentSchema,
   propertySchema,
   qualityAuditMemorySchema,
   registerSchema,
@@ -172,6 +173,33 @@ describe("automation validators", () => {
       name: "Aviso",
       template: "Hola",
       trigger: "reservation_confirmed",
+    });
+
+    expect(parsed.success).toBe(false);
+  });
+});
+
+describe("payment validators", () => {
+  it("accepts manual payment records", () => {
+    const parsed = paymentSchema.safeParse({
+      amount: "645",
+      currency: "EUR",
+      paidAt: "2026-05-01T10:30",
+      provider: "manual",
+      reservationId: uuid,
+      status: "paid",
+    });
+
+    expect(parsed.success).toBe(true);
+  });
+
+  it("rejects negative payment amounts", () => {
+    const parsed = paymentSchema.safeParse({
+      amount: -1,
+      currency: "EUR",
+      provider: "manual",
+      reservationId: uuid,
+      status: "paid",
     });
 
     expect(parsed.success).toBe(false);

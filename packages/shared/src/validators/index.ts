@@ -5,6 +5,7 @@ export * from "./calendar";
 export * from "./guest";
 export * from "./incident";
 export * from "./message";
+export * from "./payment";
 export * from "./property";
 export * from "./reservation";
 export * from "./task";

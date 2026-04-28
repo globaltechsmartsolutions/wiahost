@@ -42,6 +42,15 @@ export const reservationStatuses = [
   "no_show",
 ] as const;
 
+export const paymentStatuses = [
+  "pending",
+  "authorized",
+  "paid",
+  "refunded",
+  "failed",
+  "disputed",
+] as const;
+
 export const taskStatuses = [
   "open",
   "scheduled",

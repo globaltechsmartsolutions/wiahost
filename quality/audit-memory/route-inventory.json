@@ -145,6 +145,12 @@
       "tests": ["critical", "data", "a11y", "visual"]
     },
     {
+      "path": "/payments",
+      "auth": "protected",
+      "primaryCheck": "Payments can be created, edited and deleted while staying linked to reservations",
+      "tests": ["critical", "data", "a11y", "visual"]
+    },
+    {
       "path": "/settings",
       "auth": "protected",
       "primaryCheck": "Settings reads current profile and updates phone/full name through a Server Action",

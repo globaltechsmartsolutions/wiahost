@@ -473,4 +473,70 @@ test.describe("operations flows with Supabase @critical @data", () => {
     await page.goto("/automations");
     await expect(page.getByText(updatedRuleName)).not.toBeVisible();
   });
+
+  test("creates, updates and deletes payments through API routes", async ({
+    page,
+  }) => {
+    const existingPaymentsResponse = await page.request.get("/api/payments");
+    if (existingPaymentsResponse.ok()) {
+      const existingPayments = (await existingPaymentsResponse.json()) as {
+        data: Array<{ id: string; raw?: { provider?: string } }>;
+      };
+
+      for (const payment of existingPayments.data.filter((item) =>
+        item.raw?.provider?.startsWith("e2e-manual"),
+      )) {
+        await page.request.delete(`/api/payments/${payment.id}`);
+      }
+    }
+
+    const amount = 700 + (Date.now() % 100);
+    const paymentResponse = await page.request.post("/api/payments", {
+      data: {
+        amount,
+        currency: "EUR",
+        paidAt: `${isoDateFromToday(0)}T10:30`,
+        provider: "e2e-manual",
+        reservationId: seedIds.reservationId,
+        status: "authorized",
+      },
+    });
+    expect(paymentResponse.status()).toBe(201);
+
+    const paymentBody = (await paymentResponse.json()) as {
+      data: { id: string };
+    };
+    const updatedAmount = amount + 1;
+    const paymentPatchResponse = await page.request.patch(
+      `/api/payments/${paymentBody.data.id}`,
+      {
+        data: {
+          amount: updatedAmount,
+          currency: "EUR",
+          paidAt: `${isoDateFromToday(0)}T11:00`,
+          provider: "e2e-manual-updated",
+          reservationId: seedIds.reservationId,
+          status: "paid",
+        },
+      },
+    );
+    expect(paymentPatchResponse.status()).toBe(200);
+
+    await page.goto("/payments");
+    await expect(
+      page.getByRole("heading", { name: /control financiero/i }),
+    ).toBeVisible();
+    await expect(page.getByText(`${updatedAmount} EUR`).first()).toBeVisible();
+    await expect(
+      page.locator("span").filter({ hasText: "Pagado" }).first(),
+    ).toBeVisible();
+
+    const paymentDeleteResponse = await page.request.delete(
+      `/api/payments/${paymentBody.data.id}`,
+    );
+    expect(paymentDeleteResponse.status()).toBe(200);
+
+    await page.goto("/payments");
+    await expect(page.getByText(`${updatedAmount} EUR`)).not.toBeVisible();
+  });
 });
