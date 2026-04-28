@@ -13,7 +13,7 @@ Current baseline strategy:
 - Property list/detail/edit routes are covered by artifact-only visual checks for laptop overflow until we can freeze dynamic data for strict screenshots.
 - Operation list/detail/edit routes for reservations, tasks and incidents are covered by artifact-only visual checks for laptop overflow and responsive density.
 - Owners and settings are covered by artifact-only visual checks for laptop overflow and responsive density.
-- Calendar and guests are covered by artifact-only visual checks for laptop overflow and responsive density.
+- Calendar plus guest list/detail/edit are covered by artifact-only visual checks for laptop overflow and responsive density.
 - Lighthouse CI writes public-route reports to `quality/reports/lighthouse` and runs in CI as a non-blocking early warning until we have enough history to make it a hard gate.
 
 Promotion rule:

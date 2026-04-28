@@ -40,6 +40,16 @@ const routes: AccessibilityRoute[] = [
   },
   { name: "inbox", path: "/inbox", requiresAuth: true },
   { name: "guests", path: "/guests", requiresAuth: true },
+  {
+    name: "guest detail",
+    path: `/guests/${seedIds.guestId}`,
+    requiresAuth: true,
+  },
+  {
+    name: "edit guest",
+    path: `/guests/${seedIds.guestId}/edit`,
+    requiresAuth: true,
+  },
   { name: "tasks", path: "/tasks", requiresAuth: true },
   { name: "task detail", path: `/tasks/${seedIds.taskId}`, requiresAuth: true },
   {

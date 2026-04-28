@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 import { createGuestAction } from "@/lib/actions/guests";
 import { getGuests } from "@/lib/data/guests";
 import { AppShell } from "@/components/layout/app-shell";
@@ -169,6 +171,11 @@ export default async function GuestsPage({ searchParams }: GuestsPageProps) {
                   <span className="rounded-full bg-background px-3 py-1 text-xs text-muted-foreground">
                     {guest.phone}
                   </span>
+                </div>
+                <div className="mt-5 flex justify-end">
+                  <Button asChild variant="outline" className="rounded-full">
+                    <Link href={`/guests/${guest.id}`}>Ver ficha</Link>
+                  </Button>
                 </div>
               </CardContent>
             </Card>

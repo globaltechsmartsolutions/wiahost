@@ -33,7 +33,19 @@
     {
       "path": "/guests",
       "auth": "protected",
-      "primaryCheck": "Guest CRM lists Supabase guests, creates new guests and filters the new record",
+      "primaryCheck": "Guest CRM lists Supabase guests, creates new guests, links to guest details and filters updated records",
+      "tests": ["critical", "data", "a11y", "visual"]
+    },
+    {
+      "path": "/guests/:guestId",
+      "auth": "protected",
+      "primaryCheck": "Guest detail shows profile, notes, reservations and conversations",
+      "tests": ["critical", "data", "a11y", "visual"]
+    },
+    {
+      "path": "/guests/:guestId/edit",
+      "auth": "protected",
+      "primaryCheck": "Guest edit form updates profile fields and internal notes",
       "tests": ["critical", "data", "a11y", "visual"]
     },
     {

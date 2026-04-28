@@ -319,9 +319,39 @@ test.describe("operations flows with Supabase @critical @data", () => {
     });
     expect(guestResponse.status()).toBe(201);
 
-    await page.goto(`/guests?q=${encodeURIComponent(guestName)}`);
+    const guestBody = (await guestResponse.json()) as { data: { id: string } };
+    const updatedGuestName = `${guestName} editado`;
+    const guestPatchResponse = await page.request.patch(
+      `/api/guests/${guestBody.data.id}`,
+      {
+        data: {
+          email: `${updatedGuestName.toLowerCase().replaceAll(" ", ".")}@example.com`,
+          fullName: updatedGuestName,
+          notes: "Actualizado por Playwright para validar ficha de huesped.",
+          phone: "+34622222222",
+          preferredLanguage: "en",
+        },
+      },
+    );
+    expect(guestPatchResponse.status()).toBe(200);
+
+    await page.goto(`/guests/${guestBody.data.id}`);
+    await expect(
+      page.getByRole("heading", { name: updatedGuestName }),
+    ).toBeVisible();
+    await expect(
+      page.getByText(
+        "Actualizado por Playwright para validar ficha de huesped.",
+      ),
+    ).toBeVisible();
+
+    await page.goto(`/guests/${guestBody.data.id}/edit`);
+    await expect(page.locator("#fullName")).toHaveValue(updatedGuestName);
+    await expect(page.locator("#preferredLanguage")).toHaveValue("en");
+
+    await page.goto(`/guests?q=${encodeURIComponent(updatedGuestName)}`);
     await expect(page.getByText(`Mostrando 1 de`)).toBeVisible();
-    await expect(page.getByText(guestName)).toBeVisible();
+    await expect(page.getByText(updatedGuestName)).toBeVisible();
 
     const blockReason = uniqueName("Bloqueo E2E");
     const blockResponse = await page.request.post("/api/calendar-blocks", {

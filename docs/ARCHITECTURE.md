@@ -72,7 +72,7 @@ La UI combina datos demo con primeras integraciones reales:
 - Reservas, tareas, incidencias e inbox tienen filtros GET server-side sobre los datos cargados para proteger deep links y futura app movil.
 - Owners lee owner accounts, propiedades, reservas e incidencias desde Supabase con fallback demo.
 - Settings lee el perfil autenticado desde Supabase y permite actualizar nombre/telefono mediante Server Action.
-- Guests lee huespedes y reservas desde Supabase, permite alta mediante Server Action y expone API GET/POST.
+- Guests lee huespedes, reservas y conversaciones desde Supabase; permite alta, ficha, edicion mediante Server Actions y API GET/POST/GET detail/PATCH.
 - Calendar reutiliza la matriz operativa real del dashboard, filtra propiedades archivadas y permite crear bloqueos manuales mediante Server Action/API.
 
 La prioridad tecnica actual es conectar cada pantalla PMS a Supabase manteniendo RLS, validadores compartidos y tests.

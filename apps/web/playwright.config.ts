@@ -8,7 +8,9 @@ export default defineConfig({
   fullyParallel: false,
   retries: process.env.CI ? 2 : 0,
   timeout: 45_000,
-  workers: process.env.CI ? 1 : undefined,
+  // Supabase local and the Next dev server are shared stateful resources.
+  // One worker keeps data flows deterministic and avoids blank-page flakes.
+  workers: 1,
   reporter: process.env.CI
     ? [["list"], ["html", { open: "never" }]]
     : [["list"], ["html", { open: "never" }]],

@@ -41,3 +41,31 @@ export async function createGuest(
 
   return data;
 }
+
+export async function updateGuest(
+  supabase: SupabaseServerClient,
+  guestId: string,
+  input: GuestInput,
+) {
+  const { data, error } = await supabase
+    .from("guests")
+    .update({
+      email: input.email || null,
+      full_name: input.fullName,
+      notes: input.notes || null,
+      phone: input.phone || null,
+      preferred_language: input.preferredLanguage || "es",
+    })
+    .eq("id", guestId)
+    .select("id,full_name,email,phone,preferred_language")
+    .single();
+
+  if (error || !data) {
+    mutationError(
+      "guest_update_failed",
+      "No se ha podido actualizar el huesped.",
+    );
+  }
+
+  return data;
+}

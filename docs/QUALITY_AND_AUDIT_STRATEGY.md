@@ -20,7 +20,7 @@ Ya existe:
 - Tests iniciales de validadores compartidos.
 - Test inicial de configuracion Supabase.
 - `playwright.config.ts` formal en `apps/web`.
-- Tests E2E versionados para smoke publico/auth, login demo, creacion/edicion de reserva UI/API, owners/settings, guests/calendar y mutaciones API completas de tareas, incidencias e inbox.
+- Tests E2E versionados para smoke publico/auth, login demo, creacion/edicion de reserva UI/API, owners/settings, guest list/detail/edit, calendar blocks y mutaciones API completas de tareas, incidencias e inbox.
 - Auditoria de accesibilidad con `@axe-core/playwright` sobre rutas publicas, protegidas, calendario, guests, detalle, edicion de operaciones, owners y settings.
 - Baseline visual inicial para landing/auth y check de overflow/alineacion del dashboard, operaciones, editores, calendar/guests, owners y settings.
 - Memoria versionada en `quality/audit-memory`.
@@ -72,7 +72,7 @@ Suites recomendadas:
 - `data`: flujos con Supabase local y seed demo.
 - `mobile-web`: mismas rutas con viewport movil.
 
-Regla: cada modulo nuevo debe traer al menos un flujo Playwright.
+Regla: cada modulo nuevo debe traer al menos un flujo Playwright. Mientras usemos Supabase local y Next dev server compartidos, Playwright corre con `workers: 1` para priorizar determinismo frente a velocidad.
 
 ### 4. Visual regression
 
