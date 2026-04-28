@@ -23,6 +23,8 @@
 - Inbox inicial.
 - Tareas de limpieza/mantenimiento.
 - Incidencias.
+- Suite robusta de calidad web: unit tests, E2E, visual regression, accesibilidad y Lighthouse CI.
+- Memoria de auditoria para evitar regresiones repetidas.
 
 ## Fase 2 - Operacion PMS
 

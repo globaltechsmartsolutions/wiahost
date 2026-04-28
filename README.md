@@ -83,7 +83,8 @@ pnpm db:types
 - Roadmap: `docs/ROADMAP.md`
 - Setup local: `docs/SETUP.md`
 - Investigacion UI: `docs/UI_RESEARCH.md`
+- Calidad y auditoria inteligente: `docs/QUALITY_AND_AUDIT_STRATEGY.md`
 
 ## Siguiente paso recomendado
 
-Conectar Supabase Auth + consultas reales en el dashboard, empezando por login, profiles, propiedades, reservas, calendario, inbox y tareas.
+Completar CRUD de propiedades y montar la suite robusta de Playwright, visual regression, accesibilidad y Lighthouse CI definida en `docs/QUALITY_AND_AUDIT_STRATEGY.md`.
