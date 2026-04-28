@@ -40,4 +40,10 @@ pnpm build:web
 
 ## Estado conocido
 
-En esta fase la web funciona con datos demo. Supabase esta preparado pero no conectado todavia a las pantallas.
+En esta fase la web combina datos demo con integraciones iniciales:
+
+- Login/register usan Supabase Auth.
+- Properties tiene lectura/creacion inicial contra Supabase.
+- Dashboard, reservas, calendario, inbox, tareas e incidencias siguen siendo principalmente demo.
+
+Si `supabase --version` no funciona, instala o activa Supabase CLI antes de ejecutar `pnpm db:reset`.

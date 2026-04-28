@@ -46,6 +46,8 @@ supabase/migrations/
 
 Estas tablas no activan IA automaticamente. Su objetivo es guardar datos limpios desde el MVP para poder incorporar modelos explicables mas adelante sin rehacer la base.
 
+La estrategia IA canonica esta en `AI.md`.
+
 ## Storage
 
 Buckets preparados:
@@ -62,7 +64,7 @@ Buckets preparados:
 ## Pendientes
 
 - Generar tipos reales con `pnpm db:types`.
-- Conectar UI a Supabase.
+- Completar conexion de UI a Supabase en reservas, inbox, tareas, incidencias y dashboard.
 - Crear Edge Functions para operaciones sensibles.
 - Auditar politicas RLS antes de produccion.
 - Conectar tracking real de eventos y feedback humano desde la web.

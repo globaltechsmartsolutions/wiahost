@@ -59,10 +59,10 @@
 
 ## Fase 5 - IA y automatizacion avanzada
 
-- Revision completa del material del Modulo 3 de IA aplicada a WIAHost.
+- Documento canonico: `AI.md`.
 - Capa de base de datos preparada para IA: eventos, labels, predicciones, auditoria y memoria visual/funcional.
-- Estrategia de producto IA con cinco modulos: inbox inteligente, automatizaciones contextuales, operaciones, revenue advisor y riesgo/incidencias.
-- Playbook de maximo aprovechamiento IA: instrumentacion, structured outputs, semantic memory, tool calling, evals, observabilidad y guardrails.
+- Cinco modulos IA: inbox inteligente, automatizaciones contextuales, operaciones, revenue advisor y riesgo/incidencias.
+- Instrumentacion, structured outputs, semantic memory, tool calling, evals, observabilidad y guardrails.
 - Dataset historico de eventos, outcomes y feedback humano.
 - Feature engineering para pricing, reservas, tareas, incidencias e inbox.
 - Respuestas asistidas en inbox.

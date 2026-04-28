@@ -2,7 +2,7 @@
 
 ## Resumen
 
-WIAHost esta planteado como monorepo para soportar web, app movil y paquetes compartidos.
+WIAHost esta planteado como monorepo para soportar web, app movil futura, backend Supabase y paquetes compartidos.
 
 ```text
 wiahost/
@@ -28,8 +28,9 @@ Responsabilidades:
 - Landing publica.
 - Dashboard PMS.
 - Panel de operaciones.
-- Formularios futuros.
-- Route handlers futuros para API compatible con mobile/integraciones.
+- Formularios de auth y propiedades.
+- Route handlers iniciales para health y properties.
+- Integracion progresiva con Supabase.
 
 ### `apps/mobile` futuro
 
@@ -51,8 +52,21 @@ Contiene `database.types.ts` generado desde Supabase y tipos derivados futuros.
 
 Supabase actua como backend comun: Auth, Postgres, RLS, Realtime futuro, Storage y Edge Functions futuras.
 
+Piezas preparadas:
+
+- Migraciones SQL.
+- RLS inicial.
+- Storage buckets.
+- Seed demo.
+- Auth inicial.
+- Tablas AI-ready para eventos, labels, predicciones y auditoria.
+
 ## Estado actual de conexion
 
-La UI usa datos demo desde `apps/web/src/lib/demo-data.ts`.
+La UI combina datos demo con primeras integraciones reales:
 
-La base Supabase esta preparada, pero las pantallas aun no leen ni escriben datos reales.
+- Login/register usan Supabase Auth.
+- Properties tiene lectura/creacion inicial con Supabase.
+- Dashboard, reservas, calendario, inbox, tareas, incidencias, owners y settings siguen siendo principalmente demo.
+
+La prioridad tecnica actual es conectar cada pantalla PMS a Supabase manteniendo RLS, validadores compartidos y tests.

@@ -60,4 +60,4 @@ Modulos IA prioritarios:
 - Revenue advisor.
 - Riesgo operativo e incidencias.
 
-Detalle en `docs/AI_PRODUCT_STRATEGY.md`.
+Detalle en `AI.md`.

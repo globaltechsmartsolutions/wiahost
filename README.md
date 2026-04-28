@@ -11,11 +11,12 @@ El objetivo es centralizar propiedades, reservas, calendario multi-canal, mensaj
 - UI profesional tipo hospitality command center.
 - Dashboard navegable con datos demo.
 - Rutas web iniciales: landing, dashboard, properties, reservations, calendar, guests, inbox, tasks, incidents, owners, settings, login y register.
-- Supabase preparado con migraciones SQL, RLS, storage y seed demo.
+- Supabase preparado con migraciones SQL, RLS, storage, seed demo y base de datos preparada para IA futura.
+- Supabase Auth inicial implementado para login/register y acciones de propiedades.
 - Paquetes compartidos para tipos y validaciones en `packages/shared`.
 - Paquete de tipos de base de datos en `packages/database`.
 
-Importante: la interfaz actual usa datos demo para validar producto y diseno. La siguiente fase es conectar las pantallas a Supabase Auth y Supabase Postgres.
+Importante: varias pantallas siguen usando datos demo para validar producto y diseno. La fase actual es conectar progresivamente dashboard, reservas, inbox, tareas e incidencias a Supabase.
 
 ## Stack
 
@@ -24,7 +25,7 @@ Importante: la interfaz actual usa datos demo para validar producto y diseno. La
 - UI web: Tailwind CSS + shadcn/ui + lucide-react.
 - Backend: Supabase.
 - Base de datos: Supabase Postgres.
-- Auth futura: Supabase Auth.
+- Auth: Supabase Auth.
 - Seguridad: Supabase Row Level Security.
 - Storage: Supabase Storage.
 - Validacion: Zod.
@@ -76,20 +77,18 @@ pnpm db:types
 
 ## Documentacion
 
+Empieza por `docs/README.md`.
+
+Documentos principales:
+
 - Producto: `docs/PRODUCT.md`
 - Arquitectura: `docs/ARCHITECTURE.md`
 - Base de datos: `docs/DATABASE.md`
-- Mobile y Play Store: `docs/MOBILE_AND_PLAYSTORE.md`
+- IA: `docs/AI.md`
 - Roadmap: `docs/ROADMAP.md`
 - Setup local: `docs/SETUP.md`
-- Investigacion UI: `docs/UI_RESEARCH.md`
-- Calidad y auditoria inteligente: `docs/QUALITY_AND_AUDIT_STRATEGY.md`
-- Oportunidades de Machine Learning: `docs/ML_OPPORTUNITIES_FROM_NOTES.md`
-- Oportunidades de redes neuronales/RNN: `docs/NEURAL_NETWORKS_OPPORTUNITIES_FROM_NOTES.md`
-- Revision completa del Modulo 3 de IA: `docs/AI_MODULE_3_FULL_REVIEW.md`
-- Estrategia de producto IA: `docs/AI_PRODUCT_STRATEGY.md`
-- Playbook para maximizar IA: `docs/AI_MAXIMIZATION_PLAYBOOK.md`
+- Calidad: `docs/QUALITY_AND_AUDIT_STRATEGY.md`
 
 ## Siguiente paso recomendado
 
-Completar CRUD de propiedades y montar la suite robusta de Playwright, visual regression, accesibilidad y Lighthouse CI definida en `docs/QUALITY_AND_AUDIT_STRATEGY.md`.
+Completar la conexion real de las pantallas PMS a Supabase, empezando por propiedades, reservas, inbox, tareas e incidencias.
