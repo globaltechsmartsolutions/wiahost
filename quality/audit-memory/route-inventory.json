@@ -163,6 +163,12 @@
       "tests": ["critical", "data", "a11y", "visual"]
     },
     {
+      "path": "/statements",
+      "auth": "protected",
+      "primaryCheck": "Owner statements can be created, edited and deleted while keeping period and payout totals visible",
+      "tests": ["critical", "data", "a11y", "visual"]
+    },
+    {
       "path": "/settings",
       "auth": "protected",
       "primaryCheck": "Settings reads current profile and updates phone/full name through a Server Action",

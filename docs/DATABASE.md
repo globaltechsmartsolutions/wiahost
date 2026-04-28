@@ -54,6 +54,12 @@ La tabla `operational_events` ya tiene modulo web en `/audit` y API REST en `/ap
 
 Esta capa sirve para soporte, investigacion de incidencias, debugging funcional y datasets futuros de automatizacion/IA sin guardar informacion innecesaria.
 
+## Liquidaciones de propietario
+
+La tabla `owner_statements` ya esta conectada desde `/statements` y `/api/owner-statements`. Permite preparar statements por propietario, propiedad opcional y periodo, con ingresos brutos, comisiones, costes de limpieza, mantenimiento, payout neto y estado de sincronizacion.
+
+La fase posterior puede generar PDFs, notificaciones al propietario y pago automatizado, pero el dato financiero base ya queda normalizado.
+
 ## Storage
 
 Buckets preparados:

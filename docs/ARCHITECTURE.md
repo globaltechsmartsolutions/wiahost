@@ -77,6 +77,7 @@ La UI combina datos demo con primeras integraciones reales:
 - Automations gestiona reglas PMS con trigger, canal, plantilla, delay y estado mediante Server Actions y API REST preparada para mobile.
 - Audit registra y muestra eventos operativos sobre propiedades, reservas, tareas e incidencias usando la tabla `operational_events` preparada para trazabilidad e IA futura.
 - Documents gestiona evidencias y referencias de storage vinculadas a propiedades, reservas e incidencias mediante Server Actions y API REST preparada para mobile.
+- Statements gestiona liquidaciones de propietario con ingresos, costes, fees, periodo, estado y API REST preparada para mobile.
 - Payments gestiona pagos manuales vinculados a reservas con estado, proveedor, importe y fecha mediante Server Actions y API REST preparada para mobile.
 
 La prioridad tecnica actual es conectar cada pantalla PMS a Supabase manteniendo RLS, validadores compartidos y tests.

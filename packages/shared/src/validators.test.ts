@@ -11,6 +11,7 @@ import {
   messageLabelSchema,
   modelPredictionSchema,
   operationalEventSchema,
+  ownerStatementSchema,
   paymentSchema,
   propertySchema,
   qualityAuditMemorySchema,
@@ -202,6 +203,39 @@ describe("payment validators", () => {
       provider: "manual",
       reservationId: uuid,
       status: "paid",
+    });
+
+    expect(parsed.success).toBe(false);
+  });
+});
+
+describe("owner statement validators", () => {
+  it("accepts owner statement financial inputs from forms", () => {
+    const parsed = ownerStatementSchema.safeParse({
+      cleaningCosts: "80",
+      grossRevenue: "1200",
+      maintenanceCosts: "45",
+      netPayout: "970",
+      ownerAccountId: "10000000-0000-0000-0000-000000000001",
+      periodEnd: "2026-04-30",
+      periodStart: "2026-04-01",
+      platformFees: "105",
+      propertyId: "",
+      status: "pending",
+    });
+
+    expect(parsed.success).toBe(true);
+    if (parsed.success) {
+      expect(parsed.data.propertyId).toBeUndefined();
+      expect(parsed.data.netPayout).toBe(970);
+    }
+  });
+
+  it("rejects owner statements with inverted periods", () => {
+    const parsed = ownerStatementSchema.safeParse({
+      ownerAccountId: "10000000-0000-0000-0000-000000000001",
+      periodEnd: "2026-04-01",
+      periodStart: "2026-04-30",
     });
 
     expect(parsed.success).toBe(false);

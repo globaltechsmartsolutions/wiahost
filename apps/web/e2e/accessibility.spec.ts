@@ -73,6 +73,7 @@ const routes: AccessibilityRoute[] = [
   },
   { name: "owners", path: "/owners", requiresAuth: true },
   { name: "payments", path: "/payments", requiresAuth: true },
+  { name: "statements", path: "/statements", requiresAuth: true },
   { name: "settings", path: "/settings", requiresAuth: true },
 ];
 

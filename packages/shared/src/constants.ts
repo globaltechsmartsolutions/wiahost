@@ -51,6 +51,8 @@ export const paymentStatuses = [
   "disputed",
 ] as const;
 
+export const syncStatuses = ["pending", "synced", "failed", "ignored"] as const;
+
 export const taskStatuses = [
   "open",
   "scheduled",

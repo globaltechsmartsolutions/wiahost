@@ -15,6 +15,7 @@ const protectedRoutes = [
   "/properties",
   "/reservations",
   "/settings",
+  "/statements",
   "/tasks",
 ];
 
@@ -139,6 +140,7 @@ export const config = {
     "/register",
     "/reservations/:path*",
     "/settings/:path*",
+    "/statements/:path*",
     "/tasks/:path*",
   ],
 };

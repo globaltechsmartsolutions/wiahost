@@ -46,6 +46,7 @@ const navSections = [
     title: "Negocio",
     items: [
       { label: "Propietarios", href: "/owners", icon: Landmark },
+      { label: "Liquidaciones", href: "/statements", icon: CreditCard },
       { label: "Automatizaciones", href: "/automations", icon: Bot },
       { label: "Auditoria", href: "/audit", icon: ScrollText },
       { label: "Documentos", href: "/documents", icon: FileText },

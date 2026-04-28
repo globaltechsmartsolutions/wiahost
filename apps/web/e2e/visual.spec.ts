@@ -317,6 +317,7 @@ test.describe("visual regression baseline @visual", () => {
       "/owners",
       "/payments",
       "/settings",
+      "/statements",
     ]) {
       await page.goto(route);
       await prepareVisualPage(page);

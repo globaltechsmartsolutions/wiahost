@@ -6,6 +6,7 @@ export * from "./document";
 export * from "./guest";
 export * from "./incident";
 export * from "./message";
+export * from "./owner-statement";
 export * from "./payment";
 export * from "./property";
 export * from "./reservation";

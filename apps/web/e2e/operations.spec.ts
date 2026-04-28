@@ -658,4 +658,78 @@ test.describe("operations flows with Supabase @critical @data", () => {
     await page.goto("/audit");
     await expect(page.getByText(eventName)).not.toBeVisible();
   });
+
+  test("creates, updates and deletes owner statements through API routes", async ({
+    page,
+  }) => {
+    const existingStatementsResponse = await page.request.get(
+      "/api/owner-statements",
+    );
+    if (existingStatementsResponse.ok()) {
+      const existingStatements = (await existingStatementsResponse.json()) as {
+        data: Array<{ id: string; raw?: { grossRevenue?: number } }>;
+      };
+
+      for (const statement of existingStatements.data.filter(
+        (item) => item.raw?.grossRevenue === 9876,
+      )) {
+        await page.request.delete(`/api/owner-statements/${statement.id}`);
+      }
+    }
+
+    const statementResponse = await page.request.post("/api/owner-statements", {
+      data: {
+        cleaningCosts: 120,
+        grossRevenue: 9876,
+        maintenanceCosts: 80,
+        netPayout: 9200,
+        ownerAccountId: seedIds.ownerAccountId,
+        periodEnd: isoDateFromToday(35),
+        periodStart: isoDateFromToday(5),
+        platformFees: 476,
+        propertyId: seedIds.propertyId,
+        status: "pending",
+      },
+    });
+    expect(statementResponse.status()).toBe(201);
+
+    const statementBody = (await statementResponse.json()) as {
+      data: { id: string };
+    };
+    const statementPatchResponse = await page.request.patch(
+      `/api/owner-statements/${statementBody.data.id}`,
+      {
+        data: {
+          cleaningCosts: 120,
+          grossRevenue: 9876,
+          maintenanceCosts: 80,
+          netPayout: 9300,
+          ownerAccountId: seedIds.ownerAccountId,
+          periodEnd: isoDateFromToday(35),
+          periodStart: isoDateFromToday(5),
+          platformFees: 376,
+          propertyId: seedIds.propertyId,
+          status: "synced",
+        },
+      },
+    );
+    expect(statementPatchResponse.status()).toBe(200);
+
+    await page.goto("/statements");
+    await expect(
+      page.getByRole("heading", { name: /liquidaciones y payout/i }),
+    ).toBeVisible();
+    await expect(page.getByText("9300 EUR").first()).toBeVisible();
+    await expect(
+      page.locator("span").filter({ hasText: "Sincronizada" }).first(),
+    ).toBeVisible();
+
+    const statementDeleteResponse = await page.request.delete(
+      `/api/owner-statements/${statementBody.data.id}`,
+    );
+    expect(statementDeleteResponse.status()).toBe(200);
+
+    await page.goto("/statements");
+    await expect(page.getByText("9300 EUR")).not.toBeVisible();
+  });
 });
