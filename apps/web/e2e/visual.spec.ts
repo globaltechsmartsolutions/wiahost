@@ -310,7 +310,13 @@ test.describe("visual regression baseline @visual", () => {
     await page.setViewportSize({ height: 768, width: 1366 });
     await signInAsDemoOperator(page);
 
-    for (const route of ["/automations", "/owners", "/payments", "/settings"]) {
+    for (const route of [
+      "/automations",
+      "/documents",
+      "/owners",
+      "/payments",
+      "/settings",
+    ]) {
       await page.goto(route);
       await prepareVisualPage(page);
       await expectNoHorizontalOverflow(page);

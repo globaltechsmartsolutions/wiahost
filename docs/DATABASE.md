@@ -57,6 +57,12 @@ Buckets preparados:
 - `incident-attachments`
 - `avatars`
 
+## Documentos y evidencias
+
+El modulo `documents` ya esta conectado desde la web. En el MVP guarda metadatos y la ruta de storage para evidencias de check-in, contratos, adjuntos de incidencias o archivos operativos. Cada documento puede quedar asociado a una propiedad, una reserva y/o una incidencia.
+
+El upload avanzado de ficheros se activara sobre los buckets `reservation-documents` e `incident-attachments`; hasta entonces, la pantalla conserva trazabilidad del archivo y contexto operativo.
+
 ## Seed
 
 `supabase/seed.sql` crea usuarios demo, propietario demo, propiedades, listings por canal, huespedes, reservas, conversaciones, mensajes, tareas, incidencias, pagos y automatizaciones.
@@ -64,7 +70,7 @@ Buckets preparados:
 ## Pendientes
 
 - Generar tipos reales con `pnpm db:types`.
-- Completar conexion de UI a Supabase en reservas, inbox, tareas, incidencias y dashboard.
+- Completar upload avanzado de documentos y evidencias desde la UI.
 - Crear Edge Functions para operaciones sensibles.
 - Auditar politicas RLS antes de produccion.
 - Conectar tracking real de eventos y feedback humano desde la web.

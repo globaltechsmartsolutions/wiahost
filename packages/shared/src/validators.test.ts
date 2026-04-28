@@ -4,6 +4,7 @@ import {
   aiAuditLogSchema,
   automationRuleSchema,
   calendarBlockSchema,
+  documentSchema,
   incidentSchema,
   loginSchema,
   manualReservationSchema,
@@ -200,6 +201,32 @@ describe("payment validators", () => {
       provider: "manual",
       reservationId: uuid,
       status: "paid",
+    });
+
+    expect(parsed.success).toBe(false);
+  });
+});
+
+describe("document validators", () => {
+  it("accepts document evidence linked to an operation context", () => {
+    const parsed = documentSchema.safeParse({
+      mimeType: "application/pdf",
+      propertyId: uuid,
+      reservationId: "",
+      storagePath: "reservation-documents/res-1028/checkin.pdf",
+      title: "Evidencia de check-in",
+    });
+
+    expect(parsed.success).toBe(true);
+    if (parsed.success) {
+      expect(parsed.data.reservationId).toBeUndefined();
+    }
+  });
+
+  it("rejects document evidence without a useful storage path", () => {
+    const parsed = documentSchema.safeParse({
+      storagePath: "",
+      title: "ID",
     });
 
     expect(parsed.success).toBe(false);

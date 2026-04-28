@@ -72,6 +72,7 @@
 ### Estado actual de Fase 2
 
 - Implementado: modulo web de automatizaciones con alta, edicion, pausa/activacion, eliminacion, plantillas, trigger, canal, delay y API GET/POST/GET detail/PATCH/DELETE.
+- Implementado: modulo web de documentos y evidencias con alta, edicion, eliminacion, vinculacion a propiedad/reserva/incidencia y API GET/POST/GET detail/PATCH/DELETE.
 - Implementado: modulo web de pagos iniciales con alta, edicion, eliminacion, estados, proveedor, importe, fecha de pago y API GET/POST/GET detail/PATCH/DELETE.
 
 ## Fase 3 - Distribucion y canales

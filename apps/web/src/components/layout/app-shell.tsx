@@ -7,6 +7,7 @@ import {
   CalendarDays,
   ClipboardCheck,
   CreditCard,
+  FileText,
   Home,
   Inbox,
   KeyRound,
@@ -45,6 +46,7 @@ const navSections = [
     items: [
       { label: "Propietarios", href: "/owners", icon: Landmark },
       { label: "Automatizaciones", href: "/automations", icon: Bot },
+      { label: "Documentos", href: "/documents", icon: FileText },
       { label: "Pagos", href: "/payments", icon: CreditCard },
       { label: "Ajustes", href: "/settings", icon: Settings },
     ],

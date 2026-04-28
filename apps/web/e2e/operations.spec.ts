@@ -539,4 +539,72 @@ test.describe("operations flows with Supabase @critical @data", () => {
     await page.goto("/payments");
     await expect(page.getByText(`${updatedAmount} EUR`)).not.toBeVisible();
   });
+
+  test("creates, updates and deletes document evidence through API routes", async ({
+    page,
+  }) => {
+    const existingDocumentsResponse = await page.request.get("/api/documents");
+    if (existingDocumentsResponse.ok()) {
+      const existingDocuments = (await existingDocumentsResponse.json()) as {
+        data: Array<{ id: string; raw?: { storagePath?: string } }>;
+      };
+
+      for (const document of existingDocuments.data.filter((item) =>
+        item.raw?.storagePath?.startsWith("e2e/"),
+      )) {
+        await page.request.delete(`/api/documents/${document.id}`);
+      }
+    }
+
+    const title = uniqueName("E2E Evidencia");
+    const storagePath = `e2e/${Date.now()}-checkin.pdf`;
+    const documentResponse = await page.request.post("/api/documents", {
+      data: {
+        mimeType: "application/pdf",
+        propertyId: seedIds.propertyId,
+        reservationId: seedIds.reservationId,
+        storagePath,
+        title,
+      },
+    });
+    expect(documentResponse.status()).toBe(201);
+
+    const documentBody = (await documentResponse.json()) as {
+      data: { id: string };
+    };
+    const updatedTitle = `${title} editada`;
+    const updatedStoragePath = storagePath.replace(
+      "checkin.pdf",
+      "checkin-editado.pdf",
+    );
+    const documentPatchResponse = await page.request.patch(
+      `/api/documents/${documentBody.data.id}`,
+      {
+        data: {
+          incidentId: seedIds.incidentId,
+          mimeType: "application/pdf",
+          propertyId: seedIds.propertyId,
+          reservationId: seedIds.reservationId,
+          storagePath: updatedStoragePath,
+          title: updatedTitle,
+        },
+      },
+    );
+    expect(documentPatchResponse.status()).toBe(200);
+
+    await page.goto("/documents");
+    await expect(
+      page.getByRole("heading", { name: /evidencias operativas/i }),
+    ).toBeVisible();
+    await expect(page.getByText(updatedTitle)).toBeVisible();
+    await expect(page.getByText(updatedStoragePath)).toBeVisible();
+
+    const documentDeleteResponse = await page.request.delete(
+      `/api/documents/${documentBody.data.id}`,
+    );
+    expect(documentDeleteResponse.status()).toBe(200);
+
+    await page.goto("/documents");
+    await expect(page.getByText(updatedTitle)).not.toBeVisible();
+  });
 });

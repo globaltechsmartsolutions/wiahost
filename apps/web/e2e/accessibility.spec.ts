@@ -16,6 +16,7 @@ const routes: AccessibilityRoute[] = [
   { name: "automations", path: "/automations", requiresAuth: true },
   { name: "dashboard", path: "/dashboard", requiresAuth: true },
   { name: "calendar", path: "/calendar", requiresAuth: true },
+  { name: "documents", path: "/documents", requiresAuth: true },
   { name: "properties", path: "/properties", requiresAuth: true },
   { name: "new property", path: "/properties/new", requiresAuth: true },
   {

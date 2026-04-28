@@ -37,6 +37,12 @@
       "tests": ["critical", "data", "a11y", "visual"]
     },
     {
+      "path": "/documents",
+      "auth": "protected",
+      "primaryCheck": "Documents can be created, edited and deleted while staying linked to properties, reservations or incidents",
+      "tests": ["critical", "data", "a11y", "visual"]
+    },
+    {
       "path": "/guests",
       "auth": "protected",
       "primaryCheck": "Guest CRM lists Supabase guests, creates new guests, links to guest details and filters updated records",
