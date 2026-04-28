@@ -73,6 +73,6 @@ La UI combina datos demo con primeras integraciones reales:
 - Owners lee owner accounts, propiedades, reservas e incidencias desde Supabase con fallback demo.
 - Settings lee el perfil autenticado desde Supabase y permite actualizar nombre/telefono mediante Server Action.
 - Guests lee huespedes y reservas desde Supabase, permite alta mediante Server Action y expone API GET/POST.
-- Calendar reutiliza la matriz operativa real del dashboard y filtra propiedades archivadas para no contaminar la planificacion.
+- Calendar reutiliza la matriz operativa real del dashboard, filtra propiedades archivadas y permite crear bloqueos manuales mediante Server Action/API.
 
 La prioridad tecnica actual es conectar cada pantalla PMS a Supabase manteniendo RLS, validadores compartidos y tests.

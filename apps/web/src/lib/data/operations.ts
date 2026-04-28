@@ -195,6 +195,13 @@ type PropertyCalendarRow = {
   internal_name: string | null;
 };
 
+type CalendarBlockRow = {
+  end_date: string;
+  property_id: string;
+  reason: string;
+  start_date: string;
+};
+
 type AutomationRuleRow = {
   id: string;
   name: string;
@@ -485,6 +492,7 @@ function buildCalendarDays(): CalendarDay[] {
 }
 
 function buildCalendarMatrix(
+  blocks: CalendarBlockRow[],
   properties: PropertyCalendarRow[],
   reservations: ReservationRow[],
   days: CalendarDay[],
@@ -503,9 +511,15 @@ function buildCalendarMatrix(
           item.check_in <= dateKey &&
           item.check_out >= dateKey,
       );
+      const block = blocks.find(
+        (item) =>
+          item.property_id === property.id &&
+          item.start_date <= dateKey &&
+          item.end_date >= dateKey,
+      );
 
       if (!reservation) {
-        return "Libre";
+        return block ? `Bloqueo - ${block.reason}` : "Libre";
       }
 
       if (reservation.check_in === dateKey) {
@@ -1167,6 +1181,7 @@ export async function getDashboardData(): Promise<DashboardData> {
       automationRules,
       { data: properties },
       { data: calendarReservations },
+      { data: calendarBlocks },
     ] = await Promise.all([
       getReservations(),
       getInboxThreads(),
@@ -1183,10 +1198,16 @@ export async function getDashboardData(): Promise<DashboardData> {
         .from("reservations")
         .select("id,property_id,channel,status,check_in,check_out,total_amount")
         .limit(80),
+      supabase
+        .from("calendar_blocks")
+        .select("property_id,start_date,end_date,reason")
+        .order("created_at", { ascending: false })
+        .limit(100),
     ]);
 
     const calendarDays = buildCalendarDays();
     const calendarMatrix = buildCalendarMatrix(
+      (calendarBlocks ?? []) as CalendarBlockRow[],
       (properties ?? []) as PropertyCalendarRow[],
       (calendarReservations ?? []) as ReservationRow[],
       calendarDays,

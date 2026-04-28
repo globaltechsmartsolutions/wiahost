@@ -286,7 +286,7 @@ test.describe("operations flows with Supabase @critical @data", () => {
       page.getByRole("heading", { name: /liquidaciones/i }),
     ).toBeVisible();
     await expect(page.getByText("Carlos Propietario")).toBeVisible();
-    await expect(page.getByText("Atico Gran Via Sky")).toBeVisible();
+    await expect(page.getByText("Atico Gran Via Sky").last()).toBeVisible();
 
     await page.goto("/settings");
     await expect(page.locator("#email")).toHaveValue(
@@ -304,7 +304,7 @@ test.describe("operations flows with Supabase @critical @data", () => {
     await expect(page.locator("#phone")).toHaveValue(phone);
   });
 
-  test("creates a guest through the API and renders the real calendar matrix", async ({
+  test("creates a guest and calendar block through API routes", async ({
     page,
   }) => {
     const guestName = uniqueName("E2E Huesped");
@@ -323,10 +323,23 @@ test.describe("operations flows with Supabase @critical @data", () => {
     await expect(page.getByText(`Mostrando 1 de`)).toBeVisible();
     await expect(page.getByText(guestName)).toBeVisible();
 
+    const blockReason = uniqueName("Bloqueo E2E");
+    const blockResponse = await page.request.post("/api/calendar-blocks", {
+      data: {
+        endDate: isoDateFromToday(7),
+        propertyId: seedIds.propertyId,
+        reason: blockReason,
+        source: "manual",
+        startDate: isoDateFromToday(6),
+      },
+    });
+    expect(blockResponse.status()).toBe(201);
+
     await page.goto("/calendar");
     await expect(
       page.getByRole("heading", { name: /disponibilidad/i }),
     ).toBeVisible();
-    await expect(page.getByText("Atico Gran Via Sky")).toBeVisible();
+    await expect(page.getByText("Atico Gran Via Sky").last()).toBeVisible();
+    await expect(page.getByText(`Bloqueo - ${blockReason}`)).toBeVisible();
   });
 });

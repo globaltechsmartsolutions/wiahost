@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import {
   aiAuditLogSchema,
+  calendarBlockSchema,
   incidentSchema,
   loginSchema,
   manualReservationSchema,
@@ -124,6 +125,30 @@ describe("reservation validators", () => {
   });
 });
 
+describe("calendar validators", () => {
+  it("accepts manual calendar blocks with a valid date range", () => {
+    const parsed = calendarBlockSchema.safeParse({
+      endDate: "2026-05-08",
+      propertyId: uuid,
+      reason: "Mantenimiento preventivo",
+      startDate: "2026-05-07",
+    });
+
+    expect(parsed.success).toBe(true);
+  });
+
+  it("rejects calendar blocks whose end date is before the start date", () => {
+    const parsed = calendarBlockSchema.safeParse({
+      endDate: "2026-05-06",
+      propertyId: uuid,
+      reason: "Mantenimiento preventivo",
+      startDate: "2026-05-07",
+    });
+
+    expect(parsed.success).toBe(false);
+  });
+});
+
 describe("task validators", () => {
   it("accepts operational task priority values used by the database", () => {
     const parsed = taskSchema.safeParse({
@@ -208,7 +233,8 @@ describe("ai foundation validators", () => {
       route: "/dashboard",
       findingHash: "dashboard-cards-alignment-001",
       title: "Dashboard cards alignment",
-      description: "Keep dashboard cards aligned across desktop and laptop layouts.",
+      description:
+        "Keep dashboard cards aligned across desktop and laptop layouts.",
       severity: "medium",
     });
 

@@ -1,9 +1,20 @@
-import { getDashboardData } from "@/lib/data/operations";
 import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader } from "@/components/page-header";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { createCalendarBlockAction } from "@/lib/actions/calendar";
+import {
+  getDashboardData,
+  getOperationFormOptions,
+} from "@/lib/data/operations";
 
 export const dynamic = "force-dynamic";
+
+type CalendarPageProps = {
+  searchParams?: Promise<{ created?: string; error?: string }>;
+};
 
 function cellTone(value: string) {
   const normalized = value.toLowerCase();
@@ -27,8 +38,14 @@ function cellTone(value: string) {
   return "border-[#dfd2bf] bg-background/70 text-muted-foreground";
 }
 
-export default async function CalendarPage() {
-  const data = await getDashboardData();
+export default async function CalendarPage({
+  searchParams,
+}: CalendarPageProps) {
+  const [data, options, params] = await Promise.all([
+    getDashboardData(),
+    getOperationFormOptions(),
+    searchParams,
+  ]);
 
   return (
     <AppShell>
@@ -37,6 +54,63 @@ export default async function CalendarPage() {
         title="Disponibilidad, reservas y tareas en una parrilla operativa."
         description="Vista real de disponibilidad por propiedad, alimentada por reservas y preparada para bloqueos manuales y sincronizacion OTA."
       />
+
+      {params?.error ? (
+        <div className="rounded-3xl border border-destructive/30 bg-destructive/10 px-5 py-4 text-sm text-destructive">
+          {params.error}
+        </div>
+      ) : null}
+      {params?.created ? (
+        <div className="rounded-3xl border border-emerald-200 bg-emerald-50 px-5 py-4 text-sm text-emerald-800">
+          Bloqueo creado correctamente.
+        </div>
+      ) : null}
+
+      <Card className="rounded-[1.6rem] border-border/80 bg-card/80">
+        <CardContent className="p-4">
+          <form
+            action={createCalendarBlockAction}
+            className="grid gap-3 lg:grid-cols-[1fr_0.7fr_0.7fr_1fr_auto] lg:items-end"
+          >
+            <div className="grid gap-2">
+              <Label htmlFor="propertyId">Propiedad</Label>
+              <select
+                id="propertyId"
+                name="propertyId"
+                required
+                className="h-10 rounded-xl border border-input bg-background px-3 text-sm"
+              >
+                {options.properties.map((property) => (
+                  <option key={property.id} value={property.id}>
+                    {property.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="startDate">Desde</Label>
+              <Input id="startDate" name="startDate" type="date" required />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="endDate">Hasta</Label>
+              <Input id="endDate" name="endDate" type="date" required />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="reason">Motivo</Label>
+              <Input
+                id="reason"
+                name="reason"
+                placeholder="Mantenimiento, owner stay..."
+                required
+              />
+            </div>
+            <Button type="submit" className="rounded-full">
+              Crear bloqueo
+            </Button>
+          </form>
+        </CardContent>
+      </Card>
+
       <Card className="rounded-[2rem] border-border/80 bg-card/80">
         <CardContent className="p-0">
           <div className="overflow-x-auto">
