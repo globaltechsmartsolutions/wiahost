@@ -59,6 +59,7 @@
 
 ## Fase 5 - IA y automatizacion avanzada
 
+- Revision completa del material del Modulo 3 de IA aplicada a WIAHost.
 - Dataset historico de eventos, outcomes y feedback humano.
 - Feature engineering para pricing, reservas, tareas, incidencias e inbox.
 - Respuestas asistidas en inbox.
