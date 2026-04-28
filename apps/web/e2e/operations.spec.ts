@@ -303,4 +303,30 @@ test.describe("operations flows with Supabase @critical @data", () => {
     ).toBeVisible();
     await expect(page.locator("#phone")).toHaveValue(phone);
   });
+
+  test("creates a guest through the API and renders the real calendar matrix", async ({
+    page,
+  }) => {
+    const guestName = uniqueName("E2E Huesped");
+    const guestResponse = await page.request.post("/api/guests", {
+      data: {
+        email: `${guestName.toLowerCase().replaceAll(" ", ".")}@example.com`,
+        fullName: guestName,
+        notes: "Creado por Playwright para validar CRM de huespedes.",
+        phone: "+34611111111",
+        preferredLanguage: "es",
+      },
+    });
+    expect(guestResponse.status()).toBe(201);
+
+    await page.goto(`/guests?q=${encodeURIComponent(guestName)}`);
+    await expect(page.getByText(`Mostrando 1 de`)).toBeVisible();
+    await expect(page.getByText(guestName)).toBeVisible();
+
+    await page.goto("/calendar");
+    await expect(
+      page.getByRole("heading", { name: /disponibilidad/i }),
+    ).toBeVisible();
+    await expect(page.getByText("Atico Gran Via Sky")).toBeVisible();
+  });
 });

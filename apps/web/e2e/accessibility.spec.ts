@@ -14,6 +14,7 @@ const routes: AccessibilityRoute[] = [
   { name: "login", path: "/login" },
   { name: "register", path: "/register" },
   { name: "dashboard", path: "/dashboard", requiresAuth: true },
+  { name: "calendar", path: "/calendar", requiresAuth: true },
   { name: "properties", path: "/properties", requiresAuth: true },
   { name: "new property", path: "/properties/new", requiresAuth: true },
   {
@@ -38,6 +39,7 @@ const routes: AccessibilityRoute[] = [
     requiresAuth: true,
   },
   { name: "inbox", path: "/inbox", requiresAuth: true },
+  { name: "guests", path: "/guests", requiresAuth: true },
   { name: "tasks", path: "/tasks", requiresAuth: true },
   { name: "task detail", path: `/tasks/${seedIds.taskId}`, requiresAuth: true },
   {

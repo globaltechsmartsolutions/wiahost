@@ -20,6 +20,7 @@
 - Vitest must exclude Playwright specs.
 - Full edit forms for reservations, tasks and incidents must keep Server Actions and PATCH Route Handlers aligned so web and future mobile clients do not diverge.
 - Settings profile tests mutate the demo operator phone; tests must assert stable fields such as email/name and avoid changing demo identity labels used by visual checks.
+- Calendar data must exclude archived test properties; otherwise E2E-created archived assets can push real demo assets out of the visible matrix.
 
 ## Data
 

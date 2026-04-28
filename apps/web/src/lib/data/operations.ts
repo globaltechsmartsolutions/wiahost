@@ -1176,6 +1176,7 @@ export async function getDashboardData(): Promise<DashboardData> {
       supabase
         .from("properties")
         .select("id,name,internal_name")
+        .neq("status", "archived")
         .order("created_at", { ascending: false })
         .limit(4),
       supabase

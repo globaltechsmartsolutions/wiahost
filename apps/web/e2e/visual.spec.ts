@@ -320,4 +320,21 @@ test.describe("visual regression baseline @visual", () => {
       });
     }
   });
+
+  test("calendar and guests routes keep responsive density without desktop overflow", async ({
+    page,
+  }, testInfo) => {
+    await page.setViewportSize({ height: 768, width: 1366 });
+    await signInAsDemoOperator(page);
+
+    for (const route of ["/calendar", "/guests"]) {
+      await page.goto(route);
+      await prepareVisualPage(page);
+      await expectNoHorizontalOverflow(page);
+      await page.screenshot({
+        fullPage: false,
+        path: testInfo.outputPath(`${route.replace("/", "")}-density.png`),
+      });
+    }
+  });
 });

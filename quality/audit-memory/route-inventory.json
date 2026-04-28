@@ -25,6 +25,18 @@
       "tests": ["smoke", "visual", "a11y"]
     },
     {
+      "path": "/calendar",
+      "auth": "protected",
+      "primaryCheck": "Calendar matrix renders real active-property availability without page overflow",
+      "tests": ["critical", "data", "a11y", "visual"]
+    },
+    {
+      "path": "/guests",
+      "auth": "protected",
+      "primaryCheck": "Guest CRM lists Supabase guests, creates new guests and filters the new record",
+      "tests": ["critical", "data", "a11y", "visual"]
+    },
+    {
       "path": "/properties",
       "auth": "protected",
       "primaryCheck": "Property list exposes detail and edit actions",
