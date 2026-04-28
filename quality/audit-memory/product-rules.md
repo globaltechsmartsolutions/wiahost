@@ -22,6 +22,7 @@ These rules describe the quality bar WIAHost should preserve as the product grow
 - Multi-calendar must not show an internal horizontal scrollbar on standard desktop widths: 1366, 1440, 1536 and 1920 CSS pixels.
 - Responsive decisions must be validated against standard sizes, not only the developer's current monitor or browser zoom.
 - Laptop dashboards must not feel over-zoomed: metrics should fit four per row from standard laptop desktop widths and hero typography must stay compact enough for operations work.
+- The first dashboard viewport must prioritize operational density over marketing scale: compact sidebar, compact topbar, restrained hero and visible calendar context.
 - Mobile layouts must not create horizontal overflow.
 
 ## Forms

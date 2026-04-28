@@ -50,23 +50,23 @@ const navSections = [
 export function AppShell({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen bg-[#f6efe4] text-[#1b130b]">
-      <aside className="fixed inset-y-2 left-2 z-20 hidden w-64 flex-col overflow-hidden rounded-[1.7rem] border border-white/10 bg-[#160f09] text-white shadow-2xl 2xl:inset-y-3 2xl:left-3 2xl:w-72 2xl:rounded-[2rem] xl:flex">
-        <div className="border-b border-white/10 p-4 2xl:p-5">
-          <Link href="/" className="flex items-center gap-3">
-            <span className="flex size-10 items-center justify-center rounded-2xl bg-[#d8ff74] text-[#160f09] 2xl:size-12">
-              <Building2 className="size-5" />
+      <aside className="fixed inset-y-2 left-2 z-20 hidden w-56 flex-col overflow-hidden rounded-[1.45rem] border border-white/10 bg-[#160f09] text-white shadow-2xl 2xl:w-60 xl:flex">
+        <div className="border-b border-white/10 p-3.5">
+          <Link href="/" className="flex items-center gap-2.5">
+            <span className="flex size-9 items-center justify-center rounded-xl bg-[#d8ff74] text-[#160f09]">
+              <Building2 className="size-4" />
             </span>
             <span>
-              <span className="block text-lg font-semibold tracking-tight 2xl:text-xl">WIAHost</span>
-              <span className="block text-xs text-white/70">Hospitality command center</span>
+              <span className="block text-base font-semibold tracking-tight">WIAHost</span>
+              <span className="block text-[0.68rem] text-white/70">Hospitality command center</span>
             </span>
           </Link>
         </div>
 
-        <nav className="min-h-0 flex-1 space-y-4 overflow-y-auto p-3.5 [-ms-overflow-style:none] [scrollbar-width:none] 2xl:space-y-5 2xl:p-4 [&::-webkit-scrollbar]:hidden">
+        <nav className="min-h-0 flex-1 space-y-3.5 overflow-y-auto p-3 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {navSections.map((section) => (
             <div key={section.title}>
-              <p className="px-3 text-[0.68rem] font-semibold uppercase tracking-[0.24em] text-white/65">
+              <p className="px-2.5 text-[0.62rem] font-semibold uppercase tracking-[0.22em] text-white/65">
                 {section.title}
               </p>
               <div className="mt-2 grid gap-1">
@@ -74,9 +74,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                   <Link
                     key={item.href}
                     href={item.href}
-                    className="group flex items-center gap-3 rounded-2xl px-3 py-2 text-sm font-medium text-white/68 transition hover:bg-white/10 hover:text-white 2xl:py-2.5"
+                    className="group flex items-center gap-2.5 rounded-xl px-2.5 py-1.5 text-[0.8rem] font-medium text-white/68 transition hover:bg-white/10 hover:text-white"
                   >
-                    <item.icon className="size-4 text-white/40 transition group-hover:text-[#d8ff74]" />
+                    <item.icon className="size-3.5 text-white/40 transition group-hover:text-[#d8ff74]" />
                     {item.label}
                   </Link>
                 ))}
@@ -85,22 +85,22 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           ))}
         </nav>
 
-        <div className="p-2.5 2xl:p-3">
-          <div className="rounded-[1.35rem] border border-[#d8ff74]/25 bg-[#d8ff74]/10 p-3 2xl:rounded-[1.5rem] 2xl:p-3.5">
+        <div className="p-2.5">
+          <div className="rounded-[1.2rem] border border-[#d8ff74]/25 bg-[#d8ff74]/10 p-2.5">
             <div className="flex items-center gap-2 text-[#d8ff74]">
-              <BarChart3 className="size-4" />
-              <p className="text-sm font-semibold">Portfolio health</p>
+              <BarChart3 className="size-3.5" />
+              <p className="text-xs font-semibold">Portfolio health</p>
             </div>
-            <p className="mt-2 text-2xl font-semibold 2xl:text-3xl">92%</p>
-            <p className="mt-1 text-xs leading-5 text-white/70">
+            <p className="mt-1.5 text-2xl font-semibold">92%</p>
+            <p className="mt-1 text-[0.68rem] leading-4 text-white/70">
               Canales sincronizados, SLA de mensajes y tareas críticas bajo control.
             </p>
           </div>
         </div>
       </aside>
 
-      <div className="xl:pl-[17rem] 2xl:pl-[19rem]">
-        <header className="sticky top-0 z-10 border-b border-[#dfd2bf] bg-[#f6efe4]/86 px-4 py-2.5 backdrop-blur-xl lg:px-6 2xl:px-8 2xl:py-3">
+      <div className="xl:pl-[15rem] 2xl:pl-[15.5rem]">
+        <header className="sticky top-0 z-10 border-b border-[#dfd2bf] bg-[#f6efe4]/86 px-4 py-2 backdrop-blur-xl lg:px-5">
           <div className="mx-auto flex max-w-[1500px] items-center gap-3">
             <Link href="/" className="flex items-center gap-2 font-semibold xl:hidden">
               <span className="flex size-9 items-center justify-center rounded-xl bg-[#160f09] text-white">
@@ -112,7 +112,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-[#75695b]" />
               <Input
                 aria-label="Buscar reserva, huesped, propiedad, canal o tarea"
-                className="h-10 rounded-full border-[#dfd2bf] bg-white/70 pl-9 shadow-sm 2xl:h-11"
+                className="h-9 rounded-full border-[#dfd2bf] bg-white/70 pl-9 text-sm shadow-sm"
                 placeholder="Buscar reserva, huésped, propiedad, canal o tarea..."
               />
             </div>
@@ -127,7 +127,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               <span className="sr-only">Abrir notificaciones</span>
             </Button>
             <div className="hidden text-right sm:block">
-              <p className="text-sm font-semibold">Laura Operaciones</p>
+              <p className="text-sm font-semibold leading-4">Laura Operaciones</p>
               <p className="text-xs text-[#75695b]">Admin demo · WIA</p>
             </div>
             <form action={signOutAction} className="hidden sm:block">
@@ -137,7 +137,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             </form>
           </div>
         </header>
-        <main className="mx-auto max-w-[1500px] px-4 py-5 lg:px-6 2xl:px-8 2xl:py-6">{children}</main>
+        <main className="mx-auto max-w-[1500px] px-4 py-4 lg:px-5">{children}</main>
       </div>
     </div>
   );

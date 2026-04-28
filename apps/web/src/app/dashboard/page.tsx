@@ -28,14 +28,14 @@ function MetricTile({ metric }: { metric: ExecutiveMetric }) {
         : "bg-[#efe3cf] text-[#3a2a18]";
 
   return (
-    <Card className="h-full rounded-[1.45rem] border-[#dfd2bf] bg-white/72 py-3 shadow-sm">
-      <CardContent className="px-4 py-3">
+    <Card className="h-full rounded-[1.25rem] border-[#dfd2bf] bg-white/72 py-2 shadow-sm">
+      <CardContent className="px-3.5 py-2.5">
         <div className="flex items-start justify-between gap-3">
-          <p className="text-[0.64rem] font-semibold uppercase tracking-[0.16em] text-[#75695b] 2xl:tracking-[0.2em]">{metric.label}</p>
-          <span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${tone}`}>Live</span>
+          <p className="text-[0.58rem] font-semibold uppercase tracking-[0.14em] text-[#75695b]">{metric.label}</p>
+          <span className={`rounded-full px-2 py-0.5 text-[0.68rem] font-semibold ${tone}`}>Live</span>
         </div>
-        <p className="mt-4 text-3xl font-semibold tracking-[-0.04em] 2xl:text-4xl">{metric.value}</p>
-        <p className="mt-2 text-sm text-[#75695b]">{metric.helper}</p>
+        <p className="mt-3 text-2xl font-semibold tracking-[-0.04em]">{metric.value}</p>
+        <p className="mt-1.5 text-xs text-[#75695b]">{metric.helper}</p>
       </CardContent>
     </Card>
   );
@@ -53,7 +53,7 @@ function CalendarCell({ value }: { value: string }) {
           : "border-[#dfd2bf] bg-white/60 text-[#75695b]";
 
   return (
-    <div className={`min-h-16 rounded-2xl border px-2.5 py-2 text-xs font-semibold leading-5 ${tone}`}>
+    <div className={`min-h-12 rounded-xl border px-2 py-1.5 text-[0.7rem] font-semibold leading-4 ${tone}`}>
       {value}
     </div>
   );
@@ -74,31 +74,31 @@ export default async function DashboardPage() {
 
   return (
     <AppShell>
-      <section className="relative overflow-hidden rounded-[1.8rem] border border-[#dfd2bf] bg-[#160f09] p-5 text-white shadow-2xl 2xl:rounded-[2.2rem] 2xl:p-7">
-        <div className="absolute -right-24 -top-24 size-72 rounded-full bg-[#d8ff74]/20 blur-3xl" />
-        <div className="relative flex flex-col gap-5 xl:flex-row xl:items-end xl:justify-between">
+      <section className="relative overflow-hidden rounded-[1.45rem] border border-[#dfd2bf] bg-[#160f09] p-4 text-white shadow-xl">
+        <div className="absolute -right-24 -top-24 size-56 rounded-full bg-[#d8ff74]/20 blur-3xl" />
+        <div className="relative flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
           <div>
-            <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/8 px-3 py-1.5 text-sm text-white/70">
-              <Radio className="size-4 text-[#d8ff74]" />
+            <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/8 px-2.5 py-1 text-xs text-white/70">
+              <Radio className="size-3.5 text-[#d8ff74]" />
               Centro de mando en tiempo real
             </div>
             <h1
-              className="max-w-4xl text-balance text-[clamp(2.35rem,3.15vw,3.9rem)] font-semibold leading-[0.96] tracking-[-0.055em]"
+              className="max-w-4xl text-balance text-[clamp(1.75rem,2.2vw,2.75rem)] font-semibold leading-[0.96] tracking-[-0.05em]"
               data-testid="dashboard-hero-title"
             >
               Prioridades, reservas y canales sincronizados en una sola pantalla.
             </h1>
-            <p className="mt-4 max-w-3xl text-pretty text-base leading-7 text-white/62">
+            <p className="mt-3 max-w-3xl text-pretty text-sm leading-6 text-white/62">
               Diseñado para operar como un PMS profesional: multi-calendario, inbox priorizado, tareas,
               salud de canales, revenue y automatizaciones antes de que haya una incidencia.
             </p>
           </div>
-          <div className="grid min-w-[260px] gap-3 rounded-[1.5rem] border border-white/10 bg-white/8 p-4">
+          <div className="grid min-w-[240px] gap-2.5 rounded-[1.25rem] border border-white/10 bg-white/8 p-3">
             <div className="flex items-center justify-between">
-              <span className="text-sm text-white/60">Estado global</span>
-              <span className="rounded-full bg-[#d8ff74] px-3 py-1 text-xs font-bold text-[#160f09]">92% healthy</span>
+              <span className="text-xs text-white/60">Estado global</span>
+              <span className="rounded-full bg-[#d8ff74] px-2.5 py-0.5 text-[0.68rem] font-bold text-[#160f09]">92% healthy</span>
             </div>
-            <div className="h-2 overflow-hidden rounded-full bg-white/10">
+            <div className="h-1.5 overflow-hidden rounded-full bg-white/10">
               <div className="h-full w-[92%] rounded-full bg-[#d8ff74]" />
             </div>
             <p className="text-xs leading-5 text-white/70">2 mensajes urgentes · 1 canal requiere revisión · 5 tareas críticas.</p>
@@ -107,7 +107,7 @@ export default async function DashboardPage() {
       </section>
 
       <section
-        className="dashboard-grid mt-5"
+        className="dashboard-grid mt-3"
         data-testid="dashboard-content-grid"
       >
         {executiveMetrics.map((metric) => (
@@ -116,18 +116,18 @@ export default async function DashboardPage() {
           </div>
         ))}
         <Card
-          className="dashboard-full dashboard-wide-8 flex h-full overflow-hidden rounded-[1.7rem] border-[#dfd2bf] bg-white/74 shadow-sm 2xl:rounded-[2rem]"
+          className="dashboard-full dashboard-wide-8 flex h-full overflow-hidden rounded-[1.45rem] border-[#dfd2bf] bg-white/74 py-3 shadow-sm"
           data-testid="dashboard-calendar-card"
         >
-          <CardHeader className="flex flex-row items-center justify-between border-b border-[#eadfce]">
+          <CardHeader className="flex flex-row items-center justify-between border-b border-[#eadfce] px-4 py-2.5">
             <div>
-              <CardTitle className="flex items-center gap-2 text-xl">
-                <CalendarDays className="size-5" />
+              <CardTitle className="flex items-center gap-2 text-lg">
+                <CalendarDays className="size-4" />
                 Multi-calendario operativo
               </CardTitle>
-              <p className="mt-1 text-sm text-[#75695b]">Disponibilidad, reservas, limpiezas y bloqueos por activo.</p>
+              <p className="mt-0.5 text-xs text-[#75695b]">Disponibilidad, reservas, limpiezas y bloqueos por activo.</p>
             </div>
-            <Button variant="outline" className="rounded-full border-[#dfd2bf] bg-white" asChild>
+            <Button variant="outline" size="sm" className="h-8 rounded-full border-[#dfd2bf] bg-white text-xs" asChild>
               <Link href="/calendar">Abrir vista completa</Link>
             </Button>
           </CardHeader>
@@ -141,22 +141,22 @@ export default async function DashboardPage() {
             >
               <div className="dashboard-calendar-inner">
                 <div className="dashboard-calendar-row grid border-b border-[#eadfce] bg-[#fbf7ef]">
-                  <div className="px-5 py-4 text-xs font-semibold uppercase tracking-[0.22em] text-[#75695b]">Propiedad</div>
+                  <div className="px-4 py-2.5 text-[0.65rem] font-semibold uppercase tracking-[0.2em] text-[#75695b]">Propiedad</div>
                   {calendarDays.map((day) => (
-                    <div key={day.date} className="border-l border-[#eadfce] px-3 py-4 text-center">
-                      <p className="text-xs text-[#75695b]">{day.day}</p>
-                      <p className="text-xl font-semibold 2xl:text-2xl">{day.date}</p>
+                    <div key={day.date} className="border-l border-[#eadfce] px-2.5 py-2.5 text-center">
+                      <p className="text-[0.68rem] text-[#75695b]">{day.day}</p>
+                      <p className="text-lg font-semibold">{day.date}</p>
                     </div>
                   ))}
                 </div>
                 {calendarMatrix.map((row) => (
                   <div key={row.code} className="dashboard-calendar-row grid border-b border-[#eadfce] last:border-b-0">
-                    <div className="px-5 py-3.5">
-                      <p className="font-semibold">{row.property}</p>
+                    <div className="px-4 py-2.5">
+                      <p className="text-sm font-semibold">{row.property}</p>
                       <p className="mt-1 font-mono text-xs text-[#75695b]">{row.code}</p>
                     </div>
                     {row.cells.map((cell, index) => (
-                      <div key={`${row.code}-${calendarDays[index].date}`} className="border-l border-[#eadfce] p-1.5">
+                      <div key={`${row.code}-${calendarDays[index].date}`} className="border-l border-[#eadfce] p-1">
                         <CalendarCell value={cell} />
                       </div>
                     ))}
@@ -164,8 +164,8 @@ export default async function DashboardPage() {
                 ))}
               </div>
             </div>
-            <div className="flex flex-wrap items-center justify-between gap-3 border-t border-[#eadfce] bg-[#fbf7ef] px-5 py-3">
-              <div className="flex flex-wrap gap-2 text-xs font-medium text-[#75695b]">
+            <div className="flex flex-wrap items-center justify-between gap-2 border-t border-[#eadfce] bg-[#fbf7ef] px-4 py-2">
+              <div className="flex flex-wrap gap-1.5 text-xs font-medium text-[#75695b]">
                 <span className="rounded-full border border-emerald-300 bg-emerald-50 px-3 py-1 text-emerald-800">Check-in</span>
                 <span className="rounded-full border border-blue-300 bg-blue-50 px-3 py-1 text-blue-800">Check-out</span>
                 <span className="rounded-full border border-[#d6c4a8] bg-[#efe3cf] px-3 py-1 text-[#3a2a18]">Ocupado</span>

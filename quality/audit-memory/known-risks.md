@@ -4,6 +4,7 @@
 
 - Dashboard cards can become uneven when new metrics are added.
 - Dashboard can feel over-zoomed on laptops if metrics fall back to two columns or hero typography uses desktop-large sizes too early.
+- Dashboard can accidentally become a landing page if hero/card spacing grows; first viewport must stay dense enough for operations.
 - Dashboard gutters can drift if each row creates its own independent grid; keep dashboard content on a shared 12-column grid.
 - Dashboard rows can create visible beige gaps when one column is taller than the other; keep paired cards stretched and bottom-aligned.
 - The multi-calendar can overflow horizontally on laptop widths if the dense 12-column dashboard layout activates too early.
