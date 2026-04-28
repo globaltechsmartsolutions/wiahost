@@ -131,3 +131,59 @@
     @apply font-sans;
   }
 }
+
+@layer components {
+  .dashboard-grid {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .dashboard-calendar-inner {
+    min-width: 860px;
+  }
+
+  .dashboard-calendar-row {
+    grid-template-columns: 180px repeat(7, minmax(0, 1fr));
+  }
+
+  @media (min-width: 48rem) {
+    .dashboard-grid {
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+    }
+
+    .dashboard-span-3 {
+      grid-column: span 3 / span 3;
+    }
+
+    .dashboard-span-6 {
+      grid-column: span 6 / span 6;
+    }
+  }
+
+  @media (min-width: 112.5rem) {
+    .dashboard-grid {
+      gap: 1.25rem;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+    }
+
+    .dashboard-wide-3 {
+      grid-column: span 3 / span 3;
+    }
+
+    .dashboard-wide-4 {
+      grid-column: span 4 / span 4;
+    }
+
+    .dashboard-wide-8 {
+      grid-column: span 8 / span 8;
+    }
+
+    .dashboard-calendar-inner {
+      min-width: 920px;
+    }
+
+    .dashboard-calendar-row {
+      grid-template-columns: 210px repeat(7, minmax(0, 1fr));
+    }
+  }
+}

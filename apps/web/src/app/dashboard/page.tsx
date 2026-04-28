@@ -104,16 +104,16 @@ export default async function DashboardPage() {
       </section>
 
       <section
-        className="mt-5 grid gap-5 md:grid-cols-6 xl:grid-cols-12"
+        className="dashboard-grid mt-5"
         data-testid="dashboard-content-grid"
       >
         {executiveMetrics.map((metric) => (
-          <div key={metric.label} className="md:col-span-3 xl:col-span-3">
+          <div key={metric.label} className="dashboard-span-3 dashboard-wide-3">
             <MetricTile metric={metric} />
           </div>
         ))}
         <Card
-          className="flex h-full overflow-hidden rounded-[2rem] border-[#dfd2bf] bg-white/74 shadow-sm md:col-span-6 xl:col-span-8"
+          className="dashboard-span-6 dashboard-wide-8 flex h-full overflow-hidden rounded-[2rem] border-[#dfd2bf] bg-white/74 shadow-sm"
           data-testid="dashboard-calendar-card"
         >
           <CardHeader className="flex flex-row items-center justify-between border-b border-[#eadfce]">
@@ -132,11 +132,12 @@ export default async function DashboardPage() {
             <div
               aria-label="Multi-calendario operativo por propiedad"
               className="overflow-x-auto"
+              data-testid="dashboard-calendar-scroll"
               role="region"
               tabIndex={0}
             >
-              <div className="min-w-[920px]">
-                <div className="grid grid-cols-[210px_repeat(7,1fr)] border-b border-[#eadfce] bg-[#fbf7ef]">
+              <div className="dashboard-calendar-inner">
+                <div className="dashboard-calendar-row grid border-b border-[#eadfce] bg-[#fbf7ef]">
                   <div className="px-5 py-4 text-xs font-semibold uppercase tracking-[0.22em] text-[#75695b]">Propiedad</div>
                   {calendarDays.map((day) => (
                     <div key={day.date} className="border-l border-[#eadfce] px-3 py-4 text-center">
@@ -146,7 +147,7 @@ export default async function DashboardPage() {
                   ))}
                 </div>
                 {calendarMatrix.map((row) => (
-                  <div key={row.code} className="grid grid-cols-[210px_repeat(7,1fr)] border-b border-[#eadfce] last:border-b-0">
+                  <div key={row.code} className="dashboard-calendar-row grid border-b border-[#eadfce] last:border-b-0">
                     <div className="px-5 py-3.5">
                       <p className="font-semibold">{row.property}</p>
                       <p className="mt-1 font-mono text-xs text-[#75695b]">{row.code}</p>
@@ -175,7 +176,7 @@ export default async function DashboardPage() {
         </Card>
 
         <Card
-          className="flex h-full flex-col rounded-[2rem] border-[#dfd2bf] bg-white/74 shadow-sm md:col-span-6 xl:col-span-4"
+          className="dashboard-span-6 dashboard-wide-4 flex h-full flex-col rounded-[2rem] border-[#dfd2bf] bg-white/74 shadow-sm"
           data-testid="dashboard-priority-card"
         >
           <CardHeader className="pb-3">
@@ -207,7 +208,7 @@ export default async function DashboardPage() {
           </CardContent>
         </Card>
 
-        <Card className="h-full rounded-[2rem] border-[#dfd2bf] bg-white/74 shadow-sm md:col-span-3 xl:col-span-4">
+        <Card className="dashboard-span-3 dashboard-wide-4 h-full rounded-[2rem] border-[#dfd2bf] bg-white/74 shadow-sm">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Inbox className="size-5" />
@@ -230,7 +231,7 @@ export default async function DashboardPage() {
           </CardContent>
         </Card>
 
-        <Card className="h-full rounded-[2rem] border-[#dfd2bf] bg-white/74 shadow-sm md:col-span-3 xl:col-span-4">
+        <Card className="dashboard-span-3 dashboard-wide-4 h-full rounded-[2rem] border-[#dfd2bf] bg-white/74 shadow-sm">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <CircleDollarSign className="size-5" />
@@ -256,7 +257,7 @@ export default async function DashboardPage() {
           </CardContent>
         </Card>
 
-        <Card className="h-full rounded-[2rem] border-[#dfd2bf] bg-white/74 shadow-sm md:col-span-6 xl:col-span-4">
+        <Card className="dashboard-span-6 dashboard-wide-4 h-full rounded-[2rem] border-[#dfd2bf] bg-white/74 shadow-sm">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Sparkles className="size-5" />
@@ -277,7 +278,7 @@ export default async function DashboardPage() {
           </CardContent>
         </Card>
 
-        <Card className="h-full rounded-[2rem] border-[#dfd2bf] bg-white/74 shadow-sm md:col-span-6 xl:col-span-4">
+        <Card className="dashboard-span-6 dashboard-wide-4 h-full rounded-[2rem] border-[#dfd2bf] bg-white/74 shadow-sm">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Wrench className="size-5" />
@@ -297,7 +298,7 @@ export default async function DashboardPage() {
           </CardContent>
         </Card>
 
-        <Card className="h-full rounded-[2rem] border-[#dfd2bf] bg-white/74 shadow-sm md:col-span-6 xl:col-span-8">
+        <Card className="dashboard-span-6 dashboard-wide-8 h-full rounded-[2rem] border-[#dfd2bf] bg-white/74 shadow-sm">
           <CardHeader>
             <CardTitle>Reservas que mueven la operación</CardTitle>
           </CardHeader>

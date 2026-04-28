@@ -19,6 +19,8 @@ These rules describe the quality bar WIAHost should preserve as the product grow
 - If one card has more content than its neighbor, the neighbor should stretch as a card, not leave an external hole in the page background.
 - Sidebar must never show a stray native scrollbar in normal desktop viewport.
 - Multi-calendar must not leave awkward dead space below its rows.
+- Multi-calendar must not show an internal horizontal scrollbar on standard desktop widths: 1366, 1440, 1536 and 1920 CSS pixels.
+- Responsive decisions must be validated against standard sizes, not only the developer's current monitor or browser zoom.
 - Mobile layouts must not create horizontal overflow.
 
 ## Forms

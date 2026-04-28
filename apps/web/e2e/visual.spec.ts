@@ -26,6 +26,14 @@ async function expectNoHorizontalOverflow(page: Page) {
   expect(hasOverflow).toBe(false);
 }
 
+async function expectNoElementHorizontalOverflow(page: Page, testId: string) {
+  const hasOverflow = await page.getByTestId(testId).evaluate((element) => {
+    return element.scrollWidth > element.clientWidth + 1;
+  });
+
+  expect(hasOverflow).toBe(false);
+}
+
 async function expectBottomAligned(page: Page, firstTestId: string, secondTestId: string) {
   const first = await page.getByTestId(firstTestId).boundingBox();
   const second = await page.getByTestId(secondTestId).boundingBox();
@@ -141,16 +149,35 @@ test.describe("visual regression baseline @visual", () => {
   });
 
   test("dashboard viewport has no desktop overflow", async ({ page }, testInfo) => {
-    await page.setViewportSize({ height: 900, width: 1440 });
+    await page.setViewportSize({ height: 900, width: 1920 });
     await signInAsDemoOperator(page);
     await page.goto("/dashboard");
     await prepareVisualPage(page);
     await expectNoHorizontalOverflow(page);
+    await expectNoElementHorizontalOverflow(page, "dashboard-calendar-scroll");
     await expectBottomAligned(page, "dashboard-calendar-card", "dashboard-priority-card");
     await expectDashboardGridGaps(page);
     await page.screenshot({
       fullPage: true,
       path: testInfo.outputPath("dashboard-current.png"),
     });
+  });
+
+  test("dashboard standard desktop sizes avoid cramped calendar scrollbars", async ({ page }) => {
+    await signInAsDemoOperator(page);
+
+    for (const viewport of [
+      { height: 768, width: 1366 },
+      { height: 900, width: 1440 },
+      { height: 900, width: 1536 },
+      { height: 1080, width: 1920 },
+    ]) {
+      await page.setViewportSize(viewport);
+      await page.goto("/dashboard");
+      await prepareVisualPage(page);
+      await expectNoHorizontalOverflow(page);
+      await expectNoElementHorizontalOverflow(page, "dashboard-calendar-scroll");
+      await expectDashboardGridGaps(page);
+    }
   });
 });

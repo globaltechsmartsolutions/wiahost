@@ -5,7 +5,7 @@
 - Dashboard cards can become uneven when new metrics are added.
 - Dashboard gutters can drift if each row creates its own independent grid; keep dashboard content on a shared 12-column grid.
 - Dashboard rows can create visible beige gaps when one column is taller than the other; keep paired cards stretched and bottom-aligned.
-- The multi-calendar can overflow horizontally on laptop widths.
+- The multi-calendar can overflow horizontally on laptop widths if the dense 12-column dashboard layout activates too early.
 - Sidebar scrolling can show unwanted native scrollbars.
 - Dark command-center cards can introduce contrast issues if text opacity is too low.
 - Spanish copy with accented characters must be checked because mojibake has appeared in several files.
