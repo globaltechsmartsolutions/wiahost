@@ -13,6 +13,8 @@ export const navigationItems: NavigationItem[] = [
   { label: "Ajustes", href: "/settings" },
 ];
 
+export const channelChips = ["Airbnb", "Booking.com", "Vrbo", "Expedia", "Google", "Directo"];
+
 export const dashboardMetrics: DashboardMetric[] = [
   { label: "Ocupación", value: "94%", helper: "Próximos 30 días", trend: "+8%" },
   { label: "Ingresos", value: "42.850 €", helper: "Abril confirmado", trend: "+12%" },
@@ -20,6 +22,13 @@ export const dashboardMetrics: DashboardMetric[] = [
   { label: "Mensajes", value: "2", helper: "Sin respuesta urgente", trend: "-4" },
   { label: "Check-ins hoy", value: "7", helper: "3 pendientes de código", trend: "Hoy" },
   { label: "Tareas críticas", value: "5", helper: "Limpieza y mantenimiento", trend: "+2" },
+];
+
+export const executiveMetrics = [
+  { label: "Reservas activas", value: "128", helper: "Abril · 42 propiedades", tone: "neutral" },
+  { label: "RevPAR", value: "154 €", helper: "+11% vs mes anterior", tone: "positive" },
+  { label: "SLA inbox", value: "7m", helper: "Respuesta media", tone: "positive" },
+  { label: "Riesgo operativo", value: "5", helper: "Acciones antes de check-in", tone: "warning" },
 ];
 
 export const properties = [
@@ -58,6 +67,13 @@ export const properties = [
   },
 ];
 
+export const channelHealth = [
+  { channel: "Airbnb", bookings: 54, revenue: "18.420 €", sync: "Sincronizado", health: 98 },
+  { channel: "Booking.com", bookings: 38, revenue: "12.760 €", sync: "Sincronizado", health: 96 },
+  { channel: "Directo", bookings: 21, revenue: "7.480 €", sync: "Motor activo", health: 91 },
+  { channel: "Vrbo", bookings: 15, revenue: "4.190 €", sync: "Revisar tarifa", health: 82 },
+];
+
 export const reservations = [
   {
     id: "res-1028",
@@ -88,6 +104,37 @@ export const reservations = [
   },
 ];
 
+export const operationQueue = [
+  {
+    label: "Responder a Sofía Martín",
+    description: "Check-in autónomo · Airbnb · llegada 19:30",
+    type: "Inbox",
+    priority: "Urgente",
+    due: "20 min",
+  },
+  {
+    label: "Validar código smart lock",
+    description: "Ático Gran Vía Sky · reserva res-1028",
+    type: "Acceso",
+    priority: "Alta",
+    due: "Hoy 18:30",
+  },
+  {
+    label: "Asignar técnico AC",
+    description: "Loft Málaga Centro · incidencia abierta",
+    type: "Mantenimiento",
+    priority: "Media",
+    due: "Hoy 18:00",
+  },
+  {
+    label: "Aprobar payout propietario",
+    description: "WIA Demo Assets · cierre mensual",
+    type: "Finanzas",
+    priority: "Pendiente",
+    due: "Viernes",
+  },
+];
+
 export const tasks = [
   {
     title: "Preparar Ático Gran Vía",
@@ -113,6 +160,12 @@ export const tasks = [
     due: "Hoy · 18:30",
     priority: "Alta",
   },
+];
+
+export const automationRules = [
+  { name: "Instrucciones 24h antes", trigger: "Check-in 24h", status: "Activa", impact: "38 mensajes/mes" },
+  { name: "Código smart lock 1h antes", trigger: "Check-in 1h", status: "Activa", impact: "7 hoy" },
+  { name: "Aviso limpieza post check-out", trigger: "Checkout", status: "Activa", impact: "11 tareas" },
 ];
 
 export const inboxThreads = [
@@ -167,4 +220,22 @@ export const calendarDays = [
   { day: "Vie", date: "01", events: ["Check-in Valencia"] },
   { day: "Sáb", date: "02", events: ["Check-out Madrid"] },
   { day: "Dom", date: "03", events: ["Bloqueo mantenimiento"] },
+];
+
+export const calendarMatrix = [
+  {
+    property: "Ático Gran Vía Sky",
+    code: "MAD-GV-01",
+    cells: ["Libre", "Libre", "Check-in · Airbnb", "Ocupado", "Ocupado", "Check-out", "Limpieza"],
+  },
+  {
+    property: "Loft Málaga Centro",
+    code: "AGP-CT-02",
+    cells: ["Ocupado", "Check-in · Directo", "Ocupado", "Check-out", "Limpieza", "Libre", "Libre"],
+  },
+  {
+    property: "Sea View Valencia",
+    code: "VLC-SEA-03",
+    cells: ["Limpieza", "Libre", "Libre", "Libre", "Check-in · Booking", "Ocupado", "Bloqueo"],
+  },
 ];

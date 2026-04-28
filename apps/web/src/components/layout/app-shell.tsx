@@ -1,64 +1,135 @@
 import Link from "next/link";
-import { Bell, Building2, Search } from "lucide-react";
+import {
+  BarChart3,
+  Bell,
+  Building2,
+  CalendarDays,
+  ClipboardCheck,
+  Home,
+  Inbox,
+  KeyRound,
+  Landmark,
+  MessageSquareWarning,
+  Search,
+  Settings,
+  Users,
+} from "lucide-react";
 
-import { navigationItems } from "@/lib/demo-data";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
+const navSections = [
+  {
+    title: "Control",
+    items: [
+      { label: "Dashboard", href: "/dashboard", icon: Home },
+      { label: "Calendario", href: "/calendar", icon: CalendarDays },
+      { label: "Reservas", href: "/reservations", icon: ClipboardCheck },
+      { label: "Inbox", href: "/inbox", icon: Inbox },
+    ],
+  },
+  {
+    title: "Operación",
+    items: [
+      { label: "Propiedades", href: "/properties", icon: Building2 },
+      { label: "Huéspedes", href: "/guests", icon: Users },
+      { label: "Tareas", href: "/tasks", icon: KeyRound },
+      { label: "Incidencias", href: "/incidents", icon: MessageSquareWarning },
+    ],
+  },
+  {
+    title: "Negocio",
+    items: [
+      { label: "Propietarios", href: "/owners", icon: Landmark },
+      { label: "Ajustes", href: "/settings", icon: Settings },
+    ],
+  },
+];
+
 export function AppShell({ children }: { children: React.ReactNode }) {
   return (
-    <div className="min-h-screen bg-background">
-      <aside className="fixed inset-y-4 left-4 z-20 hidden w-64 flex-col rounded-[2rem] border border-border/80 bg-card/90 p-4 shadow-xl backdrop-blur xl:flex">
-        <Link href="/" className="flex items-center gap-3 rounded-2xl px-3 py-2">
-          <span className="flex size-11 items-center justify-center rounded-2xl bg-primary text-primary-foreground">
-            <Building2 className="size-5" />
-          </span>
-          <span>
-            <span className="block text-lg font-semibold tracking-tight">WIAHost</span>
-            <span className="block text-xs text-muted-foreground">PMS/CRM operativo</span>
-          </span>
-        </Link>
+    <div className="min-h-screen bg-[#f6efe4] text-[#1b130b]">
+      <aside className="fixed inset-y-3 left-3 z-20 hidden w-72 flex-col overflow-hidden rounded-[2rem] border border-white/10 bg-[#160f09] text-white shadow-2xl xl:flex">
+        <div className="border-b border-white/10 p-5">
+          <Link href="/" className="flex items-center gap-3">
+            <span className="flex size-12 items-center justify-center rounded-2xl bg-[#d8ff74] text-[#160f09]">
+              <Building2 className="size-5" />
+            </span>
+            <span>
+              <span className="block text-xl font-semibold tracking-tight">WIAHost</span>
+              <span className="block text-xs text-white/55">Hospitality command center</span>
+            </span>
+          </Link>
+        </div>
 
-        <nav className="mt-8 grid gap-1">
-          {navigationItems.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className="rounded-2xl px-3 py-2 text-sm font-medium text-muted-foreground transition hover:bg-muted hover:text-foreground"
-            >
-              {item.label}
-            </Link>
+        <nav className="flex-1 space-y-6 overflow-y-auto p-4">
+          {navSections.map((section) => (
+            <div key={section.title}>
+              <p className="px-3 text-[0.68rem] font-semibold uppercase tracking-[0.24em] text-white/35">
+                {section.title}
+              </p>
+              <div className="mt-2 grid gap-1">
+                {section.items.map((item) => (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className="group flex items-center gap-3 rounded-2xl px-3 py-2.5 text-sm font-medium text-white/68 transition hover:bg-white/10 hover:text-white"
+                  >
+                    <item.icon className="size-4 text-white/40 transition group-hover:text-[#d8ff74]" />
+                    {item.label}
+                  </Link>
+                ))}
+              </div>
+            </div>
           ))}
         </nav>
 
-        <div className="mt-auto rounded-3xl border border-border/80 bg-background/60 p-4">
-          <p className="text-sm font-medium">Modo demo</p>
-          <p className="mt-1 text-xs leading-5 text-muted-foreground">
-            Datos preparados para validar producto antes de conectar canales reales.
-          </p>
+        <div className="p-4">
+          <div className="rounded-[1.5rem] border border-[#d8ff74]/25 bg-[#d8ff74]/10 p-4">
+            <div className="flex items-center gap-2 text-[#d8ff74]">
+              <BarChart3 className="size-4" />
+              <p className="text-sm font-semibold">Portfolio health</p>
+            </div>
+            <p className="mt-3 text-3xl font-semibold">92%</p>
+            <p className="mt-1 text-xs leading-5 text-white/55">
+              Canales sincronizados, SLA de mensajes y tareas críticas bajo control.
+            </p>
+          </div>
         </div>
       </aside>
 
-      <div className="xl:pl-72">
-        <header className="sticky top-0 z-10 border-b border-border/70 bg-background/80 px-5 py-4 backdrop-blur lg:px-8">
-          <div className="mx-auto flex max-w-7xl items-center gap-4">
-            <Link href="/" className="font-semibold xl:hidden">
+      <div className="xl:pl-[19rem]">
+        <header className="sticky top-0 z-10 border-b border-[#dfd2bf] bg-[#f6efe4]/86 px-4 py-3 backdrop-blur-xl lg:px-8">
+          <div className="mx-auto flex max-w-[1500px] items-center gap-3">
+            <Link href="/" className="flex items-center gap-2 font-semibold xl:hidden">
+              <span className="flex size-9 items-center justify-center rounded-xl bg-[#160f09] text-white">
+                <Building2 className="size-4" />
+              </span>
               WIAHost
             </Link>
             <div className="relative hidden flex-1 md:block">
-              <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-              <Input className="h-10 rounded-full bg-card pl-9" placeholder="Buscar reserva, huésped, propiedad o tarea..." />
+              <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-[#75695b]" />
+              <Input
+                className="h-11 rounded-full border-[#dfd2bf] bg-white/70 pl-9 shadow-sm"
+                placeholder="Buscar reserva, huésped, propiedad, canal o tarea..."
+              />
             </div>
-            <Button variant="outline" size="icon" className="ml-auto rounded-full bg-card">
+            <Button variant="outline" className="hidden rounded-full border-[#dfd2bf] bg-white/70 lg:inline-flex">
+              Abril 2026
+            </Button>
+            <Button variant="outline" className="hidden rounded-full border-[#dfd2bf] bg-white/70 lg:inline-flex">
+              Portfolio Madrid + Costa
+            </Button>
+            <Button variant="outline" size="icon" className="ml-auto rounded-full border-[#dfd2bf] bg-white/70">
               <Bell className="size-4" />
             </Button>
             <div className="hidden text-right sm:block">
-              <p className="text-sm font-medium">Laura Operaciones</p>
-              <p className="text-xs text-muted-foreground">Admin demo</p>
+              <p className="text-sm font-semibold">Laura Operaciones</p>
+              <p className="text-xs text-[#75695b]">Admin demo · WIA</p>
             </div>
           </div>
         </header>
-        <main className="mx-auto max-w-7xl px-5 py-8 lg:px-8">{children}</main>
+        <main className="mx-auto max-w-[1500px] px-4 py-6 lg:px-8">{children}</main>
       </div>
     </div>
   );

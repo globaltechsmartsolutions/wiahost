@@ -1,120 +1,286 @@
-import { ArrowRight, CalendarDays, Inbox, Wrench } from "lucide-react";
+import {
+  Activity,
+  ArrowRight,
+  CalendarDays,
+  CheckCircle2,
+  CircleDollarSign,
+  Inbox,
+  Radio,
+  Sparkles,
+  Wrench,
+} from "lucide-react";
 
 import { AppShell } from "@/components/layout/app-shell";
-import { MetricCard } from "@/components/metric-card";
-import { PageHeader } from "@/components/page-header";
 import { StatusBadge } from "@/components/status-badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { calendarDays, dashboardMetrics, inboxThreads, reservations, tasks } from "@/lib/demo-data";
+import {
+  automationRules,
+  calendarDays,
+  calendarMatrix,
+  channelHealth,
+  executiveMetrics,
+  inboxThreads,
+  operationQueue,
+  reservations,
+  tasks,
+} from "@/lib/demo-data";
+
+function MetricTile({ metric }: { metric: (typeof executiveMetrics)[number] }) {
+  const tone =
+    metric.tone === "positive"
+      ? "bg-emerald-100 text-emerald-900"
+      : metric.tone === "warning"
+        ? "bg-amber-100 text-amber-900"
+        : "bg-[#efe3cf] text-[#3a2a18]";
+
+  return (
+    <Card className="rounded-[1.7rem] border-[#dfd2bf] bg-white/72 shadow-sm">
+      <CardContent className="p-5">
+        <div className="flex items-start justify-between gap-3">
+          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#75695b]">{metric.label}</p>
+          <span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${tone}`}>Live</span>
+        </div>
+        <p className="mt-7 text-4xl font-semibold tracking-[-0.04em]">{metric.value}</p>
+        <p className="mt-2 text-sm text-[#75695b]">{metric.helper}</p>
+      </CardContent>
+    </Card>
+  );
+}
+
+function CalendarCell({ value }: { value: string }) {
+  const tone = value.includes("Check-in")
+    ? "border-emerald-300 bg-emerald-50 text-emerald-900"
+    : value.includes("Check-out")
+      ? "border-blue-300 bg-blue-50 text-blue-900"
+      : value.includes("Bloqueo")
+        ? "border-red-300 bg-red-50 text-red-900"
+        : value.includes("Ocupado")
+          ? "border-[#d6c4a8] bg-[#efe3cf] text-[#3a2a18]"
+          : "border-[#dfd2bf] bg-white/60 text-[#75695b]";
+
+  return (
+    <div className={`min-h-16 rounded-2xl border px-3 py-2 text-xs font-semibold leading-5 ${tone}`}>
+      {value}
+    </div>
+  );
+}
 
 export default function DashboardPage() {
   return (
     <AppShell>
-      <PageHeader
-        eyebrow="Centro de mando"
-        title="Operación diaria, revenue y servicio al huésped en una sola vista."
-        description="El dashboard prioriza lo que puede bloquear una estancia: llegadas, mensajes sin respuesta, limpiezas, incidencias y salud comercial por canal."
-      />
+      <section className="relative overflow-hidden rounded-[2.2rem] border border-[#dfd2bf] bg-[#160f09] p-5 text-white shadow-2xl sm:p-7">
+        <div className="absolute -right-24 -top-24 size-72 rounded-full bg-[#d8ff74]/20 blur-3xl" />
+        <div className="relative flex flex-col gap-6 xl:flex-row xl:items-end xl:justify-between">
+          <div>
+            <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/8 px-3 py-1.5 text-sm text-white/70">
+              <Radio className="size-4 text-[#d8ff74]" />
+              Centro de mando en tiempo real
+            </div>
+            <h1 className="max-w-4xl text-balance text-4xl font-semibold tracking-[-0.055em] sm:text-5xl lg:text-6xl">
+              Prioridades, reservas y canales sincronizados en una sola pantalla.
+            </h1>
+            <p className="mt-5 max-w-3xl text-pretty text-base leading-7 text-white/62 sm:text-lg">
+              Diseñado para operar como un PMS profesional: multi-calendario, inbox priorizado, tareas,
+              salud de canales, revenue y automatizaciones antes de que haya una incidencia.
+            </p>
+          </div>
+          <div className="grid min-w-[280px] gap-3 rounded-[1.7rem] border border-white/10 bg-white/8 p-4">
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-white/60">Estado global</span>
+              <span className="rounded-full bg-[#d8ff74] px-3 py-1 text-xs font-bold text-[#160f09]">92% healthy</span>
+            </div>
+            <div className="h-2 overflow-hidden rounded-full bg-white/10">
+              <div className="h-full w-[92%] rounded-full bg-[#d8ff74]" />
+            </div>
+            <p className="text-xs leading-5 text-white/45">2 mensajes urgentes · 1 canal requiere revisión · 5 tareas críticas.</p>
+          </div>
+        </div>
+      </section>
 
-      <section className="grid auto-rows-fr gap-4 md:grid-cols-2 xl:grid-cols-3">
-        {dashboardMetrics.map((metric) => (
-          <MetricCard key={metric.label} metric={metric} />
+      <section className="mt-5 grid auto-rows-fr gap-4 md:grid-cols-2 xl:grid-cols-4">
+        {executiveMetrics.map((metric) => (
+          <MetricTile key={metric.label} metric={metric} />
         ))}
       </section>
 
-      <section className="mt-6 grid gap-6 xl:grid-cols-[1.15fr_0.85fr]">
-        <Card className="rounded-[2rem] border-border/80 bg-card/80">
-          <CardHeader className="flex flex-row items-center justify-between">
+      <section className="mt-5 grid items-start gap-5 xl:grid-cols-[1.4fr_0.6fr]">
+        <Card className="self-start overflow-hidden rounded-[2rem] border-[#dfd2bf] bg-white/74 shadow-sm">
+          <CardHeader className="flex flex-row items-center justify-between border-b border-[#eadfce]">
             <div>
-              <CardTitle className="flex items-center gap-2">
+              <CardTitle className="flex items-center gap-2 text-xl">
                 <CalendarDays className="size-5" />
-                Calendario operativo
+                Multi-calendario operativo
               </CardTitle>
-              <p className="mt-1 text-sm text-muted-foreground">Reservas, bloqueos y tareas por día.</p>
+              <p className="mt-1 text-sm text-[#75695b]">Disponibilidad, reservas, limpiezas y bloqueos por activo.</p>
             </div>
-            <Button variant="outline" className="rounded-full" asChild>
-              <a href="/calendar">Abrir calendario</a>
+            <Button variant="outline" className="rounded-full border-[#dfd2bf] bg-white" asChild>
+              <a href="/calendar">Abrir vista completa</a>
             </Button>
           </CardHeader>
-          <CardContent>
-            <div className="grid gap-3 lg:grid-cols-7">
-              {calendarDays.map((day) => (
-                <div key={`${day.day}-${day.date}`} className="min-h-44 rounded-3xl border border-border/80 bg-background/60 p-4">
-                  <p className="text-sm text-muted-foreground">{day.day}</p>
-                  <p className="mt-1 text-3xl font-semibold">{day.date}</p>
-                  <div className="mt-4 space-y-2">
-                    {day.events.map((event) => (
-                      <div key={event} className="rounded-2xl bg-card px-3 py-2 text-xs font-medium shadow-sm">
-                        {event}
+          <CardContent className="p-0">
+            <div className="overflow-x-auto">
+              <div className="min-w-[920px]">
+                <div className="grid grid-cols-[210px_repeat(7,1fr)] border-b border-[#eadfce] bg-[#fbf7ef]">
+                  <div className="px-5 py-4 text-xs font-semibold uppercase tracking-[0.22em] text-[#75695b]">Propiedad</div>
+                  {calendarDays.map((day) => (
+                    <div key={day.date} className="border-l border-[#eadfce] px-3 py-4 text-center">
+                      <p className="text-xs text-[#75695b]">{day.day}</p>
+                      <p className="text-2xl font-semibold">{day.date}</p>
+                    </div>
+                  ))}
+                </div>
+                {calendarMatrix.map((row) => (
+                  <div key={row.code} className="grid grid-cols-[210px_repeat(7,1fr)] border-b border-[#eadfce] last:border-b-0">
+                    <div className="px-5 py-4">
+                      <p className="font-semibold">{row.property}</p>
+                      <p className="mt-1 font-mono text-xs text-[#75695b]">{row.code}</p>
+                    </div>
+                    {row.cells.map((cell, index) => (
+                      <div key={`${row.code}-${calendarDays[index].date}`} className="border-l border-[#eadfce] p-2">
+                        <CalendarCell value={cell} />
                       </div>
                     ))}
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
           </CardContent>
         </Card>
 
-        <div className="grid gap-6">
-          <Card className="rounded-[2rem] border-border/80 bg-card/80">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Inbox className="size-5" />
-                Inbox prioritario
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              {inboxThreads.slice(0, 3).map((thread) => (
-                <div key={thread.guest} className="rounded-3xl border border-border/80 bg-background/60 p-4">
-                  <div className="flex items-start justify-between gap-3">
-                    <div>
-                      <p className="font-semibold">{thread.guest}</p>
-                      <p className="text-sm text-muted-foreground">{thread.property} · {thread.channel}</p>
-                    </div>
-                    <StatusBadge value={thread.status} />
-                  </div>
-                  <p className="mt-3 text-sm leading-6">{thread.message}</p>
-                </div>
-              ))}
-            </CardContent>
-          </Card>
-
-          <Card className="rounded-[2rem] border-border/80 bg-card/80">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Wrench className="size-5" />
-                Próximas acciones
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              {tasks.map((task) => (
-                <div key={task.title} className="flex items-center justify-between gap-3 rounded-3xl border border-border/80 bg-background/60 p-4">
+        <Card className="self-start rounded-[2rem] border-[#dfd2bf] bg-white/74 shadow-sm">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-xl">
+              <Activity className="size-5" />
+              Cola prioritaria
+            </CardTitle>
+            <p className="text-sm text-[#75695b]">Siguiente mejor acción para operaciones.</p>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            {operationQueue.map((item) => (
+              <div key={item.label} className="rounded-3xl border border-[#dfd2bf] bg-[#fbf7ef] p-4">
+                <div className="flex items-start justify-between gap-3">
                   <div>
-                    <p className="font-semibold">{task.title}</p>
-                    <p className="text-sm text-muted-foreground">{task.property} · {task.due}</p>
+                    <p className="font-semibold">{item.label}</p>
+                    <p className="mt-1 text-sm leading-5 text-[#75695b]">{item.description}</p>
                   </div>
-                  <ArrowRight className="size-4 text-muted-foreground" />
+                  <StatusBadge value={item.priority} />
                 </div>
-              ))}
-            </CardContent>
-          </Card>
-        </div>
+                <div className="mt-4 flex items-center justify-between text-xs text-[#75695b]">
+                  <span>{item.type}</span>
+                  <span>{item.due}</span>
+                </div>
+              </div>
+            ))}
+          </CardContent>
+        </Card>
       </section>
 
-      <section className="mt-6">
-        <Card className="rounded-[2rem] border-border/80 bg-card/80">
+      <section className="mt-5 grid gap-5 xl:grid-cols-3">
+        <Card className="rounded-[2rem] border-[#dfd2bf] bg-white/74 shadow-sm">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Inbox className="size-5" />
+              Inbox con SLA
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            {inboxThreads.map((thread) => (
+              <div key={thread.guest} className="rounded-3xl border border-[#dfd2bf] bg-[#fbf7ef] p-4">
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <p className="font-semibold">{thread.guest}</p>
+                    <p className="text-sm text-[#75695b]">{thread.property} · {thread.channel}</p>
+                  </div>
+                  <StatusBadge value={thread.status} />
+                </div>
+                <p className="mt-3 text-sm leading-6">{thread.message}</p>
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+
+        <Card className="rounded-[2rem] border-[#dfd2bf] bg-white/74 shadow-sm">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <CircleDollarSign className="size-5" />
+              Salud de canales
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {channelHealth.map((channel) => (
+              <div key={channel.channel}>
+                <div className="flex items-center justify-between gap-3 text-sm">
+                  <div>
+                    <p className="font-semibold">{channel.channel}</p>
+                    <p className="text-[#75695b]">{channel.bookings} reservas · {channel.revenue}</p>
+                  </div>
+                  <span className="font-mono text-xs text-[#75695b]">{channel.health}%</span>
+                </div>
+                <div className="mt-2 h-2 overflow-hidden rounded-full bg-[#eadfce]">
+                  <div className="h-full rounded-full bg-[#160f09]" style={{ width: `${channel.health}%` }} />
+                </div>
+                <p className="mt-1 text-xs text-[#75695b]">{channel.sync}</p>
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+
+        <Card className="rounded-[2rem] border-[#dfd2bf] bg-white/74 shadow-sm">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Sparkles className="size-5" />
+              Automatizaciones activas
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            {automationRules.map((rule) => (
+              <div key={rule.name} className="rounded-3xl border border-[#dfd2bf] bg-[#fbf7ef] p-4">
+                <div className="flex items-center justify-between gap-3">
+                  <p className="font-semibold">{rule.name}</p>
+                  <CheckCircle2 className="size-4 text-emerald-700" />
+                </div>
+                <p className="mt-1 text-sm text-[#75695b]">{rule.trigger}</p>
+                <p className="mt-3 text-xs font-semibold uppercase tracking-[0.18em] text-[#75695b]">{rule.impact}</p>
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+      </section>
+
+      <section className="mt-5 grid gap-5 xl:grid-cols-[0.75fr_1.25fr]">
+        <Card className="rounded-[2rem] border-[#dfd2bf] bg-white/74 shadow-sm">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Wrench className="size-5" />
+              Tareas críticas
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            {tasks.map((task) => (
+              <div key={task.title} className="flex items-center justify-between gap-3 rounded-3xl border border-[#dfd2bf] bg-[#fbf7ef] p-4">
+                <div>
+                  <p className="font-semibold">{task.title}</p>
+                  <p className="text-sm text-[#75695b]">{task.property} · {task.due}</p>
+                </div>
+                <ArrowRight className="size-4 text-[#75695b]" />
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+
+        <Card className="rounded-[2rem] border-[#dfd2bf] bg-white/74 shadow-sm">
           <CardHeader>
             <CardTitle>Reservas que mueven la operación</CardTitle>
           </CardHeader>
           <CardContent className="grid gap-3 md:grid-cols-3">
             {reservations.map((reservation) => (
-              <div key={reservation.id} className="rounded-3xl border border-border/80 bg-background/60 p-4">
+              <div key={reservation.id} className="rounded-3xl border border-[#dfd2bf] bg-[#fbf7ef] p-4">
                 <div className="flex items-start justify-between gap-3">
                   <p className="font-semibold">{reservation.guest}</p>
                   <StatusBadge value={reservation.status} />
                 </div>
-                <p className="mt-2 text-sm text-muted-foreground">{reservation.property}</p>
+                <p className="mt-2 text-sm text-[#75695b]">{reservation.property}</p>
                 <p className="mt-4 text-sm">{reservation.dates}</p>
                 <p className="mt-2 text-2xl font-semibold">{reservation.amount}</p>
               </div>
