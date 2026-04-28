@@ -1,7 +1,15 @@
 import type {
+  aiActorTypes,
+  aiFeedbackValues,
+  aiLabelSources,
+  aiModelTasks,
+  aiPredictionStatuses,
   bookingChannels,
   incidentStatuses,
+  qualityAuditAreas,
+  qualityAuditStatuses,
   reservationStatuses,
+  severities,
   taskStatuses
 } from "./constants";
 import type { UserRole } from "./roles";
@@ -10,6 +18,14 @@ export type BookingChannel = (typeof bookingChannels)[number];
 export type ReservationStatus = (typeof reservationStatuses)[number];
 export type TaskStatus = (typeof taskStatuses)[number];
 export type IncidentStatus = (typeof incidentStatuses)[number];
+export type Severity = (typeof severities)[number];
+export type AiActorType = (typeof aiActorTypes)[number];
+export type AiLabelSource = (typeof aiLabelSources)[number];
+export type AiModelTask = (typeof aiModelTasks)[number];
+export type AiPredictionStatus = (typeof aiPredictionStatuses)[number];
+export type AiFeedbackValue = (typeof aiFeedbackValues)[number];
+export type QualityAuditArea = (typeof qualityAuditAreas)[number];
+export type QualityAuditStatus = (typeof qualityAuditStatuses)[number];
 
 export type PropertyStatus = "draft" | "active" | "paused" | "archived";
 export type ListingStatus = "draft" | "published" | "paused" | "sync_error";

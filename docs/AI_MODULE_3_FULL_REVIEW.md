@@ -21,6 +21,11 @@ Documentos previos relacionados:
 - `docs/NEURAL_NETWORKS_OPPORTUNITIES_FROM_NOTES.md`
 - `docs/QUALITY_AND_AUDIT_STRATEGY.md`
 
+Implementacion base en el producto:
+
+- `supabase/migrations/0004_ai_foundation.sql`
+- `packages/shared/src/validators/ai.ts`
+
 ## Conclusion ejecutiva
 
 El modulo aporta mucho, pero la conclusion profesional para WIAHost no es "meter IA ya". La conclusion buena es preparar datos, trazabilidad, labels y baselines desde ahora para que la IA futura sea fiable.

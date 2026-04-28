@@ -1,9 +1,14 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  aiAuditLogSchema,
   incidentSchema,
   loginSchema,
+  messageLabelSchema,
+  modelPredictionSchema,
+  operationalEventSchema,
   propertySchema,
+  qualityAuditMemorySchema,
   registerSchema,
   reservationSchema,
 } from "./validators";
@@ -92,5 +97,71 @@ describe("incident validators", () => {
     });
 
     expect(parsed.success).toBe(false);
+  });
+});
+
+describe("ai foundation validators", () => {
+  it("accepts operational tracking events without raw personal data", () => {
+    const parsed = operationalEventSchema.safeParse({
+      eventName: "reservation.confirmed",
+      entityType: "reservation",
+      entityId: uuid,
+      reservationId: uuid,
+      source: "web",
+      metadata: { channel: "direct" },
+    });
+
+    expect(parsed.success).toBe(true);
+  });
+
+  it("requires message labels to include at least one useful signal", () => {
+    const parsed = messageLabelSchema.safeParse({
+      conversationId: uuid,
+      source: "human",
+    });
+
+    expect(parsed.success).toBe(false);
+  });
+
+  it("accepts explainable model prediction payloads", () => {
+    const parsed = modelPredictionSchema.safeParse({
+      task: "message_priority",
+      modelName: "baseline-rules",
+      modelVersion: "0.1.0",
+      entityType: "conversation",
+      entityId: uuid,
+      inputHash: "conversation-123456",
+      output: { priority: "high" },
+      explanation: { reason: "Check-in cercano y mensaje sin responder." },
+      confidence: 0.82,
+    });
+
+    expect(parsed.success).toBe(true);
+  });
+
+  it("captures ai audit entries with privacy flags", () => {
+    const parsed = aiAuditLogSchema.safeParse({
+      action: "message_summary.generated",
+      provider: "internal",
+      modelName: "baseline-summary",
+      promptHash: "prompt-abcdef123",
+      containsPersonalData: true,
+      riskLevel: "medium",
+    });
+
+    expect(parsed.success).toBe(true);
+  });
+
+  it("accepts visual audit memories for regression tracking", () => {
+    const parsed = qualityAuditMemorySchema.safeParse({
+      area: "visual",
+      route: "/dashboard",
+      findingHash: "dashboard-cards-alignment-001",
+      title: "Dashboard cards alignment",
+      description: "Keep dashboard cards aligned across desktop and laptop layouts.",
+      severity: "medium",
+    });
+
+    expect(parsed.success).toBe(true);
   });
 });
