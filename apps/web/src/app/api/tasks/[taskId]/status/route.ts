@@ -10,7 +10,7 @@ type RouteContext = {
   params: Promise<{ taskId: string }>;
 };
 
-const idSchema = z.uuid();
+const idSchema = z.guid();
 
 export async function PATCH(request: Request, { params }: RouteContext) {
   const context = await getAuthenticatedApiContext();

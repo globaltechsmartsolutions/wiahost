@@ -26,7 +26,7 @@ import {
 import { isSupabaseConfigured } from "@/lib/supabase/config";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
-const idSchema = z.uuid();
+const idSchema = z.guid();
 
 function requiredString(formData: FormData, key: string) {
   const value = formData.get(key);
@@ -93,15 +93,18 @@ export async function createManualReservationAction(formData: FormData) {
   }
 
   const { supabase } = await getMutationContext(path);
+  let reservationId: string;
 
   try {
-    await createManualReservation(supabase, parsed.data);
+    const reservation = await createManualReservation(supabase, parsed.data);
+    reservationId = reservation.id;
   } catch (error) {
     redirectWithError(path, mutationMessage(error, "No se ha podido crear la reserva."));
   }
 
   revalidatePath("/reservations");
   revalidatePath("/dashboard");
+  redirect(`/reservations/${reservationId}`);
 }
 
 export async function updateReservationStatusAction(formData: FormData) {
@@ -123,6 +126,7 @@ export async function updateReservationStatusAction(formData: FormData) {
 
   revalidatePath("/reservations");
   revalidatePath("/dashboard");
+  redirect("/reservations");
 }
 
 export async function createTaskAction(formData: FormData) {
@@ -136,15 +140,18 @@ export async function createTaskAction(formData: FormData) {
   }
 
   const { supabase, userId } = await getMutationContext(path);
+  let taskId: string;
 
   try {
-    await createTask(supabase, parsed.data, userId);
+    const task = await createTask(supabase, parsed.data, userId);
+    taskId = task.id;
   } catch (error) {
     redirectWithError(path, mutationMessage(error, "No se ha podido crear la tarea."));
   }
 
   revalidatePath("/tasks");
   revalidatePath("/dashboard");
+  redirect(`/tasks/${taskId}`);
 }
 
 export async function updateTaskStatusAction(formData: FormData) {
@@ -166,6 +173,7 @@ export async function updateTaskStatusAction(formData: FormData) {
 
   revalidatePath("/tasks");
   revalidatePath("/dashboard");
+  redirect("/tasks");
 }
 
 export async function createIncidentAction(formData: FormData) {
@@ -179,15 +187,18 @@ export async function createIncidentAction(formData: FormData) {
   }
 
   const { supabase, userId } = await getMutationContext(path);
+  let incidentId: string;
 
   try {
-    await createIncident(supabase, parsed.data, userId);
+    const incident = await createIncident(supabase, parsed.data, userId);
+    incidentId = incident.id;
   } catch (error) {
     redirectWithError(path, mutationMessage(error, "No se ha podido crear la incidencia."));
   }
 
   revalidatePath("/incidents");
   revalidatePath("/dashboard");
+  redirect(`/incidents/${incidentId}`);
 }
 
 export async function updateIncidentStatusAction(formData: FormData) {
@@ -209,6 +220,7 @@ export async function updateIncidentStatusAction(formData: FormData) {
 
   revalidatePath("/incidents");
   revalidatePath("/dashboard");
+  redirect("/incidents");
 }
 
 export async function sendConversationReplyAction(formData: FormData) {
@@ -233,4 +245,5 @@ export async function sendConversationReplyAction(formData: FormData) {
 
   revalidatePath("/inbox");
   revalidatePath("/dashboard");
+  redirect(`/inbox/${parsed.data.conversationId}`);
 }

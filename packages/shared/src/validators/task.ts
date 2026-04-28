@@ -8,7 +8,7 @@ const optionalText = z.preprocess(
 
 const optionalUuid = z.preprocess(
   (value) => (typeof value === "string" && value.trim() === "" ? undefined : value),
-  z.uuid().optional(),
+  z.guid().optional(),
 );
 
 const optionalDateTime = z.preprocess(
@@ -17,7 +17,7 @@ const optionalDateTime = z.preprocess(
 );
 
 export const taskSchema = z.object({
-  propertyId: z.uuid(),
+  propertyId: z.guid(),
   reservationId: optionalUuid,
   title: z.string().trim().min(3, "El titulo debe tener al menos 3 caracteres."),
   description: optionalText,

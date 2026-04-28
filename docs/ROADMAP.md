@@ -35,7 +35,8 @@
 - Implementado: servicios de mutacion compartidos entre Server Actions y API routes para evitar duplicar logica.
 - Implementado: API routes autenticadas para listar/crear reservas, tareas, incidencias, inbox y mensajes.
 - Implementado: paginas de detalle para reservas, tareas, incidencias y conversaciones con fallback demo.
-- Pendiente inmediato: edicion completa, borrado/archivo controlado, filtros avanzados, feedback visual de guardado y pruebas E2E de flujos con Supabase local.
+- Implementado: Supabase local verificado con Auth, seed demo, tipos generados y escrituras reales desde UI/API.
+- Pendiente inmediato: edicion completa, borrado/archivo controlado, filtros avanzados, feedback visual de guardado y convertir las pruebas manuales Supabase en E2E automatizadas.
 
 ## Fase 2 - Operacion PMS
 

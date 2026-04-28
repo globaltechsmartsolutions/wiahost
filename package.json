@@ -5,7 +5,7 @@
   "packageManager": "pnpm@10.33.2",
   "scripts": {
     "dev": "turbo dev",
-    "dev:web": "pnpm --filter web dev",
+    "dev:web": "pnpm --filter web exec next dev --port 3002",
     "build": "turbo build",
     "build:web": "pnpm --filter web build",
     "lint": "turbo lint",
@@ -20,6 +20,7 @@
   },
   "devDependencies": {
     "prettier": "latest",
+    "supabase": "^2.95.5",
     "turbo": "latest"
   }
 }

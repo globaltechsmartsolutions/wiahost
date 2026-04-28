@@ -7,8 +7,8 @@ const optionalText = z.preprocess(
 );
 
 export const reservationSchema = z.object({
-  propertyId: z.uuid(),
-  guestId: z.uuid(),
+  propertyId: z.guid(),
+  guestId: z.guid(),
   channel: z.enum(bookingChannels),
   status: z.enum(reservationStatuses).default("confirmed"),
   checkIn: z.iso.date(),
@@ -22,7 +22,7 @@ export const reservationSchema = z.object({
 
 export const manualReservationSchema = z
   .object({
-    propertyId: z.uuid(),
+    propertyId: z.guid(),
     guestFullName: z.string().trim().min(2, "El nombre del huesped es obligatorio."),
     guestEmail: z.preprocess(
       (value) => (typeof value === "string" && value.trim() === "" ? undefined : value),

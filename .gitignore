@@ -16,6 +16,7 @@ test-results
 .env.*
 !.env.example
 !.env.local.example
+!apps/web/.env.example
 
 # logs
 *.log

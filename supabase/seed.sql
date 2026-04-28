@@ -6,17 +6,76 @@ insert into auth.users (
   email,
   encrypted_password,
   email_confirmed_at,
+  confirmation_token,
+  recovery_token,
+  email_change_token_new,
+  email_change,
+  email_change_token_current,
+  reauthentication_token,
   raw_app_meta_data,
   raw_user_meta_data,
   created_at,
   updated_at
 )
 values
-  ('00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated', 'admin@wiahost.local', crypt('Password123!', gen_salt('bf')), now(), '{"provider":"email","providers":["email"]}', '{"full_name":"Admin WIAHost","role":"admin"}', now(), now()),
-  ('00000000-0000-0000-0000-000000000002', '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated', 'operaciones@wiahost.local', crypt('Password123!', gen_salt('bf')), now(), '{"provider":"email","providers":["email"]}', '{"full_name":"Laura Operaciones","role":"operator"}', now(), now()),
-  ('00000000-0000-0000-0000-000000000003', '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated', 'owner@wiahost.local', crypt('Password123!', gen_salt('bf')), now(), '{"provider":"email","providers":["email"]}', '{"full_name":"Carlos Propietario","role":"owner"}', now(), now()),
-  ('00000000-0000-0000-0000-000000000004', '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated', 'limpieza@wiahost.local', crypt('Password123!', gen_salt('bf')), now(), '{"provider":"email","providers":["email"]}', '{"full_name":"Marta Limpieza","role":"housekeeping"}', now(), now())
+  ('00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated', 'admin@wiahost.local', crypt('Password123!', gen_salt('bf')), now(), '', '', '', '', '', '', '{"provider":"email","providers":["email"]}', '{"full_name":"Admin WIAHost","role":"admin"}', now(), now()),
+  ('00000000-0000-0000-0000-000000000002', '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated', 'operaciones@wiahost.local', crypt('Password123!', gen_salt('bf')), now(), '', '', '', '', '', '', '{"provider":"email","providers":["email"]}', '{"full_name":"Laura Operaciones","role":"operator"}', now(), now()),
+  ('00000000-0000-0000-0000-000000000003', '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated', 'owner@wiahost.local', crypt('Password123!', gen_salt('bf')), now(), '', '', '', '', '', '', '{"provider":"email","providers":["email"]}', '{"full_name":"Carlos Propietario","role":"owner"}', now(), now()),
+  ('00000000-0000-0000-0000-000000000004', '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated', 'limpieza@wiahost.local', crypt('Password123!', gen_salt('bf')), now(), '', '', '', '', '', '', '{"provider":"email","providers":["email"]}', '{"full_name":"Marta Limpieza","role":"housekeeping"}', now(), now())
 on conflict (id) do nothing;
+
+insert into auth.identities (
+  id,
+  provider_id,
+  user_id,
+  identity_data,
+  provider,
+  last_sign_in_at,
+  created_at,
+  updated_at
+)
+values
+  (
+    '01000000-0000-0000-0000-000000000001',
+    '00000000-0000-0000-0000-000000000001',
+    '00000000-0000-0000-0000-000000000001',
+    '{"sub":"00000000-0000-0000-0000-000000000001","email":"admin@wiahost.local","email_verified":true,"phone_verified":false}',
+    'email',
+    now(),
+    now(),
+    now()
+  ),
+  (
+    '01000000-0000-0000-0000-000000000002',
+    '00000000-0000-0000-0000-000000000002',
+    '00000000-0000-0000-0000-000000000002',
+    '{"sub":"00000000-0000-0000-0000-000000000002","email":"operaciones@wiahost.local","email_verified":true,"phone_verified":false}',
+    'email',
+    now(),
+    now(),
+    now()
+  ),
+  (
+    '01000000-0000-0000-0000-000000000003',
+    '00000000-0000-0000-0000-000000000003',
+    '00000000-0000-0000-0000-000000000003',
+    '{"sub":"00000000-0000-0000-0000-000000000003","email":"owner@wiahost.local","email_verified":true,"phone_verified":false}',
+    'email',
+    now(),
+    now(),
+    now()
+  ),
+  (
+    '01000000-0000-0000-0000-000000000004',
+    '00000000-0000-0000-0000-000000000004',
+    '00000000-0000-0000-0000-000000000004',
+    '{"sub":"00000000-0000-0000-0000-000000000004","email":"limpieza@wiahost.local","email_verified":true,"phone_verified":false}',
+    'email',
+    now(),
+    now(),
+    now()
+  )
+on conflict (provider_id, provider) do nothing;
 
 insert into public.owner_accounts (id, profile_id, display_name, company_name)
 values ('10000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000003', 'Carlos Propietario', 'WIA Demo Assets')

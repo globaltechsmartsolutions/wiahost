@@ -9,14 +9,15 @@ El objetivo es centralizar propiedades, reservas, calendario multi-canal, mensaj
 - Monorepo con pnpm workspaces y Turborepo.
 - Web app con Next.js App Router en `apps/web`.
 - UI profesional tipo hospitality command center.
-- Dashboard navegable con datos demo.
+- Dashboard navegable con datos Supabase y fallback demo.
 - Rutas web iniciales: landing, dashboard, properties, reservations, calendar, guests, inbox, tasks, incidents, owners, settings, login y register.
 - Supabase preparado con migraciones SQL, RLS, storage, seed demo y base de datos preparada para IA futura.
-- Supabase Auth inicial implementado para login/register y acciones de propiedades.
+- Supabase Auth implementado y verificado con usuarios demo locales.
+- Reservas, tareas, incidencias e inbox tienen lectura, detalle, API y escrituras reales verificadas contra Supabase local.
 - Paquetes compartidos para tipos y validaciones en `packages/shared`.
 - Paquete de tipos de base de datos en `packages/database`.
 
-Importante: varias pantallas siguen usando datos demo para validar producto y diseno. La fase actual es conectar progresivamente dashboard, reservas, inbox, tareas e incidencias a Supabase.
+Importante: la web mantiene fallback demo para poder navegar sin entorno local, pero con `.env.local` configurado trabaja contra Supabase.
 
 ## Stack
 
@@ -40,8 +41,11 @@ Importante: varias pantallas siguen usando datos demo para validar producto y di
 git clone https://github.com/globaltechsmartsolutions/wiahost.git
 cd wiahost
 pnpm install
-cp .env.example apps/web/.env.local
-pnpm dev:web
+cp apps/web/.env.example apps/web/.env.local
+pnpm supabase:start
+pnpm db:reset
+pnpm db:types
+pnpm --filter web exec next dev --port 3002
 ```
 
 Para usar el puerto 3002:
@@ -52,15 +56,20 @@ pnpm --filter web exec next dev --port 3002
 
 ## Supabase local
 
-Cuando tengas Supabase CLI instalado:
+La CLI de Supabase esta instalada como devDependency del repo:
 
 ```bash
-supabase start
+pnpm supabase:start
 pnpm db:reset
 pnpm db:types
 ```
 
-El seed crea usuarios y datos demo para operaciones PMS.
+El seed crea usuarios y datos demo para operaciones PMS:
+
+- `operaciones@wiahost.local` / `Password123!`
+- `admin@wiahost.local` / `Password123!`
+- `owner@wiahost.local` / `Password123!`
+- `limpieza@wiahost.local` / `Password123!`
 
 ## Scripts principales
 
@@ -91,4 +100,4 @@ Documentos principales:
 
 ## Siguiente paso recomendado
 
-Completar la conexion real de las pantallas PMS a Supabase, empezando por propiedades, reservas, inbox, tareas e incidencias.
+Convertir las pruebas manuales Supabase en E2E automatizadas y seguir con edicion completa, filtros y borrado/archivo controlado.

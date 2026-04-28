@@ -3,7 +3,7 @@ import { incidentStatuses, severities } from "../constants";
 
 const optionalUuid = z.preprocess(
   (value) => (typeof value === "string" && value.trim() === "" ? undefined : value),
-  z.uuid().optional(),
+  z.guid().optional(),
 );
 
 const optionalNumber = z.preprocess(
@@ -12,7 +12,7 @@ const optionalNumber = z.preprocess(
 );
 
 export const incidentSchema = z.object({
-  propertyId: z.uuid(),
+  propertyId: z.guid(),
   reservationId: optionalUuid,
   title: z.string().trim().min(3, "El titulo debe tener al menos 3 caracteres."),
   description: z.string().trim().min(10, "Describe mejor la incidencia.").max(3000),

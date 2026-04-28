@@ -10,7 +10,7 @@ type RouteContext = {
   params: Promise<{ conversationId: string }>;
 };
 
-const idSchema = z.uuid();
+const idSchema = z.guid();
 
 export async function GET(_: Request, { params }: RouteContext) {
   const context = await getAuthenticatedApiContext();
