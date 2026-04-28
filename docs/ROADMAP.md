@@ -59,12 +59,16 @@
 
 ## Fase 5 - IA y automatizacion avanzada
 
+- Dataset historico de eventos, outcomes y feedback humano.
+- Feature engineering para pricing, reservas, tareas, incidencias e inbox.
 - Respuestas asistidas en inbox.
 - Clasificacion de urgencia.
 - Deteccion de sentimiento.
 - Resumen de conversaciones.
 - Recomendaciones operativas.
 - Pricing insights.
+- Segmentacion de propiedades y reservas con clustering.
+- Deteccion de anomalias operativas.
 
 ## Fase 6 - Produccion SaaS
 
