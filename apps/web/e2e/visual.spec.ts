@@ -1,6 +1,6 @@
 import { expect, test, type Page } from "@playwright/test";
 
-import { signInAsDemoOperator } from "./helpers";
+import { seedIds, signInAsDemoOperator } from "./helpers";
 
 async function prepareVisualPage(page: Page) {
   await page.addStyleTag({
@@ -218,6 +218,21 @@ test.describe("visual regression baseline @visual", () => {
       await page.screenshot({
         fullPage: false,
         path: testInfo.outputPath(`${route.replace("/", "")}-density.png`),
+      });
+    }
+  });
+
+  test("property management routes keep responsive density without desktop overflow", async ({ page }, testInfo) => {
+    await page.setViewportSize({ height: 768, width: 1366 });
+    await signInAsDemoOperator(page);
+
+    for (const route of ["/properties", `/properties/${seedIds.propertyId}`, `/properties/${seedIds.propertyId}/edit`]) {
+      await page.goto(route);
+      await prepareVisualPage(page);
+      await expectNoHorizontalOverflow(page);
+      await page.screenshot({
+        fullPage: false,
+        path: testInfo.outputPath(`${route.replaceAll("/", "-").replace(":", "")}-density.png`),
       });
     }
   });

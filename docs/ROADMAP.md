@@ -43,7 +43,7 @@
 - Implementado: Playwright E2E inicial para landing/login/register, redireccion anonima, login demo, creacion de reserva UI y mutaciones API de tareas, incidencias e inbox.
 - Implementado: auditoria de accesibilidad con axe sobre rutas publicas y protegidas.
 - Implementado: baseline visual inicial para landing/auth y check de alineacion del dashboard.
-- Implementado: visual checks de densidad/overflow para rutas operativas principales en desktop portatil.
+- Implementado: visual checks de densidad/overflow para rutas operativas y gestion de propiedades en desktop portatil.
 - Implementado: dashboard sobre grid compartido de 12 columnas para que los huecos entre cards queden alineados aunque cambie el numero de cards por fila.
 - Implementado: breakpoint responsive del dashboard para evitar calendario apretado y scrollbar horizontal interno en 1366, 1440, 1536 y 1920.
 - Implementado: escala compacta de dashboard para portatil, con cuatro metricas por fila y hero menos sobredimensionado.
