@@ -68,11 +68,11 @@ En esta fase la web ya funciona contra Supabase local si `.env.local` tiene las 
 
 - Login/register usan Supabase Auth.
 - Dashboard, reservas, inbox, tareas, incidencias, properties, calendar, guests, owners y settings quedan protegidas por `proxy.ts`.
-- Properties tiene lectura/creacion inicial contra Supabase.
+- Properties tiene lectura, detalle, creacion, edicion y archivo controlado contra Supabase.
 - Dashboard, reservas, inbox, tareas e incidencias leen de Supabase con fallback demo si no hay entorno configurado.
 - Reservas manuales, tareas, incidencias y respuestas de inbox tienen escrituras reales verificadas contra Supabase local.
-- Playwright valida smoke publico/auth y flujos reales de reservas, tareas, incidencias e inbox contra Supabase local.
-- Axe valida rutas publicas y protegidas sin violaciones WCAG criticas/serias.
+- Playwright valida smoke publico/auth y flujos reales de propiedades, reservas, tareas, incidencias e inbox contra Supabase local.
+- Axe valida rutas publicas y protegidas, incluyendo detalle/edicion de propiedades, sin violaciones WCAG criticas/serias.
 - Playwright visual valida landing/auth y comprueba que el dashboard no tenga overflow ni huecos por desalineacion entre calendario y cola prioritaria.
 - Lighthouse CI valida landing/login/register con budgets iniciales de performance, accesibilidad, best practices y SEO.
 

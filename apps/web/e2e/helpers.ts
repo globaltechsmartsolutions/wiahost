@@ -13,6 +13,11 @@ export const seedIds = {
 
 export async function signInAsDemoOperator(page: Page) {
   await page.goto("/login");
+  if (page.url().endsWith("/dashboard")) {
+    await expect(page.getByRole("heading", { name: /prioridades/i })).toBeVisible();
+    return;
+  }
+
   await page.locator("#email").fill(demoOperator.email);
   await page.locator("#password").fill(demoOperator.password);
   await page.getByRole("button", { name: /entrar al panel/i }).click();

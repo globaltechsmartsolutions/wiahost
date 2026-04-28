@@ -27,14 +27,26 @@
     {
       "path": "/properties",
       "auth": "protected",
-      "primaryCheck": "Property list is visible",
-      "tests": ["a11y"]
+      "primaryCheck": "Property list exposes detail and edit actions",
+      "tests": ["critical", "data", "a11y"]
     },
     {
       "path": "/properties/new",
       "auth": "protected",
       "primaryCheck": "Property creation form is visible",
       "tests": ["a11y"]
+    },
+    {
+      "path": "/properties/:propertyId",
+      "auth": "protected",
+      "primaryCheck": "Property detail shows operational data and safe archive action",
+      "tests": ["critical", "data", "a11y"]
+    },
+    {
+      "path": "/properties/:propertyId/edit",
+      "auth": "protected",
+      "primaryCheck": "Property edit form updates Supabase records",
+      "tests": ["critical", "data", "a11y"]
     },
     {
       "path": "/reservations",

@@ -13,6 +13,7 @@ El objetivo es centralizar propiedades, reservas, calendario multi-canal, mensaj
 - Rutas web iniciales: landing, dashboard, properties, reservations, calendar, guests, inbox, tasks, incidents, owners, settings, login y register.
 - Supabase preparado con migraciones SQL, RLS, storage, seed demo y base de datos preparada para IA futura.
 - Supabase Auth implementado y verificado con usuarios demo locales.
+- Propiedades tienen lectura, detalle, creacion, edicion, API y archivo controlado contra Supabase local.
 - Reservas, tareas, incidencias e inbox tienen lectura, detalle, API y escrituras reales verificadas contra Supabase local.
 - Rutas protegidas con `proxy.ts` de Next.js 16 y suite Playwright E2E inicial para smoke, login, reservas, tareas, incidencias e inbox.
 - Auditoria de accesibilidad con axe, baseline visual inicial, Lighthouse CI y memoria versionada en `quality/audit-memory`.
@@ -111,4 +112,4 @@ El dashboard no debe tener huecos muertos entre modulos. Si dos cards comparten 
 
 ## Siguiente paso recomendado
 
-Seguir con edicion completa, borrado/archivo controlado, feedback visual de guardado y snapshots visuales estables por modulo.
+Seguir con feedback visual de guardado mas fino, edicion completa de reservas/tareas/incidencias y snapshots visuales estables por modulo.

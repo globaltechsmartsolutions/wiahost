@@ -129,6 +129,8 @@ Rutas iniciales:
 - `/dashboard`
 - `/properties`
 - `/properties/new`
+- `/properties/:propertyId`
+- `/properties/:propertyId/edit`
 
 ### 6. Performance, SEO and best practices
 

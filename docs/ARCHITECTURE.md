@@ -29,7 +29,7 @@ Responsabilidades:
 - Dashboard PMS.
 - Panel de operaciones.
 - Formularios de auth y propiedades.
-- Route handlers iniciales para health y properties.
+- Route handlers para health, properties, reservas, tareas, incidencias e inbox.
 - Integracion progresiva con Supabase.
 
 ### `apps/mobile` futuro
@@ -66,7 +66,7 @@ Piezas preparadas:
 La UI combina datos demo con primeras integraciones reales:
 
 - Login/register usan Supabase Auth.
-- Properties tiene lectura/creacion inicial con Supabase.
+- Properties tiene lectura, creacion, detalle, edicion y archivo controlado con Supabase.
 - Dashboard, reservas, calendario, inbox, tareas e incidencias leen de Supabase con fallback demo.
 - Reservas, tareas, incidencias e inbox tienen filtros GET server-side sobre los datos cargados para proteger deep links y futura app movil.
 - Owners y settings siguen siendo principalmente demo.

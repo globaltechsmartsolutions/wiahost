@@ -44,6 +44,14 @@ export default async function PropertiesPage({
                 </div>
                 <StatusBadge value={property.status} />
               </div>
+              <div className="mt-5 flex flex-wrap gap-2">
+                <Button asChild variant="outline" className="rounded-full">
+                  <Link href={`/properties/${property.id}`}>Ver detalle</Link>
+                </Button>
+                <Button asChild variant="ghost" className="rounded-full">
+                  <Link href={`/properties/${property.id}/edit`}>Editar</Link>
+                </Button>
+              </div>
               <div className="mt-8 grid grid-cols-2 gap-3">
                 <div className="rounded-3xl bg-background/70 p-4">
                   <p className="text-xs uppercase tracking-[0.22em] text-muted-foreground">Canal</p>

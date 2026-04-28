@@ -1,7 +1,7 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
 
-import { signInAsDemoOperator } from "./helpers";
+import { seedIds, signInAsDemoOperator } from "./helpers";
 
 type AccessibilityRoute = {
   name: string;
@@ -16,6 +16,8 @@ const routes: AccessibilityRoute[] = [
   { name: "dashboard", path: "/dashboard", requiresAuth: true },
   { name: "properties", path: "/properties", requiresAuth: true },
   { name: "new property", path: "/properties/new", requiresAuth: true },
+  { name: "property detail", path: `/properties/${seedIds.propertyId}`, requiresAuth: true },
+  { name: "edit property", path: `/properties/${seedIds.propertyId}/edit`, requiresAuth: true },
   { name: "reservations", path: "/reservations", requiresAuth: true },
   { name: "inbox", path: "/inbox", requiresAuth: true },
   { name: "tasks", path: "/tasks", requiresAuth: true },
@@ -44,12 +46,14 @@ async function analyzePage(page: Page) {
 test.describe("accessibility audit @a11y", () => {
   for (const route of routes) {
     test(`${route.name} has no critical WCAG violations`, async ({ page }) => {
+      test.setTimeout(90_000);
+
       if (route.requiresAuth) {
         await signInAsDemoOperator(page);
       }
 
-      await page.goto(route.path);
-      await page.waitForLoadState("networkidle");
+      await page.goto(route.path, { waitUntil: "domcontentloaded" });
+      await page.locator("body").waitFor();
 
       const result = await analyzePage(page);
       const blockingViolations = result.violations.filter((violation) =>

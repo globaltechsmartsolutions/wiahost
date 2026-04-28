@@ -127,4 +127,61 @@ test.describe("operations flows with Supabase @critical @data", () => {
     await expect(page.getByText(`Mostrando 1 de`)).toBeVisible();
     await expect(page.getByText(replyBody)).toBeVisible();
   });
+
+  test("updates and archives a property through authenticated API routes", async ({ page }) => {
+    await signInAsDemoOperator(page);
+
+    const propertyName = uniqueName("E2E Propiedad");
+    const updatedName = `${propertyName} editada`;
+    const propertyResponse = await page.request.post("/api/properties", {
+      data: {
+        addressLine: "Calle E2E 12",
+        basePrice: 180,
+        bathrooms: 1,
+        bedrooms: 2,
+        city: "Madrid",
+        cleaningFee: 55,
+        country: "Spain",
+        description: "Propiedad creada por Playwright para validar CRUD.",
+        internalName: uniqueName("E2E-PROP"),
+        maxGuests: 4,
+        name: propertyName,
+        province: "Madrid",
+        status: "active",
+      },
+    });
+
+    expect(propertyResponse.ok()).toBe(true);
+    const propertyBody = (await propertyResponse.json()) as { data: { id: string } };
+
+    const updateResponse = await page.request.patch(`/api/properties/${propertyBody.data.id}`, {
+      data: {
+        addressLine: "Calle E2E 14",
+        basePrice: 195,
+        bathrooms: 1.5,
+        bedrooms: 2,
+        city: "Madrid",
+        cleaningFee: 60,
+        country: "Spain",
+        description: "Propiedad actualizada por Playwright.",
+        internalName: uniqueName("E2E-PROP-EDIT"),
+        maxGuests: 4,
+        name: updatedName,
+        province: "Madrid",
+        status: "paused",
+      },
+    });
+
+    expect(updateResponse.ok()).toBe(true);
+
+    await page.goto(`/properties/${propertyBody.data.id}`);
+    await expect(page.getByRole("heading", { name: updatedName })).toBeVisible();
+    await expect(page.getByText("Pausado")).toBeVisible();
+
+    const archiveResponse = await page.request.delete(`/api/properties/${propertyBody.data.id}`);
+    expect(archiveResponse.ok()).toBe(true);
+
+    await page.goto(`/properties/${propertyBody.data.id}`);
+    await expect(page.getByText("Archivado")).toBeVisible();
+  });
 });
