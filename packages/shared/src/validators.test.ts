@@ -4,6 +4,7 @@ import {
   aiAuditLogSchema,
   incidentSchema,
   loginSchema,
+  manualReservationSchema,
   messageLabelSchema,
   modelPredictionSchema,
   operationalEventSchema,
@@ -11,6 +12,7 @@ import {
   qualityAuditMemorySchema,
   registerSchema,
   reservationSchema,
+  taskSchema,
 } from "./validators";
 
 const uuid = "11111111-1111-4111-8111-111111111111";
@@ -81,6 +83,54 @@ describe("reservation validators", () => {
       guestsCount: 2,
       nightlyRate: 150,
       totalAmount: 450,
+    });
+
+    expect(parsed.success).toBe(true);
+  });
+
+  it("accepts a manual reservation form without a pre-existing guest", () => {
+    const parsed = manualReservationSchema.safeParse({
+      propertyId: uuid,
+      guestFullName: "Sofia Martin",
+      guestEmail: "sofia@example.com",
+      channel: "manual",
+      checkIn: "2026-05-01",
+      checkOut: "2026-05-04",
+      guestsCount: "2",
+      nightlyRate: "150",
+      cleaningFee: "45",
+      taxesAmount: "0",
+      securityDeposit: "200",
+    });
+
+    expect(parsed.success).toBe(true);
+  });
+
+  it("rejects a reservation whose check-out is before check-in", () => {
+    const parsed = manualReservationSchema.safeParse({
+      propertyId: uuid,
+      guestFullName: "Sofia Martin",
+      channel: "manual",
+      checkIn: "2026-05-04",
+      checkOut: "2026-05-01",
+      guestsCount: 2,
+      nightlyRate: 150,
+      cleaningFee: 45,
+      taxesAmount: 0,
+      securityDeposit: 200,
+    });
+
+    expect(parsed.success).toBe(false);
+  });
+});
+
+describe("task validators", () => {
+  it("accepts operational task priority values used by the database", () => {
+    const parsed = taskSchema.safeParse({
+      propertyId: uuid,
+      title: "Preparar check-in autonomo",
+      type: "cleaning",
+      priority: "high",
     });
 
     expect(parsed.success).toBe(true);

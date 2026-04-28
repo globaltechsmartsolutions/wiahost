@@ -7,6 +7,7 @@ import {
   inboxThreads as demoInboxThreads,
   incidents as demoIncidents,
   operationQueue as demoOperationQueue,
+  properties as demoProperties,
   reservations as demoReservations,
   tasks as demoTasks,
 } from "@/lib/demo-data";
@@ -23,6 +24,17 @@ export type InboxThreadItem = (typeof demoInboxThreads)[number];
 export type TaskListItem = (typeof demoTasks)[number];
 export type IncidentListItem = (typeof demoIncidents)[number];
 export type AutomationRuleItem = (typeof demoAutomationRules)[number];
+
+export type SelectOption = {
+  id: string;
+  label: string;
+  helper?: string;
+};
+
+export type OperationFormOptions = {
+  properties: SelectOption[];
+  reservations: SelectOption[];
+};
 
 export type DashboardData = {
   executiveMetrics: ExecutiveMetric[];
@@ -47,7 +59,7 @@ type ReservationRow = {
   check_in: string;
   check_out: string;
   total_amount: number | string | null;
-  properties?: Relation<{ name: string | null; internal_name?: string | null }>;
+  properties?: Relation<{ id?: string; name: string | null; internal_name?: string | null; city?: string | null }>;
   guests?: Relation<{ full_name: string | null }>;
 };
 
@@ -110,18 +122,23 @@ const statusLabels: Record<string, string> = {
   checked_in: "En estancia",
   checked_out: "Check-out",
   confirmed: "Confirmada",
+  critical: "Critica",
   done: "Cerrada",
   draft: "Borrador",
   failed: "Error",
   high: "Alta",
   in_progress: "En curso",
   investigating: "Investigando",
+  inquiry: "Consulta",
   low: "Baja",
   medium: "Media",
   no_show: "No show",
   open: "Abierta",
   paused: "Pausado",
   pending: "Pendiente",
+  pending_guest: "Pendiente huesped",
+  pending_team: "Pendiente equipo",
+  resolved: "Resuelta",
   scheduled: "Programada",
 };
 
@@ -139,12 +156,20 @@ const channelLabels: Record<string, string> = {
   whatsapp: "WhatsApp",
 };
 
+const taskTypeLabels: Record<string, string> = {
+  admin: "Administracion",
+  cleaning: "Limpieza",
+  guest_request: "Peticion huesped",
+  inspection: "Inspeccion",
+  maintenance: "Mantenimiento",
+};
+
 function label(value: string | null | undefined) {
   if (!value) {
     return "Pendiente";
   }
 
-  return statusLabels[value] ?? channelLabels[value] ?? value;
+  return statusLabels[value] ?? channelLabels[value] ?? taskTypeLabels[value] ?? value;
 }
 
 function one<T>(relation: Relation<T>): T | null {
@@ -157,11 +182,8 @@ function one<T>(relation: Relation<T>): T | null {
 
 function money(value: number | string | null | undefined) {
   const numeric = Number(value ?? 0);
-  return new Intl.NumberFormat("es-ES", {
-    currency: "EUR",
-    maximumFractionDigits: 0,
-    style: "currency",
-  }).format(Number.isFinite(numeric) ? numeric : 0);
+  const safeValue = Number.isFinite(numeric) ? numeric : 0;
+  return `${new Intl.NumberFormat("es-ES", { maximumFractionDigits: 0 }).format(safeValue)} EUR`;
 }
 
 function parseMoney(value: string) {
@@ -206,7 +228,7 @@ function dueLabel(value: string | null | undefined) {
 }
 
 function isCriticalTask(task: TaskListItem) {
-  return ["Alta", "Urgente", "Media"].includes(task.priority) && !["Cerrada", "Cancelada"].includes(task.status);
+  return ["Alta", "Critica", "Media"].includes(task.priority) && !["Cerrada", "Cancelada"].includes(task.status);
 }
 
 function buildChannelHealth(reservations: ReservationListItem[]): ChannelHealthItem[] {
@@ -238,7 +260,7 @@ function buildOperationQueue({
   tasks: TaskListItem[];
 }): OperationQueueItem[] {
   const inboxItems = inboxThreads.slice(0, 2).map((thread) => ({
-    description: `${thread.property} · ${thread.channel}`,
+    description: `${thread.property} - ${thread.channel}`,
     due: thread.waiting,
     label: `Responder a ${thread.guest}`,
     priority: thread.status,
@@ -246,7 +268,7 @@ function buildOperationQueue({
   }));
 
   const taskItems = tasks.filter(isCriticalTask).slice(0, 2).map((task) => ({
-    description: `${task.property} · ${task.due}`,
+    description: `${task.property} - ${task.due}`,
     due: task.due,
     label: task.title,
     priority: task.priority,
@@ -254,7 +276,7 @@ function buildOperationQueue({
   }));
 
   const incidentItems = incidents.slice(0, 2).map((incident) => ({
-    description: `${incident.property} · ${incident.cost}`,
+    description: `${incident.property} - ${incident.cost}`,
     due: "Revisar hoy",
     label: incident.title,
     priority: incident.severity,
@@ -321,7 +343,7 @@ function buildCalendarMatrix(properties: PropertyCalendarRow[], reservations: Re
       }
 
       if (reservation.check_in === dateKey) {
-        return `Check-in · ${label(reservation.channel)}`;
+        return `Check-in - ${label(reservation.channel)}`;
       }
 
       if (reservation.check_out === dateKey) {
@@ -404,6 +426,7 @@ export async function getInboxThreads(): Promise<InboxThreadItem[]> {
       return {
         channel: label(latestMessage?.channel ?? reservation?.channel ?? "inbox"),
         guest: one(conversation.guests)?.full_name ?? "Contacto sin nombre",
+        id: conversation.id,
         message: latestMessage?.body ?? "Sin mensajes recientes.",
         property: one(conversation.properties)?.name ?? "Propiedad sin asignar",
         status: conversation.status === "open" ? "Urgente" : label(conversation.status),
@@ -434,6 +457,7 @@ export async function getTasks(): Promise<TaskListItem[]> {
 
     return (data as TaskRow[]).map((task) => ({
       due: dueLabel(task.due_at),
+      id: task.id,
       priority: label(task.priority),
       property: one(task.properties)?.name ?? "Propiedad sin asignar",
       status: label(task.status),
@@ -464,6 +488,7 @@ export async function getIncidents(): Promise<IncidentListItem[]> {
 
     return (data as IncidentRow[]).map((incident) => ({
       cost: incident.estimated_cost ? `${money(incident.estimated_cost)} estimados` : "Coste pendiente",
+      id: incident.id,
       property: one(incident.properties)?.name ?? "Propiedad sin asignar",
       severity: label(incident.severity),
       status: label(incident.status),
@@ -471,6 +496,52 @@ export async function getIncidents(): Promise<IncidentListItem[]> {
     }));
   } catch {
     return demoIncidents;
+  }
+}
+
+export async function getOperationFormOptions(): Promise<OperationFormOptions> {
+  const fallbackOptions = {
+    properties: demoProperties.map((property) => ({
+      helper: property.city,
+      id: property.id,
+      label: property.name,
+    })),
+    reservations: demoReservations.map((reservation) => ({
+      helper: reservation.dates,
+      id: reservation.id,
+      label: `${reservation.guest} - ${reservation.property}`,
+    })),
+  };
+
+  if (!isSupabaseConfigured()) {
+    return fallbackOptions;
+  }
+
+  try {
+    const supabase = await createSupabaseServerClient();
+    const [{ data: properties }, { data: reservations }] = await Promise.all([
+      supabase.from("properties").select("id,name,city,internal_name").order("name", { ascending: true }),
+      supabase
+        .from("reservations")
+        .select("id,check_in,check_out,properties(name),guests(full_name)")
+        .order("check_in", { ascending: false })
+        .limit(50),
+    ]);
+
+    return {
+      properties: ((properties ?? []) as PropertyCalendarRow[]).map((property) => ({
+        helper: property.internal_name ?? property.id.slice(0, 8),
+        id: property.id,
+        label: property.name,
+      })),
+      reservations: ((reservations ?? []) as ReservationRow[]).map((reservation) => ({
+        helper: dateRange(reservation.check_in, reservation.check_out),
+        id: reservation.id,
+        label: `${one(reservation.guests)?.full_name ?? "Huesped"} - ${one(reservation.properties)?.name ?? "Propiedad"}`,
+      })),
+    };
+  } catch {
+    return fallbackOptions;
   }
 }
 
@@ -542,7 +613,7 @@ export async function getDashboardData(): Promise<DashboardData> {
       automationRules,
       calendarDays: calendarMatrix.length ? calendarDays : demoCalendarDays,
       calendarMatrix: calendarMatrix.length ? calendarMatrix : demoCalendarMatrix,
-      channelHealth: buildChannelHealth(reservations),
+      channelHealth: reservations.length ? buildChannelHealth(reservations) : demoChannelHealth,
       executiveMetrics: buildExecutiveMetrics({ inboxThreads, incidents, reservations, tasks }),
       inboxThreads,
       incidents,

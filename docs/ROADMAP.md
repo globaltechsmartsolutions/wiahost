@@ -18,13 +18,19 @@
 - Profiles y roles.
 - Dashboard con queries reales.
 - CRUD de propiedades.
-- Reservas reales.
+- Reservas reales con creacion manual y cambio de estado.
 - Multi-calendario desde base de datos.
-- Inbox inicial.
-- Tareas de limpieza/mantenimiento.
-- Incidencias.
+- Inbox inicial con respuesta desde el panel.
+- Tareas de limpieza/mantenimiento con creacion y cambio de estado.
+- Incidencias con creacion, coste estimado y cambio de estado.
 - Suite robusta de calidad web: unit tests, E2E, visual regression, accesibilidad y Lighthouse CI.
 - Memoria de auditoria para evitar regresiones repetidas.
+
+### Estado actual de Fase 1
+
+- Implementado: dashboard operativo, paginas de reservas, inbox, tareas e incidencias conectadas a Supabase con fallback demo.
+- Implementado: Server Actions para crear reservas manuales, crear tareas, crear incidencias, responder conversaciones y actualizar estados.
+- Pendiente inmediato: detalle por entidad, edicion completa, borrado/archivo controlado, filtros avanzados y pruebas E2E de flujos con Supabase local.
 
 ## Fase 2 - Operacion PMS
 

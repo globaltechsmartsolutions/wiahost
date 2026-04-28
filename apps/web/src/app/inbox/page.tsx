@@ -2,38 +2,61 @@ import { EmptyState } from "@/components/empty-state";
 import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader } from "@/components/page-header";
 import { StatusBadge } from "@/components/status-badge";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { Textarea } from "@/components/ui/textarea";
+import { sendConversationReplyAction } from "@/lib/actions/operations";
 import { getInboxThreads } from "@/lib/data/operations";
 
 export const dynamic = "force-dynamic";
 
-export default async function InboxPage() {
-  const inboxThreads = await getInboxThreads();
+type InboxPageProps = {
+  searchParams?: Promise<{ error?: string }>;
+};
+
+export default async function InboxPage({ searchParams }: InboxPageProps) {
+  const [inboxThreads, params] = await Promise.all([getInboxThreads(), searchParams]);
 
   return (
     <AppShell>
       <PageHeader
         eyebrow="Inbox unificado"
         title="Conversaciones de canales y web directa en una bandeja."
-        description="Preparado para WhatsApp Business, email, Airbnb, Booking, Vrbo y formularios propios con SLA de respuesta."
+        description="Responde desde el panel y deja preparada la base para WhatsApp Business, email, Airbnb, Booking, Vrbo y formularios propios."
       />
+
+      {params?.error ? (
+        <div className="rounded-3xl border border-destructive/30 bg-destructive/10 px-5 py-4 text-sm text-destructive">
+          {params.error}
+        </div>
+      ) : null}
 
       {inboxThreads.length ? (
         <Card className="rounded-[2rem] border-border/80 bg-card/80">
           <CardContent className="space-y-3 p-5">
             {inboxThreads.map((thread) => (
               <div
-                key={`${thread.guest}-${thread.waiting}`}
-                className="grid gap-4 rounded-3xl border border-border/80 bg-background/60 p-4 md:grid-cols-[0.8fr_1.3fr_0.4fr] md:items-center"
+                key={thread.id}
+                className="grid gap-4 rounded-3xl border border-border/80 bg-background/60 p-4 xl:grid-cols-[0.8fr_1.2fr_0.45fr] xl:items-start"
               >
                 <div>
                   <p className="font-semibold">{thread.guest}</p>
                   <p className="text-sm text-muted-foreground">
-                    {thread.property} · {thread.channel}
+                    {thread.property} - {thread.channel}
                   </p>
                 </div>
-                <p className="text-sm leading-6">{thread.message}</p>
-                <div className="flex items-center justify-between gap-3 md:justify-end">
+                <div>
+                  <p className="text-sm leading-6">{thread.message}</p>
+                  <form action={sendConversationReplyAction} className="mt-4 grid gap-2">
+                    <input type="hidden" name="conversationId" value={thread.id} />
+                    <input type="hidden" name="channel" value="inbox" />
+                    <Textarea name="body" required placeholder="Responder al huesped..." className="min-h-20 bg-card" />
+                    <Button type="submit" size="sm" className="justify-self-end rounded-full">
+                      Enviar respuesta
+                    </Button>
+                  </form>
+                </div>
+                <div className="flex items-center justify-between gap-3 xl:justify-end">
                   <span className="text-sm text-muted-foreground">{thread.waiting}</span>
                   <StatusBadge value={thread.status} />
                 </div>
