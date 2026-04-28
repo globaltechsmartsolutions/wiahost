@@ -14,19 +14,11 @@ import { AppShell } from "@/components/layout/app-shell";
 import { StatusBadge } from "@/components/status-badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  automationRules,
-  calendarDays,
-  calendarMatrix,
-  channelHealth,
-  executiveMetrics,
-  inboxThreads,
-  operationQueue,
-  reservations,
-  tasks,
-} from "@/lib/demo-data";
+import { getDashboardData, type ExecutiveMetric } from "@/lib/data/operations";
 
-function MetricTile({ metric }: { metric: (typeof executiveMetrics)[number] }) {
+export const dynamic = "force-dynamic";
+
+function MetricTile({ metric }: { metric: ExecutiveMetric }) {
   const tone =
     metric.tone === "positive"
       ? "bg-emerald-100 text-emerald-900"
@@ -66,7 +58,19 @@ function CalendarCell({ value }: { value: string }) {
   );
 }
 
-export default function DashboardPage() {
+export default async function DashboardPage() {
+  const {
+    automationRules,
+    calendarDays,
+    calendarMatrix,
+    channelHealth,
+    executiveMetrics,
+    inboxThreads,
+    operationQueue,
+    reservations,
+    tasks,
+  } = await getDashboardData();
+
   return (
     <AppShell>
       <section className="relative overflow-hidden rounded-[2.2rem] border border-[#dfd2bf] bg-[#160f09] p-5 text-white shadow-2xl sm:p-7">
