@@ -60,7 +60,7 @@ function CalendarCell({ value }: { value: string }) {
           : "border-[#dfd2bf] bg-white/60 text-[#75695b]";
 
   return (
-    <div className={`min-h-16 rounded-2xl border px-3 py-2 text-xs font-semibold leading-5 ${tone}`}>
+    <div className={`min-h-14 rounded-2xl border px-3 py-2 text-xs font-semibold leading-5 ${tone}`}>
       {value}
     </div>
   );
@@ -132,12 +132,12 @@ export default function DashboardPage() {
                 </div>
                 {calendarMatrix.map((row) => (
                   <div key={row.code} className="grid grid-cols-[210px_repeat(7,1fr)] border-b border-[#eadfce] last:border-b-0">
-                    <div className="px-5 py-4">
+                    <div className="px-5 py-3.5">
                       <p className="font-semibold">{row.property}</p>
                       <p className="mt-1 font-mono text-xs text-[#75695b]">{row.code}</p>
                     </div>
                     {row.cells.map((cell, index) => (
-                      <div key={`${row.code}-${calendarDays[index].date}`} className="border-l border-[#eadfce] p-2">
+                      <div key={`${row.code}-${calendarDays[index].date}`} className="border-l border-[#eadfce] p-1.5">
                         <CalendarCell value={cell} />
                       </div>
                     ))}
@@ -145,20 +145,31 @@ export default function DashboardPage() {
                 ))}
               </div>
             </div>
+            <div className="flex flex-wrap items-center justify-between gap-3 border-t border-[#eadfce] bg-[#fbf7ef] px-5 py-3">
+              <div className="flex flex-wrap gap-2 text-xs font-medium text-[#75695b]">
+                <span className="rounded-full border border-emerald-300 bg-emerald-50 px-3 py-1 text-emerald-800">Check-in</span>
+                <span className="rounded-full border border-blue-300 bg-blue-50 px-3 py-1 text-blue-800">Check-out</span>
+                <span className="rounded-full border border-[#d6c4a8] bg-[#efe3cf] px-3 py-1 text-[#3a2a18]">Ocupado</span>
+                <span className="rounded-full border border-red-300 bg-red-50 px-3 py-1 text-red-800">Bloqueo</span>
+              </div>
+              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#75695b]">
+                Sync OTA activo · sin dobles reservas
+              </p>
+            </div>
           </CardContent>
         </Card>
 
         <Card className="self-start rounded-[2rem] border-[#dfd2bf] bg-white/74 shadow-sm">
-          <CardHeader>
+          <CardHeader className="pb-3">
             <CardTitle className="flex items-center gap-2 text-xl">
               <Activity className="size-5" />
               Cola prioritaria
             </CardTitle>
             <p className="text-sm text-[#75695b]">Siguiente mejor acción para operaciones.</p>
           </CardHeader>
-          <CardContent className="space-y-3">
+          <CardContent className="space-y-2.5">
             {operationQueue.map((item) => (
-              <div key={item.label} className="rounded-3xl border border-[#dfd2bf] bg-[#fbf7ef] p-4">
+              <div key={item.label} className="rounded-3xl border border-[#dfd2bf] bg-[#fbf7ef] p-3.5">
                 <div className="flex items-start justify-between gap-3">
                   <div>
                     <p className="font-semibold">{item.label}</p>
@@ -166,7 +177,7 @@ export default function DashboardPage() {
                   </div>
                   <StatusBadge value={item.priority} />
                 </div>
-                <div className="mt-4 flex items-center justify-between text-xs text-[#75695b]">
+                <div className="mt-2.5 flex items-center justify-between text-xs text-[#75695b]">
                   <span>{item.type}</span>
                   <span>{item.due}</span>
                 </div>

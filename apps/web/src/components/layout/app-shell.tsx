@@ -62,7 +62,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           </Link>
         </div>
 
-        <nav className="flex-1 space-y-6 overflow-y-auto p-4">
+        <nav className="min-h-0 flex-1 space-y-5 overflow-y-auto p-4 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {navSections.map((section) => (
             <div key={section.title}>
               <p className="px-3 text-[0.68rem] font-semibold uppercase tracking-[0.24em] text-white/35">
@@ -84,13 +84,13 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           ))}
         </nav>
 
-        <div className="p-4">
-          <div className="rounded-[1.5rem] border border-[#d8ff74]/25 bg-[#d8ff74]/10 p-4">
+        <div className="p-3">
+          <div className="rounded-[1.5rem] border border-[#d8ff74]/25 bg-[#d8ff74]/10 p-3.5">
             <div className="flex items-center gap-2 text-[#d8ff74]">
               <BarChart3 className="size-4" />
               <p className="text-sm font-semibold">Portfolio health</p>
             </div>
-            <p className="mt-3 text-3xl font-semibold">92%</p>
+            <p className="mt-2 text-3xl font-semibold">92%</p>
             <p className="mt-1 text-xs leading-5 text-white/55">
               Canales sincronizados, SLA de mensajes y tareas críticas bajo control.
             </p>

@@ -238,4 +238,9 @@ export const calendarMatrix = [
     code: "VLC-SEA-03",
     cells: ["Limpieza", "Libre", "Libre", "Libre", "Check-in · Booking", "Ocupado", "Bloqueo"],
   },
+  {
+    property: "Eixample Urban Suite",
+    code: "BCN-EIX-04",
+    cells: ["Check-out", "Limpieza", "Libre", "Check-in · Vrbo", "Ocupado", "Ocupado", "Libre"],
+  },
 ];
