@@ -107,6 +107,18 @@
       "auth": "protected",
       "primaryCheck": "Inbox reply API flow writes a visible outbound message and filters preserve the conversation",
       "tests": ["critical", "data", "a11y", "visual"]
+    },
+    {
+      "path": "/owners",
+      "auth": "protected",
+      "primaryCheck": "Owner portal reads owner accounts, assets, revenue, payouts and open incidents from Supabase",
+      "tests": ["critical", "data", "a11y", "visual"]
+    },
+    {
+      "path": "/settings",
+      "auth": "protected",
+      "primaryCheck": "Settings reads current profile and updates phone/full name through a Server Action",
+      "tests": ["critical", "data", "a11y", "visual"]
     }
   ]
 }

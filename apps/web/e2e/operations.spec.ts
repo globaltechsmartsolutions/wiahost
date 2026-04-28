@@ -277,4 +277,30 @@ test.describe("operations flows with Supabase @critical @data", () => {
     await page.goto(`/properties/${propertyBody.data.id}`);
     await expect(page.getByText("Archivado")).toBeVisible();
   });
+
+  test("loads owner portal data and updates the current profile settings", async ({
+    page,
+  }) => {
+    await page.goto("/owners");
+    await expect(
+      page.getByRole("heading", { name: /liquidaciones/i }),
+    ).toBeVisible();
+    await expect(page.getByText("Carlos Propietario")).toBeVisible();
+    await expect(page.getByText("Atico Gran Via Sky")).toBeVisible();
+
+    await page.goto("/settings");
+    await expect(page.locator("#email")).toHaveValue(
+      "operaciones@wiahost.local",
+    );
+
+    const phone = `+34${Date.now().toString().slice(-9)}`;
+    await page.locator("#phone").fill(phone);
+    await page.getByRole("button", { name: /guardar perfil/i }).click();
+
+    await expect(page).toHaveURL(/\/settings\?updated=1$/);
+    await expect(
+      page.getByText("Perfil actualizado correctamente."),
+    ).toBeVisible();
+    await expect(page.locator("#phone")).toHaveValue(phone);
+  });
 });

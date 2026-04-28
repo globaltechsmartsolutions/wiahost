@@ -56,6 +56,8 @@ const routes: AccessibilityRoute[] = [
     path: `/incidents/${seedIds.incidentId}/edit`,
     requiresAuth: true,
   },
+  { name: "owners", path: "/owners", requiresAuth: true },
+  { name: "settings", path: "/settings", requiresAuth: true },
 ];
 
 function formatViolations(

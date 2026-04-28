@@ -20,9 +20,9 @@ Ya existe:
 - Tests iniciales de validadores compartidos.
 - Test inicial de configuracion Supabase.
 - `playwright.config.ts` formal en `apps/web`.
-- Tests E2E versionados para smoke publico/auth, login demo, creacion/edicion de reserva UI/API y mutaciones API completas de tareas, incidencias e inbox.
-- Auditoria de accesibilidad con `@axe-core/playwright` sobre rutas publicas, protegidas, detalle y edicion de operaciones.
-- Baseline visual inicial para landing/auth y check de overflow/alineacion del dashboard, operaciones y editores.
+- Tests E2E versionados para smoke publico/auth, login demo, creacion/edicion de reserva UI/API, owners/settings y mutaciones API completas de tareas, incidencias e inbox.
+- Auditoria de accesibilidad con `@axe-core/playwright` sobre rutas publicas, protegidas, detalle, edicion de operaciones, owners y settings.
+- Baseline visual inicial para landing/auth y check de overflow/alineacion del dashboard, operaciones, editores, owners y settings.
 - Memoria versionada en `quality/audit-memory`.
 - Lighthouse CI configurado para landing/login/register con budgets iniciales, reportes en filesystem y wrapper local para estabilizar Chrome en Windows.
 - CI inicial con typecheck, lint, unit tests y build web.
@@ -141,6 +141,8 @@ Rutas iniciales:
 - `/incidents/:incidentId`
 - `/incidents/:incidentId/edit`
 - `/inbox`
+- `/owners`
+- `/settings`
 
 ### 6. Performance, SEO and best practices
 
@@ -338,7 +340,7 @@ Un cambio no deberia entrar si:
 - Hecho: crear `playwright.config.ts`.
 - Hecho: crear `apps/web/e2e/smoke.spec.ts`.
 - Hecho: crear `apps/web/e2e/operations.spec.ts`.
-- Hecho: validar landing, login, register, dashboard protegido, login demo, reserva UI/API, tareas, incidencias e inbox.
+- Hecho: validar landing, login, register, dashboard protegido, login demo, reserva UI/API, tareas, incidencias, inbox, owners y settings.
 - Hecho: guardar traces, screenshots y video en fallo.
 
 ### Paso 2
@@ -348,6 +350,7 @@ Un cambio no deberia entrar si:
 - Hecho: check de dashboard sin overflow horizontal y con calendario/cola prioritaria alineados.
 - Hecho: check visual de rutas operativas `/reservations`, `/tasks`, `/incidents` e `/inbox` sin overflow en desktop portatil y con filtros visibles.
 - Hecho: check visual de rutas detalle/edicion de reservas, tareas e incidencias sin overflow en desktop portatil.
+- Hecho: check visual de owners/settings sin overflow en desktop portatil.
 - Hecho: desactivar animaciones en modo test.
 
 ### Paso 3

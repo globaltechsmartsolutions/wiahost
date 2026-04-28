@@ -70,6 +70,7 @@ La UI combina datos demo con primeras integraciones reales:
 - Dashboard, reservas, calendario, inbox, tareas e incidencias leen de Supabase con fallback demo.
 - Reservas, tareas e incidencias tienen creacion, detalle, edicion completa y actualizacion de estado mediante Server Actions y Route Handlers compartiendo servicios de mutacion.
 - Reservas, tareas, incidencias e inbox tienen filtros GET server-side sobre los datos cargados para proteger deep links y futura app movil.
-- Owners y settings siguen siendo principalmente demo.
+- Owners lee owner accounts, propiedades, reservas e incidencias desde Supabase con fallback demo.
+- Settings lee el perfil autenticado desde Supabase y permite actualizar nombre/telefono mediante Server Action.
 
 La prioridad tecnica actual es conectar cada pantalla PMS a Supabase manteniendo RLS, validadores compartidos y tests.
