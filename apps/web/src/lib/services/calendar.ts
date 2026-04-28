@@ -43,3 +43,52 @@ export async function createCalendarBlock(
 
   return data;
 }
+
+export async function updateCalendarBlock(
+  supabase: SupabaseServerClient,
+  blockId: string,
+  input: CalendarBlockInput,
+) {
+  const { data, error } = await supabase
+    .from("calendar_blocks")
+    .update({
+      end_date: input.endDate,
+      property_id: input.propertyId,
+      reason: input.reason,
+      source: input.source,
+      start_date: input.startDate,
+    })
+    .eq("id", blockId)
+    .select("id,property_id,start_date,end_date,reason")
+    .single();
+
+  if (error || !data) {
+    mutationError(
+      "calendar_block_update_failed",
+      "No se ha podido actualizar el bloqueo.",
+    );
+  }
+
+  return data;
+}
+
+export async function deleteCalendarBlock(
+  supabase: SupabaseServerClient,
+  blockId: string,
+) {
+  const { data, error } = await supabase
+    .from("calendar_blocks")
+    .delete()
+    .eq("id", blockId)
+    .select("id")
+    .single();
+
+  if (error || !data) {
+    mutationError(
+      "calendar_block_delete_failed",
+      "No se ha podido eliminar el bloqueo.",
+    );
+  }
+
+  return data;
+}

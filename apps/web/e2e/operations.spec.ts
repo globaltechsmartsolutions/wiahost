@@ -286,7 +286,9 @@ test.describe("operations flows with Supabase @critical @data", () => {
       page.getByRole("heading", { name: /liquidaciones/i }),
     ).toBeVisible();
     await expect(page.getByText("Carlos Propietario")).toBeVisible();
-    await expect(page.getByText("Atico Gran Via Sky").last()).toBeVisible();
+    await expect(
+      page.locator("p").filter({ hasText: "Atico Gran Via Sky" }).first(),
+    ).toBeVisible();
 
     await page.goto("/settings");
     await expect(page.locator("#email")).toHaveValue(
@@ -364,12 +366,45 @@ test.describe("operations flows with Supabase @critical @data", () => {
       },
     });
     expect(blockResponse.status()).toBe(201);
+    const blockBody = (await blockResponse.json()) as { data: { id: string } };
+
+    const updatedBlockReason = `${blockReason} editado`;
+    const blockPatchResponse = await page.request.patch(
+      `/api/calendar-blocks/${blockBody.data.id}`,
+      {
+        data: {
+          endDate: isoDateFromToday(7),
+          propertyId: seedIds.propertyId,
+          reason: updatedBlockReason,
+          source: "manual",
+          startDate: isoDateFromToday(6),
+        },
+      },
+    );
+    expect(blockPatchResponse.status()).toBe(200);
+
+    const blockDetailResponse = await page.request.get(
+      `/api/calendar-blocks/${blockBody.data.id}`,
+    );
+    expect(blockDetailResponse.status()).toBe(200);
 
     await page.goto("/calendar");
     await expect(
       page.getByRole("heading", { name: /disponibilidad/i }),
     ).toBeVisible();
-    await expect(page.getByText("Atico Gran Via Sky").last()).toBeVisible();
-    await expect(page.getByText(`Bloqueo - ${blockReason}`)).toBeVisible();
+    await expect(
+      page.locator("p").filter({ hasText: "Atico Gran Via Sky" }).first(),
+    ).toBeVisible();
+    await expect(
+      page.getByText(`Bloqueo - ${updatedBlockReason}`),
+    ).toBeVisible();
+
+    const blockDeleteResponse = await page.request.delete(
+      `/api/calendar-blocks/${blockBody.data.id}`,
+    );
+    expect(blockDeleteResponse.status()).toBe(200);
+
+    await page.goto("/calendar");
+    await expect(page.getByText(updatedBlockReason)).not.toBeVisible();
   });
 });

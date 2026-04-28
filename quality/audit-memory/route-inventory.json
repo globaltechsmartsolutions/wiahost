@@ -27,7 +27,7 @@
     {
       "path": "/calendar",
       "auth": "protected",
-      "primaryCheck": "Calendar matrix renders real active-property availability and accepts manual blocks without page overflow",
+      "primaryCheck": "Calendar matrix renders real active-property availability and creates, updates and deletes manual blocks without page overflow",
       "tests": ["critical", "data", "a11y", "visual"]
     },
     {

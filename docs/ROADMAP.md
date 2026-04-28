@@ -41,7 +41,7 @@
 - Implementado: settings conectado a Supabase con lectura y actualizacion del perfil operativo.
 - Implementado: CRM de huespedes conectado a Supabase con listado, filtro, alta y API GET/POST.
 - Implementado: ficha y edicion de huespedes con contexto de reservas, conversaciones, notas internas y API GET/PATCH.
-- Implementado: calendario multi-propiedad conectado a la matriz real de reservas, excluyendo propiedades archivadas, con alta de bloqueos manuales por UI/API.
+- Implementado: calendario multi-propiedad conectado a la matriz real de reservas, excluyendo propiedades archivadas, con alta, edicion y eliminacion de bloqueos manuales por UI/API.
 - Implementado: feedback visual basico tras crear reservas/tareas/incidencias, enviar respuestas y actualizar estados.
 - Implementado: filtros operativos en reservas, tareas, incidencias e inbox por busqueda y estado/canal/prioridad/severidad segun modulo.
 - Implementado: Supabase local verificado con Auth, seed demo, tipos generados y escrituras reales desde UI/API.
@@ -56,7 +56,7 @@
 - Implementado: primera vista del dashboard mas densa, con sidebar/topbar/hero/cards compactos y calendario visible antes.
 - Implementado: memoria versionada en `quality/audit-memory` con reglas visuales, riesgos, rutas y hallazgos previos.
 - Implementado: CI inicial con typecheck, lint, unit tests, build web y Lighthouse CI no bloqueante con reportes como artefacto.
-- Pendiente inmediato: edicion/eliminacion de bloqueos de calendario, snapshots visuales estables por modulo y endurecer Lighthouse cuando haya baseline historico.
+- Pendiente inmediato: snapshots visuales estables por modulo y endurecer Lighthouse cuando haya baseline historico.
 
 ## Fase 2 - Operacion PMS
 
