@@ -39,6 +39,60 @@ async function expectBottomAligned(page: Page, firstTestId: string, secondTestId
   expect(Math.abs(firstBottom - secondBottom)).toBeLessThanOrEqual(2);
 }
 
+async function expectDashboardGridGaps(page: Page) {
+  const result = await page.getByTestId("dashboard-content-grid").evaluate((grid) => {
+    const styles = window.getComputedStyle(grid);
+    const columnGap = Number.parseFloat(styles.columnGap);
+    const rowGap = Number.parseFloat(styles.rowGap);
+    const children = Array.from(grid.children).map((child) => {
+      const rect = child.getBoundingClientRect();
+
+      return {
+        bottom: rect.bottom,
+        left: rect.left,
+        right: rect.right,
+        top: rect.top,
+      };
+    });
+
+    const rows = new Map<number, typeof children>();
+    for (const child of children) {
+      const key = Math.round(child.top);
+      rows.set(key, [...(rows.get(key) ?? []), child]);
+    }
+
+    const rowValues = Array.from(rows.entries())
+      .map(([top, items]) => ({
+        items: items.sort((first, second) => first.left - second.left),
+        maxBottom: Math.max(...items.map((item) => item.bottom)),
+        top,
+      }))
+      .sort((first, second) => first.top - second.top);
+
+    const horizontalGaps = rowValues.flatMap((row) =>
+      row.items.slice(1).map((item, index) => item.left - row.items[index].right),
+    );
+    const verticalGaps = rowValues
+      .slice(1)
+      .map((row, index) => row.top - rowValues[index].maxBottom);
+
+    return {
+      columnGap,
+      horizontalGaps,
+      rowGap,
+      verticalGaps,
+    };
+  });
+
+  for (const gap of result.horizontalGaps) {
+    expect(Math.abs(gap - result.columnGap)).toBeLessThanOrEqual(2);
+  }
+
+  for (const gap of result.verticalGaps) {
+    expect(Math.abs(gap - result.rowGap)).toBeLessThanOrEqual(2);
+  }
+}
+
 test.describe("visual regression baseline @visual", () => {
   test("landing desktop stays visually stable", async ({ page }) => {
     await page.setViewportSize({ height: 900, width: 1440 });
@@ -93,6 +147,7 @@ test.describe("visual regression baseline @visual", () => {
     await prepareVisualPage(page);
     await expectNoHorizontalOverflow(page);
     await expectBottomAligned(page, "dashboard-calendar-card", "dashboard-priority-card");
+    await expectDashboardGridGaps(page);
     await page.screenshot({
       fullPage: true,
       path: testInfo.outputPath("dashboard-current.png"),

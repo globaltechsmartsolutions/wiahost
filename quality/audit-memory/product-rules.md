@@ -13,6 +13,8 @@ These rules describe the quality bar WIAHost should preserve as the product grow
 
 - Cards in the same grid should use equal row heights where the information hierarchy benefits from comparison.
 - Dashboard modules must avoid random width jumps between rows.
+- Dashboard content must use a shared column grid so gutters line up across rows, even when one row has 2 cards and another has 3 or 4.
+- The amount of cards can change, but the gaps between cards must remain aligned to the same grid rhythm.
 - Dashboard rows must not leave dead background gaps between modules; if two cards share a row on desktop, their top and bottom edges must align.
 - If one card has more content than its neighbor, the neighbor should stretch as a card, not leave an external hole in the page background.
 - Sidebar must never show a stray native scrollbar in normal desktop viewport.

@@ -31,7 +31,7 @@ function MetricTile({ metric }: { metric: ExecutiveMetric }) {
     <Card className="h-full rounded-[1.7rem] border-[#dfd2bf] bg-white/72 shadow-sm">
       <CardContent className="p-5">
         <div className="flex items-start justify-between gap-3">
-          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#75695b]">{metric.label}</p>
+          <p className="text-[0.68rem] font-semibold uppercase tracking-[0.18em] text-[#75695b] 2xl:tracking-[0.24em]">{metric.label}</p>
           <span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${tone}`}>Live</span>
         </div>
         <p className="mt-7 text-4xl font-semibold tracking-[-0.04em]">{metric.value}</p>
@@ -103,18 +103,17 @@ export default async function DashboardPage() {
         </div>
       </section>
 
-      <section className="mt-5 grid auto-rows-fr gap-4 md:grid-cols-2 xl:grid-cols-4">
-        {executiveMetrics.map((metric) => (
-          <MetricTile key={metric.label} metric={metric} />
-        ))}
-      </section>
-
       <section
-        className="mt-5 grid items-stretch gap-5 xl:grid-cols-[1.4fr_0.6fr]"
-        data-testid="dashboard-calendar-priority-grid"
+        className="mt-5 grid gap-5 md:grid-cols-6 xl:grid-cols-12"
+        data-testid="dashboard-content-grid"
       >
+        {executiveMetrics.map((metric) => (
+          <div key={metric.label} className="md:col-span-3 xl:col-span-3">
+            <MetricTile metric={metric} />
+          </div>
+        ))}
         <Card
-          className="flex h-full overflow-hidden rounded-[2rem] border-[#dfd2bf] bg-white/74 shadow-sm"
+          className="flex h-full overflow-hidden rounded-[2rem] border-[#dfd2bf] bg-white/74 shadow-sm md:col-span-6 xl:col-span-8"
           data-testid="dashboard-calendar-card"
         >
           <CardHeader className="flex flex-row items-center justify-between border-b border-[#eadfce]">
@@ -126,7 +125,7 @@ export default async function DashboardPage() {
               <p className="mt-1 text-sm text-[#75695b]">Disponibilidad, reservas, limpiezas y bloqueos por activo.</p>
             </div>
             <Button variant="outline" className="rounded-full border-[#dfd2bf] bg-white" asChild>
-              <a href="/calendar">Abrir vista completa</a>
+              <Link href="/calendar">Abrir vista completa</Link>
             </Button>
           </CardHeader>
           <CardContent className="p-0">
@@ -176,7 +175,7 @@ export default async function DashboardPage() {
         </Card>
 
         <Card
-          className="flex h-full flex-col rounded-[2rem] border-[#dfd2bf] bg-white/74 shadow-sm"
+          className="flex h-full flex-col rounded-[2rem] border-[#dfd2bf] bg-white/74 shadow-sm md:col-span-6 xl:col-span-4"
           data-testid="dashboard-priority-card"
         >
           <CardHeader className="pb-3">
@@ -207,10 +206,8 @@ export default async function DashboardPage() {
             </Button>
           </CardContent>
         </Card>
-      </section>
 
-      <section className="mt-5 grid auto-rows-fr gap-5 xl:grid-cols-3">
-        <Card className="h-full rounded-[2rem] border-[#dfd2bf] bg-white/74 shadow-sm">
+        <Card className="h-full rounded-[2rem] border-[#dfd2bf] bg-white/74 shadow-sm md:col-span-3 xl:col-span-4">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Inbox className="size-5" />
@@ -233,7 +230,7 @@ export default async function DashboardPage() {
           </CardContent>
         </Card>
 
-        <Card className="h-full rounded-[2rem] border-[#dfd2bf] bg-white/74 shadow-sm">
+        <Card className="h-full rounded-[2rem] border-[#dfd2bf] bg-white/74 shadow-sm md:col-span-3 xl:col-span-4">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <CircleDollarSign className="size-5" />
@@ -259,7 +256,7 @@ export default async function DashboardPage() {
           </CardContent>
         </Card>
 
-        <Card className="h-full rounded-[2rem] border-[#dfd2bf] bg-white/74 shadow-sm">
+        <Card className="h-full rounded-[2rem] border-[#dfd2bf] bg-white/74 shadow-sm md:col-span-6 xl:col-span-4">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Sparkles className="size-5" />
@@ -279,10 +276,8 @@ export default async function DashboardPage() {
             ))}
           </CardContent>
         </Card>
-      </section>
 
-      <section className="mt-5 grid auto-rows-fr gap-5 xl:grid-cols-[0.75fr_1.25fr]">
-        <Card className="h-full rounded-[2rem] border-[#dfd2bf] bg-white/74 shadow-sm">
+        <Card className="h-full rounded-[2rem] border-[#dfd2bf] bg-white/74 shadow-sm md:col-span-6 xl:col-span-4">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Wrench className="size-5" />
@@ -302,7 +297,7 @@ export default async function DashboardPage() {
           </CardContent>
         </Card>
 
-        <Card className="h-full rounded-[2rem] border-[#dfd2bf] bg-white/74 shadow-sm">
+        <Card className="h-full rounded-[2rem] border-[#dfd2bf] bg-white/74 shadow-sm md:col-span-6 xl:col-span-8">
           <CardHeader>
             <CardTitle>Reservas que mueven la operación</CardTitle>
           </CardHeader>

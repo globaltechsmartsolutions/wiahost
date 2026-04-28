@@ -176,6 +176,7 @@ quality/
 - Reglas visuales del producto.
 - Ejemplo: dashboard profesional, cards alineadas, sidebar sin barras raras, mobile sin overflow.
 - Regla obligatoria: no puede haber huecos muertos entre cards del dashboard; si dos cards comparten fila en desktop, deben alinear borde superior e inferior.
+- Regla obligatoria: el numero de cards puede variar, pero los huecos entre ellas deben caer sobre la misma rejilla/gutter del dashboard.
 
 `quality/audit-memory/known-risks.md`
 
