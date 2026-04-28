@@ -36,6 +36,38 @@ export type OperationFormOptions = {
   reservations: SelectOption[];
 };
 
+export type DetailField = {
+  label: string;
+  value: string;
+};
+
+export type ReservationDetail = ReservationListItem & {
+  fields: DetailField[];
+  notes: string;
+};
+
+export type TaskDetail = TaskListItem & {
+  description: string;
+  fields: DetailField[];
+};
+
+export type IncidentDetail = IncidentListItem & {
+  description: string;
+  fields: DetailField[];
+};
+
+export type ConversationMessageItem = {
+  id: string;
+  body: string;
+  channel: string;
+  direction: string;
+  sentAt: string;
+};
+
+export type ConversationDetail = InboxThreadItem & {
+  messages: ConversationMessageItem[];
+};
+
 export type DashboardData = {
   executiveMetrics: ExecutiveMetric[];
   calendarDays: CalendarDay[];
@@ -59,7 +91,12 @@ type ReservationRow = {
   check_in: string;
   check_out: string;
   total_amount: number | string | null;
-  properties?: Relation<{ id?: string; name: string | null; internal_name?: string | null; city?: string | null }>;
+  properties?: Relation<{
+    id?: string;
+    name: string | null;
+    internal_name?: string | null;
+    city?: string | null;
+  }>;
   guests?: Relation<{ full_name: string | null }>;
 };
 
@@ -73,11 +110,13 @@ type ConversationRow = {
 };
 
 type MessageRow = {
+  id?: string;
   conversation_id: string;
   channel: string;
   body: string;
   sent_at: string;
   direction: string;
+  read_at?: string | null;
 };
 
 type TaskRow = {
@@ -96,7 +135,15 @@ type IncidentRow = {
   status: string;
   severity: string;
   estimated_cost: number | string | null;
+  description?: string | null;
+  charge_amount?: number | string | null;
+  created_at?: string | null;
   properties?: Relation<{ name: string | null }>;
+  reservations?: Relation<{
+    id: string | null;
+    check_in: string | null;
+    check_out: string | null;
+  }>;
 };
 
 type PropertyCalendarRow = {
@@ -169,7 +216,12 @@ function label(value: string | null | undefined) {
     return "Pendiente";
   }
 
-  return statusLabels[value] ?? channelLabels[value] ?? taskTypeLabels[value] ?? value;
+  return (
+    statusLabels[value] ??
+    channelLabels[value] ??
+    taskTypeLabels[value] ??
+    value
+  );
 }
 
 function one<T>(relation: Relation<T>): T | null {
@@ -187,12 +239,18 @@ function money(value: number | string | null | undefined) {
 }
 
 function parseMoney(value: string) {
-  const normalized = value.replace(/[^\d,.-]/g, "").replace(/\./g, "").replace(",", ".");
+  const normalized = value
+    .replace(/[^\d,.-]/g, "")
+    .replace(/\./g, "")
+    .replace(",", ".");
   return Number(normalized) || 0;
 }
 
 function shortDate(value: string) {
-  return new Intl.DateTimeFormat("es-ES", { day: "2-digit", month: "short" }).format(new Date(value));
+  return new Intl.DateTimeFormat("es-ES", {
+    day: "2-digit",
+    month: "short",
+  }).format(new Date(value));
 }
 
 function dateRange(checkIn: string, checkOut: string) {
@@ -204,7 +262,10 @@ function waitingSince(value: string | null | undefined) {
     return "Sin fecha";
   }
 
-  const minutes = Math.max(0, Math.round((Date.now() - new Date(value).getTime()) / 60000));
+  const minutes = Math.max(
+    0,
+    Math.round((Date.now() - new Date(value).getTime()) / 60000),
+  );
 
   if (minutes < 60) {
     return `${minutes} min`;
@@ -228,14 +289,22 @@ function dueLabel(value: string | null | undefined) {
 }
 
 function isCriticalTask(task: TaskListItem) {
-  return ["Alta", "Critica", "Media"].includes(task.priority) && !["Cerrada", "Cancelada"].includes(task.status);
+  return (
+    ["Alta", "Critica", "Media"].includes(task.priority) &&
+    !["Cerrada", "Cancelada"].includes(task.status)
+  );
 }
 
-function buildChannelHealth(reservations: ReservationListItem[]): ChannelHealthItem[] {
+function buildChannelHealth(
+  reservations: ReservationListItem[],
+): ChannelHealthItem[] {
   const grouped = new Map<string, { bookings: number; revenue: number }>();
 
   for (const reservation of reservations) {
-    const current = grouped.get(reservation.channel) ?? { bookings: 0, revenue: 0 };
+    const current = grouped.get(reservation.channel) ?? {
+      bookings: 0,
+      revenue: 0,
+    };
     current.bookings += 1;
     current.revenue += parseMoney(reservation.amount);
     grouped.set(reservation.channel, current);
@@ -267,13 +336,16 @@ function buildOperationQueue({
     type: "Inbox",
   }));
 
-  const taskItems = tasks.filter(isCriticalTask).slice(0, 2).map((task) => ({
-    description: `${task.property} - ${task.due}`,
-    due: task.due,
-    label: task.title,
-    priority: task.priority,
-    type: task.type,
-  }));
+  const taskItems = tasks
+    .filter(isCriticalTask)
+    .slice(0, 2)
+    .map((task) => ({
+      description: `${task.property} - ${task.due}`,
+      due: task.due,
+      label: task.title,
+      priority: task.priority,
+      type: task.type,
+    }));
 
   const incidentItems = incidents.slice(0, 2).map((incident) => ({
     description: `${incident.property} - ${incident.cost}`,
@@ -297,18 +369,46 @@ function buildExecutiveMetrics({
   reservations: ReservationListItem[];
   tasks: TaskListItem[];
 }): ExecutiveMetric[] {
-  const activeReservations = reservations.filter((reservation) => !["Cancelada", "No show"].includes(reservation.status));
-  const revenue = reservations.reduce((total, reservation) => total + parseMoney(reservation.amount), 0);
+  const activeReservations = reservations.filter(
+    (reservation) => !["Cancelada", "No show"].includes(reservation.status),
+  );
+  const revenue = reservations.reduce(
+    (total, reservation) => total + parseMoney(reservation.amount),
+    0,
+  );
   const riskCount =
-    inboxThreads.filter((thread) => ["Urgente", "Alta"].includes(thread.status)).length +
+    inboxThreads.filter((thread) => ["Urgente", "Alta"].includes(thread.status))
+      .length +
     tasks.filter(isCriticalTask).length +
-    incidents.filter((incident) => !["Resuelta", "Cancelada"].includes(incident.status)).length;
+    incidents.filter(
+      (incident) => !["Resuelta", "Cancelada"].includes(incident.status),
+    ).length;
 
   return [
-    { helper: "Reservas no canceladas", label: "Reservas activas", tone: "neutral", value: String(activeReservations.length) },
-    { helper: "Total confirmado visible", label: "Ingresos", tone: "positive", value: money(revenue) },
-    { helper: "Mensajes pendientes", label: "SLA inbox", tone: inboxThreads.length ? "warning" : "positive", value: inboxThreads.length ? inboxThreads[0].waiting : "OK" },
-    { helper: "Acciones operativas", label: "Riesgo operativo", tone: riskCount ? "warning" : "positive", value: String(riskCount) },
+    {
+      helper: "Reservas no canceladas",
+      label: "Reservas activas",
+      tone: "neutral",
+      value: String(activeReservations.length),
+    },
+    {
+      helper: "Total confirmado visible",
+      label: "Ingresos",
+      tone: "positive",
+      value: money(revenue),
+    },
+    {
+      helper: "Mensajes pendientes",
+      label: "SLA inbox",
+      tone: inboxThreads.length ? "warning" : "positive",
+      value: inboxThreads.length ? inboxThreads[0].waiting : "OK",
+    },
+    {
+      helper: "Acciones operativas",
+      label: "Riesgo operativo",
+      tone: riskCount ? "warning" : "positive",
+      value: String(riskCount),
+    },
   ];
 }
 
@@ -319,13 +419,19 @@ function buildCalendarDays(): CalendarDay[] {
 
     return {
       date: new Intl.DateTimeFormat("es-ES", { day: "2-digit" }).format(date),
-      day: new Intl.DateTimeFormat("es-ES", { weekday: "short" }).format(date).replace(".", ""),
+      day: new Intl.DateTimeFormat("es-ES", { weekday: "short" })
+        .format(date)
+        .replace(".", ""),
       events: [],
     };
   });
 }
 
-function buildCalendarMatrix(properties: PropertyCalendarRow[], reservations: ReservationRow[], days: CalendarDay[]): CalendarMatrixRow[] {
+function buildCalendarMatrix(
+  properties: PropertyCalendarRow[],
+  reservations: ReservationRow[],
+  days: CalendarDay[],
+): CalendarMatrixRow[] {
   const dateKeys = days.map((_, index) => {
     const date = new Date();
     date.setDate(date.getDate() + index);
@@ -335,7 +441,10 @@ function buildCalendarMatrix(properties: PropertyCalendarRow[], reservations: Re
   return properties.slice(0, 4).map((property) => ({
     cells: dateKeys.map((dateKey) => {
       const reservation = reservations.find(
-        (item) => item.property_id === property.id && item.check_in <= dateKey && item.check_out >= dateKey,
+        (item) =>
+          item.property_id === property.id &&
+          item.check_in <= dateKey &&
+          item.check_out >= dateKey,
       );
 
       if (!reservation) {
@@ -366,7 +475,9 @@ export async function getReservations(): Promise<ReservationListItem[]> {
     const supabase = await createSupabaseServerClient();
     const { data, error } = await supabase
       .from("reservations")
-      .select("id,channel,status,check_in,check_out,total_amount,properties(name),guests(full_name)")
+      .select(
+        "id,channel,status,check_in,check_out,total_amount,properties(name),guests(full_name)",
+      )
       .order("check_in", { ascending: true })
       .limit(12);
 
@@ -395,10 +506,15 @@ export async function getInboxThreads(): Promise<InboxThreadItem[]> {
 
   try {
     const supabase = await createSupabaseServerClient();
-    const [{ data: conversations, error: conversationsError }, { data: messages, error: messagesError }] = await Promise.all([
+    const [
+      { data: conversations, error: conversationsError },
+      { data: messages, error: messagesError },
+    ] = await Promise.all([
       supabase
         .from("conversations")
-        .select("id,status,last_message_at,properties(name),guests(full_name),reservations(channel,check_in)")
+        .select(
+          "id,status,last_message_at,properties(name),guests(full_name),reservations(channel,check_in)",
+        )
         .order("last_message_at", { ascending: false })
         .limit(12),
       supabase
@@ -424,13 +540,20 @@ export async function getInboxThreads(): Promise<InboxThreadItem[]> {
       const reservation = one(conversation.reservations);
 
       return {
-        channel: label(latestMessage?.channel ?? reservation?.channel ?? "inbox"),
+        channel: label(
+          latestMessage?.channel ?? reservation?.channel ?? "inbox",
+        ),
         guest: one(conversation.guests)?.full_name ?? "Contacto sin nombre",
         id: conversation.id,
         message: latestMessage?.body ?? "Sin mensajes recientes.",
         property: one(conversation.properties)?.name ?? "Propiedad sin asignar",
-        status: conversation.status === "open" ? "Urgente" : label(conversation.status),
-        waiting: waitingSince(latestMessage?.sent_at ?? conversation.last_message_at),
+        status:
+          conversation.status === "open"
+            ? "Urgente"
+            : label(conversation.status),
+        waiting: waitingSince(
+          latestMessage?.sent_at ?? conversation.last_message_at,
+        ),
       };
     });
   } catch {
@@ -487,7 +610,9 @@ export async function getIncidents(): Promise<IncidentListItem[]> {
     }
 
     return (data as IncidentRow[]).map((incident) => ({
-      cost: incident.estimated_cost ? `${money(incident.estimated_cost)} estimados` : "Coste pendiente",
+      cost: incident.estimated_cost
+        ? `${money(incident.estimated_cost)} estimados`
+        : "Coste pendiente",
       id: incident.id,
       property: one(incident.properties)?.name ?? "Propiedad sin asignar",
       severity: label(incident.severity),
@@ -496,6 +621,314 @@ export async function getIncidents(): Promise<IncidentListItem[]> {
     }));
   } catch {
     return demoIncidents;
+  }
+}
+
+export async function getReservationDetail(
+  reservationId: string,
+): Promise<ReservationDetail | null> {
+  if (!isSupabaseConfigured()) {
+    const reservation = demoReservations.find(
+      (item) => item.id === reservationId,
+    );
+
+    if (!reservation) {
+      return null;
+    }
+
+    return {
+      ...reservation,
+      fields: [
+        { label: "Canal", value: reservation.channel },
+        { label: "Fechas", value: reservation.dates },
+        { label: "Importe", value: reservation.amount },
+        { label: "Estado", value: reservation.status },
+      ],
+      notes:
+        "Reserva demo lista para validar el flujo visual antes de conectar Supabase.",
+    };
+  }
+
+  try {
+    const supabase = await createSupabaseServerClient();
+    const { data, error } = await supabase
+      .from("reservations")
+      .select(
+        "id,channel,status,check_in,check_out,guests_count,nightly_rate,cleaning_fee,taxes_amount,total_amount,payout_amount,security_deposit,notes,properties(name,internal_name,city),guests(full_name,email,phone)",
+      )
+      .eq("id", reservationId)
+      .single();
+
+    if (error || !data) {
+      return null;
+    }
+
+    const reservation = data as ReservationRow & {
+      cleaning_fee?: number | string | null;
+      guests_count?: number | null;
+      nightly_rate?: number | string | null;
+      notes?: string | null;
+      payout_amount?: number | string | null;
+      security_deposit?: number | string | null;
+      taxes_amount?: number | string | null;
+    };
+    const property = one(reservation.properties);
+    const guest = one(reservation.guests);
+
+    return {
+      amount: money(reservation.total_amount),
+      channel: label(reservation.channel),
+      dates: dateRange(reservation.check_in, reservation.check_out),
+      fields: [
+        {
+          label: "Propiedad",
+          value: property?.name ?? "Propiedad sin asignar",
+        },
+        { label: "Canal", value: label(reservation.channel) },
+        { label: "Personas", value: String(reservation.guests_count ?? 1) },
+        { label: "Tarifa noche", value: money(reservation.nightly_rate) },
+        { label: "Limpieza", value: money(reservation.cleaning_fee) },
+        { label: "Tasas", value: money(reservation.taxes_amount) },
+        { label: "Payout", value: money(reservation.payout_amount) },
+        { label: "Deposito", value: money(reservation.security_deposit) },
+      ],
+      guest: guest?.full_name ?? "Huesped sin nombre",
+      id: reservation.id,
+      notes: reservation.notes ?? "Sin notas internas.",
+      property: property?.name ?? "Propiedad sin asignar",
+      status: label(reservation.status),
+    };
+  } catch {
+    return null;
+  }
+}
+
+export async function getTaskDetail(
+  taskId: string,
+): Promise<TaskDetail | null> {
+  if (!isSupabaseConfigured()) {
+    const task = demoTasks.find((item) => item.id === taskId);
+
+    if (!task) {
+      return null;
+    }
+
+    return {
+      ...task,
+      description:
+        "Tarea demo para validar responsable, prioridad y estado antes de conectar Supabase.",
+      fields: [
+        { label: "Propiedad", value: task.property },
+        { label: "Tipo", value: task.type },
+        { label: "Vencimiento", value: task.due },
+        { label: "Prioridad", value: task.priority },
+      ],
+    };
+  }
+
+  try {
+    const supabase = await createSupabaseServerClient();
+    const { data, error } = await supabase
+      .from("tasks")
+      .select(
+        "id,title,type,status,priority,due_at,description,properties(name),reservations(id,check_in,check_out)",
+      )
+      .eq("id", taskId)
+      .single();
+
+    if (error || !data) {
+      return null;
+    }
+
+    const task = data as TaskRow & {
+      description?: string | null;
+      reservations?: Relation<{
+        id: string | null;
+        check_in: string | null;
+        check_out: string | null;
+      }>;
+    };
+    const reservation = one(task.reservations);
+
+    return {
+      description: task.description ?? "Sin descripcion ampliada.",
+      due: dueLabel(task.due_at),
+      fields: [
+        {
+          label: "Propiedad",
+          value: one(task.properties)?.name ?? "Propiedad sin asignar",
+        },
+        {
+          label: "Reserva",
+          value: reservation?.id
+            ? `${reservation.check_in} - ${reservation.check_out}`
+            : "Sin reserva concreta",
+        },
+        { label: "Tipo", value: label(task.type) },
+        { label: "Vencimiento", value: dueLabel(task.due_at) },
+      ],
+      id: task.id,
+      priority: label(task.priority),
+      property: one(task.properties)?.name ?? "Propiedad sin asignar",
+      status: label(task.status),
+      title: task.title,
+      type: label(task.type),
+    };
+  } catch {
+    return null;
+  }
+}
+
+export async function getIncidentDetail(
+  incidentId: string,
+): Promise<IncidentDetail | null> {
+  if (!isSupabaseConfigured()) {
+    const incident = demoIncidents.find((item) => item.id === incidentId);
+
+    if (!incident) {
+      return null;
+    }
+
+    return {
+      ...incident,
+      description:
+        "Incidencia demo para revisar el flujo de seguimiento, coste y estado.",
+      fields: [
+        { label: "Propiedad", value: incident.property },
+        { label: "Severidad", value: incident.severity },
+        { label: "Estado", value: incident.status },
+        { label: "Coste", value: incident.cost },
+      ],
+    };
+  }
+
+  try {
+    const supabase = await createSupabaseServerClient();
+    const { data, error } = await supabase
+      .from("incidents")
+      .select(
+        "id,title,status,severity,description,estimated_cost,charge_amount,created_at,properties(name),reservations(id,check_in,check_out)",
+      )
+      .eq("id", incidentId)
+      .single();
+
+    if (error || !data) {
+      return null;
+    }
+
+    const incident = data as IncidentRow;
+    const reservation = one(incident.reservations);
+
+    return {
+      cost: incident.estimated_cost
+        ? `${money(incident.estimated_cost)} estimados`
+        : "Coste pendiente",
+      description: incident.description ?? "Sin descripcion ampliada.",
+      fields: [
+        {
+          label: "Propiedad",
+          value: one(incident.properties)?.name ?? "Propiedad sin asignar",
+        },
+        {
+          label: "Reserva",
+          value: reservation?.id
+            ? `${reservation.check_in} - ${reservation.check_out}`
+            : "Sin reserva concreta",
+        },
+        {
+          label: "Creada",
+          value: incident.created_at
+            ? dueLabel(incident.created_at)
+            : "Sin fecha",
+        },
+        {
+          label: "Cargo al huesped",
+          value: incident.charge_amount
+            ? money(incident.charge_amount)
+            : "Sin cargo",
+        },
+      ],
+      id: incident.id,
+      property: one(incident.properties)?.name ?? "Propiedad sin asignar",
+      severity: label(incident.severity),
+      status: label(incident.status),
+      title: incident.title,
+    };
+  } catch {
+    return null;
+  }
+}
+
+export async function getConversationDetail(
+  conversationId: string,
+): Promise<ConversationDetail | null> {
+  if (!isSupabaseConfigured()) {
+    const thread = demoInboxThreads.find((item) => item.id === conversationId);
+
+    if (!thread) {
+      return null;
+    }
+
+    return {
+      ...thread,
+      messages: [
+        {
+          body: thread.message,
+          channel: thread.channel,
+          direction: "inbound",
+          id: `${thread.id}-message`,
+          sentAt: thread.waiting,
+        },
+      ],
+    };
+  }
+
+  try {
+    const supabase = await createSupabaseServerClient();
+    const [
+      { data: conversation, error: conversationError },
+      { data: messages, error: messagesError },
+    ] = await Promise.all([
+      supabase
+        .from("conversations")
+        .select(
+          "id,status,last_message_at,properties(name),guests(full_name),reservations(channel,check_in)",
+        )
+        .eq("id", conversationId)
+        .single(),
+      supabase
+        .from("conversation_messages")
+        .select("id,conversation_id,channel,direction,body,sent_at,read_at")
+        .eq("conversation_id", conversationId)
+        .order("sent_at", { ascending: true }),
+    ]);
+
+    if (conversationError || messagesError || !conversation) {
+      return null;
+    }
+
+    const row = conversation as ConversationRow;
+    const latestMessage = ((messages ?? []) as MessageRow[]).at(-1);
+    const reservation = one(row.reservations);
+
+    return {
+      channel: label(latestMessage?.channel ?? reservation?.channel ?? "inbox"),
+      guest: one(row.guests)?.full_name ?? "Contacto sin nombre",
+      id: row.id,
+      message: latestMessage?.body ?? "Sin mensajes recientes.",
+      messages: ((messages ?? []) as MessageRow[]).map((message) => ({
+        body: message.body,
+        channel: label(message.channel),
+        direction: label(message.direction),
+        id: message.id ?? `${message.conversation_id}-${message.sent_at}`,
+        sentAt: dueLabel(message.sent_at),
+      })),
+      property: one(row.properties)?.name ?? "Propiedad sin asignar",
+      status: row.status === "open" ? "Urgente" : label(row.status),
+      waiting: waitingSince(latestMessage?.sent_at ?? row.last_message_at),
+    };
+  } catch {
+    return null;
   }
 }
 
@@ -520,7 +953,10 @@ export async function getOperationFormOptions(): Promise<OperationFormOptions> {
   try {
     const supabase = await createSupabaseServerClient();
     const [{ data: properties }, { data: reservations }] = await Promise.all([
-      supabase.from("properties").select("id,name,city,internal_name").order("name", { ascending: true }),
+      supabase
+        .from("properties")
+        .select("id,name,city,internal_name")
+        .order("name", { ascending: true }),
       supabase
         .from("reservations")
         .select("id,check_in,check_out,properties(name),guests(full_name)")
@@ -529,16 +965,20 @@ export async function getOperationFormOptions(): Promise<OperationFormOptions> {
     ]);
 
     return {
-      properties: ((properties ?? []) as PropertyCalendarRow[]).map((property) => ({
-        helper: property.internal_name ?? property.id.slice(0, 8),
-        id: property.id,
-        label: property.name,
-      })),
-      reservations: ((reservations ?? []) as ReservationRow[]).map((reservation) => ({
-        helper: dateRange(reservation.check_in, reservation.check_out),
-        id: reservation.id,
-        label: `${one(reservation.guests)?.full_name ?? "Huesped"} - ${one(reservation.properties)?.name ?? "Propiedad"}`,
-      })),
+      properties: ((properties ?? []) as PropertyCalendarRow[]).map(
+        (property) => ({
+          helper: property.internal_name ?? property.id.slice(0, 8),
+          id: property.id,
+          label: property.name,
+        }),
+      ),
+      reservations: ((reservations ?? []) as ReservationRow[]).map(
+        (reservation) => ({
+          helper: dateRange(reservation.check_in, reservation.check_out),
+          id: reservation.id,
+          label: `${one(reservation.guests)?.full_name ?? "Huesped"} - ${one(reservation.properties)?.name ?? "Propiedad"}`,
+        }),
+      ),
     };
   } catch {
     return fallbackOptions;
@@ -563,7 +1003,9 @@ async function getAutomationRules(): Promise<AutomationRuleItem[]> {
     }
 
     return (data as AutomationRuleRow[]).map((rule) => ({
-      impact: rule.delay_minutes ? `${rule.delay_minutes} min de espera` : "Ejecucion inmediata",
+      impact: rule.delay_minutes
+        ? `${rule.delay_minutes} min de espera`
+        : "Ejecucion inmediata",
       name: rule.name,
       status: rule.enabled ? "Activa" : "Pausada",
       trigger: label(rule.trigger),
@@ -591,16 +1033,30 @@ export async function getDashboardData(): Promise<DashboardData> {
 
   try {
     const supabase = await createSupabaseServerClient();
-    const [reservations, inboxThreads, tasks, incidents, automationRules, { data: properties }, { data: calendarReservations }] =
-      await Promise.all([
-        getReservations(),
-        getInboxThreads(),
-        getTasks(),
-        getIncidents(),
-        getAutomationRules(),
-        supabase.from("properties").select("id,name,internal_name").order("created_at", { ascending: false }).limit(4),
-        supabase.from("reservations").select("id,property_id,channel,status,check_in,check_out,total_amount").limit(80),
-      ]);
+    const [
+      reservations,
+      inboxThreads,
+      tasks,
+      incidents,
+      automationRules,
+      { data: properties },
+      { data: calendarReservations },
+    ] = await Promise.all([
+      getReservations(),
+      getInboxThreads(),
+      getTasks(),
+      getIncidents(),
+      getAutomationRules(),
+      supabase
+        .from("properties")
+        .select("id,name,internal_name")
+        .order("created_at", { ascending: false })
+        .limit(4),
+      supabase
+        .from("reservations")
+        .select("id,property_id,channel,status,check_in,check_out,total_amount")
+        .limit(80),
+    ]);
 
     const calendarDays = buildCalendarDays();
     const calendarMatrix = buildCalendarMatrix(
@@ -612,9 +1068,18 @@ export async function getDashboardData(): Promise<DashboardData> {
     return {
       automationRules,
       calendarDays: calendarMatrix.length ? calendarDays : demoCalendarDays,
-      calendarMatrix: calendarMatrix.length ? calendarMatrix : demoCalendarMatrix,
-      channelHealth: reservations.length ? buildChannelHealth(reservations) : demoChannelHealth,
-      executiveMetrics: buildExecutiveMetrics({ inboxThreads, incidents, reservations, tasks }),
+      calendarMatrix: calendarMatrix.length
+        ? calendarMatrix
+        : demoCalendarMatrix,
+      channelHealth: reservations.length
+        ? buildChannelHealth(reservations)
+        : demoChannelHealth,
+      executiveMetrics: buildExecutiveMetrics({
+        inboxThreads,
+        incidents,
+        reservations,
+        tasks,
+      }),
       inboxThreads,
       incidents,
       operationQueue: buildOperationQueue({ inboxThreads, incidents, tasks }),

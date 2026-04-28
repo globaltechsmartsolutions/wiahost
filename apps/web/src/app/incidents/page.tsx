@@ -1,13 +1,24 @@
+import Link from "next/link";
+
 import { EmptyState } from "@/components/empty-state";
 import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader } from "@/components/page-header";
 import { StatusBadge } from "@/components/status-badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { createIncidentAction, updateIncidentStatusAction } from "@/lib/actions/operations";
+import {
+  createIncidentAction,
+  updateIncidentStatusAction,
+} from "@/lib/actions/operations";
 import { getIncidents, getOperationFormOptions } from "@/lib/data/operations";
 
 export const dynamic = "force-dynamic";
@@ -31,8 +42,14 @@ const incidentStatuses = [
   { label: "Cancelada", value: "cancelled" },
 ];
 
-export default async function IncidentsPage({ searchParams }: IncidentsPageProps) {
-  const [options, incidents, params] = await Promise.all([getOperationFormOptions(), getIncidents(), searchParams]);
+export default async function IncidentsPage({
+  searchParams,
+}: IncidentsPageProps) {
+  const [options, incidents, params] = await Promise.all([
+    getOperationFormOptions(),
+    getIncidents(),
+    searchParams,
+  ]);
 
   return (
     <AppShell>
@@ -52,13 +69,21 @@ export default async function IncidentsPage({ searchParams }: IncidentsPageProps
         <Card className="rounded-[2rem] border-border/80 bg-card/80">
           <CardHeader>
             <CardTitle>Nueva incidencia</CardTitle>
-            <CardDescription>Registra el problema mientras ocurre para no perder evidencia ni contexto.</CardDescription>
+            <CardDescription>
+              Registra el problema mientras ocurre para no perder evidencia ni
+              contexto.
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <form action={createIncidentAction} className="grid gap-4">
               <div className="grid gap-2">
                 <Label htmlFor="propertyId">Propiedad</Label>
-                <select id="propertyId" name="propertyId" required className="h-9 rounded-xl border border-input bg-background px-3 text-sm">
+                <select
+                  id="propertyId"
+                  name="propertyId"
+                  required
+                  className="h-9 rounded-xl border border-input bg-background px-3 text-sm"
+                >
                   {options.properties.map((property) => (
                     <option key={property.id} value={property.id}>
                       {property.label}
@@ -69,7 +94,11 @@ export default async function IncidentsPage({ searchParams }: IncidentsPageProps
 
               <div className="grid gap-2">
                 <Label htmlFor="reservationId">Reserva relacionada</Label>
-                <select id="reservationId" name="reservationId" className="h-9 rounded-xl border border-input bg-background px-3 text-sm">
+                <select
+                  id="reservationId"
+                  name="reservationId"
+                  className="h-9 rounded-xl border border-input bg-background px-3 text-sm"
+                >
                   <option value="">Sin reserva concreta</option>
                   {options.reservations.map((reservation) => (
                     <option key={reservation.id} value={reservation.id}>
@@ -81,13 +110,22 @@ export default async function IncidentsPage({ searchParams }: IncidentsPageProps
 
               <div className="grid gap-2">
                 <Label htmlFor="title">Titulo</Label>
-                <Input id="title" name="title" required placeholder="Ej. Danos en cerradura inteligente" />
+                <Input
+                  id="title"
+                  name="title"
+                  required
+                  placeholder="Ej. Danos en cerradura inteligente"
+                />
               </div>
 
               <div className="grid gap-3 md:grid-cols-2">
                 <div className="grid gap-2">
                   <Label htmlFor="severity">Severidad</Label>
-                  <select id="severity" name="severity" className="h-9 rounded-xl border border-input bg-background px-3 text-sm">
+                  <select
+                    id="severity"
+                    name="severity"
+                    className="h-9 rounded-xl border border-input bg-background px-3 text-sm"
+                  >
                     {severities.map((severity) => (
                       <option key={severity.value} value={severity.value}>
                         {severity.label}
@@ -97,12 +135,25 @@ export default async function IncidentsPage({ searchParams }: IncidentsPageProps
                 </div>
                 <div className="grid gap-2">
                   <Label htmlFor="estimatedCost">Coste estimado</Label>
-                  <Input id="estimatedCost" name="estimatedCost" type="number" min="0" step="0.01" placeholder="90" />
+                  <Input
+                    id="estimatedCost"
+                    name="estimatedCost"
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    placeholder="90"
+                  />
                 </div>
               </div>
 
-              <Textarea name="description" required placeholder="Describe que ha pasado, impacto, fotos pendientes y proximo paso." />
-              <Button type="submit" className="rounded-full">Crear incidencia</Button>
+              <Textarea
+                name="description"
+                required
+                placeholder="Describe que ha pasado, impacto, fotos pendientes y proximo paso."
+              />
+              <Button type="submit" className="rounded-full">
+                Crear incidencia
+              </Button>
             </form>
           </CardContent>
         </Card>
@@ -110,12 +161,19 @@ export default async function IncidentsPage({ searchParams }: IncidentsPageProps
         {incidents.length ? (
           <section className="grid gap-4 md:grid-cols-2">
             {incidents.map((incident) => (
-              <Card key={incident.id} className="rounded-[2rem] border-border/80 bg-card/80">
+              <Card
+                key={incident.id}
+                className="rounded-[2rem] border-border/80 bg-card/80"
+              >
                 <CardContent className="p-5">
                   <div className="flex items-start justify-between gap-3">
                     <div>
-                      <h2 className="text-2xl font-semibold tracking-tight">{incident.title}</h2>
-                      <p className="mt-2 text-sm text-muted-foreground">{incident.property}</p>
+                      <h2 className="text-2xl font-semibold tracking-tight">
+                        {incident.title}
+                      </h2>
+                      <p className="mt-2 text-sm text-muted-foreground">
+                        {incident.property}
+                      </p>
                     </div>
                     <StatusBadge value={incident.status} />
                   </div>
@@ -123,23 +181,51 @@ export default async function IncidentsPage({ searchParams }: IncidentsPageProps
                     <StatusBadge value={incident.severity} />
                     <p className="font-semibold">{incident.cost}</p>
                   </div>
-                  <form action={updateIncidentStatusAction} className="mt-4 flex gap-2">
-                    <input type="hidden" name="incidentId" value={incident.id} />
-                    <select name="status" className="h-8 flex-1 rounded-xl border border-input bg-background px-2 text-xs">
+                  <form
+                    action={updateIncidentStatusAction}
+                    className="mt-4 flex gap-2"
+                  >
+                    <input
+                      type="hidden"
+                      name="incidentId"
+                      value={incident.id}
+                    />
+                    <Button
+                      asChild
+                      size="sm"
+                      variant="outline"
+                      className="rounded-full"
+                    >
+                      <Link href={`/incidents/${incident.id}`}>Detalle</Link>
+                    </Button>
+                    <select
+                      name="status"
+                      className="h-8 flex-1 rounded-xl border border-input bg-background px-2 text-xs"
+                    >
                       {incidentStatuses.map((status) => (
                         <option key={status.value} value={status.value}>
                           {status.label}
                         </option>
                       ))}
                     </select>
-                    <Button type="submit" size="sm" variant="outline" className="rounded-full">Actualizar</Button>
+                    <Button
+                      type="submit"
+                      size="sm"
+                      variant="outline"
+                      className="rounded-full"
+                    >
+                      Actualizar
+                    </Button>
                   </form>
                 </CardContent>
               </Card>
             ))}
           </section>
         ) : (
-          <EmptyState title="No hay incidencias abiertas" description="Los danos, problemas tecnicos y reclamaciones apareceran aqui." />
+          <EmptyState
+            title="No hay incidencias abiertas"
+            description="Los danos, problemas tecnicos y reclamaciones apareceran aqui."
+          />
         )}
       </section>
     </AppShell>

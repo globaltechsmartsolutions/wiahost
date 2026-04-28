@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 import { EmptyState } from "@/components/empty-state";
 import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader } from "@/components/page-header";
@@ -15,7 +17,10 @@ type InboxPageProps = {
 };
 
 export default async function InboxPage({ searchParams }: InboxPageProps) {
-  const [inboxThreads, params] = await Promise.all([getInboxThreads(), searchParams]);
+  const [inboxThreads, params] = await Promise.all([
+    getInboxThreads(),
+    searchParams,
+  ]);
 
   return (
     <AppShell>
@@ -47,25 +52,54 @@ export default async function InboxPage({ searchParams }: InboxPageProps) {
                 </div>
                 <div>
                   <p className="text-sm leading-6">{thread.message}</p>
-                  <form action={sendConversationReplyAction} className="mt-4 grid gap-2">
-                    <input type="hidden" name="conversationId" value={thread.id} />
+                  <form
+                    action={sendConversationReplyAction}
+                    className="mt-4 grid gap-2"
+                  >
+                    <input
+                      type="hidden"
+                      name="conversationId"
+                      value={thread.id}
+                    />
                     <input type="hidden" name="channel" value="inbox" />
-                    <Textarea name="body" required placeholder="Responder al huesped..." className="min-h-20 bg-card" />
-                    <Button type="submit" size="sm" className="justify-self-end rounded-full">
+                    <Textarea
+                      name="body"
+                      required
+                      placeholder="Responder al huesped..."
+                      className="min-h-20 bg-card"
+                    />
+                    <Button
+                      type="submit"
+                      size="sm"
+                      className="justify-self-end rounded-full"
+                    >
                       Enviar respuesta
                     </Button>
                   </form>
                 </div>
                 <div className="flex items-center justify-between gap-3 xl:justify-end">
-                  <span className="text-sm text-muted-foreground">{thread.waiting}</span>
+                  <span className="text-sm text-muted-foreground">
+                    {thread.waiting}
+                  </span>
                   <StatusBadge value={thread.status} />
+                  <Button
+                    asChild
+                    size="sm"
+                    variant="outline"
+                    className="rounded-full"
+                  >
+                    <Link href={`/inbox/${thread.id}`}>Abrir</Link>
+                  </Button>
                 </div>
               </div>
             ))}
           </CardContent>
         </Card>
       ) : (
-        <EmptyState title="Inbox sin conversaciones" description="Los mensajes de canales, email, WhatsApp o web directa apareceran aqui." />
+        <EmptyState
+          title="Inbox sin conversaciones"
+          description="Los mensajes de canales, email, WhatsApp o web directa apareceran aqui."
+        />
       )}
     </AppShell>
   );

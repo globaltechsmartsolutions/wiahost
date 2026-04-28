@@ -24,6 +24,7 @@
 - Tareas de limpieza/mantenimiento con creacion y cambio de estado.
 - Incidencias con creacion, coste estimado y cambio de estado.
 - API web/mobile para reservas, tareas, incidencias e inbox.
+- Detalle navegable de reservas, tareas, incidencias y conversaciones.
 - Suite robusta de calidad web: unit tests, E2E, visual regression, accesibilidad y Lighthouse CI.
 - Memoria de auditoria para evitar regresiones repetidas.
 
@@ -33,7 +34,8 @@
 - Implementado: Server Actions para crear reservas manuales, crear tareas, crear incidencias, responder conversaciones y actualizar estados.
 - Implementado: servicios de mutacion compartidos entre Server Actions y API routes para evitar duplicar logica.
 - Implementado: API routes autenticadas para listar/crear reservas, tareas, incidencias, inbox y mensajes.
-- Pendiente inmediato: detalle por entidad, edicion completa, borrado/archivo controlado, filtros avanzados, feedback visual de guardado y pruebas E2E de flujos con Supabase local.
+- Implementado: paginas de detalle para reservas, tareas, incidencias y conversaciones con fallback demo.
+- Pendiente inmediato: edicion completa, borrado/archivo controlado, filtros avanzados, feedback visual de guardado y pruebas E2E de flujos con Supabase local.
 
 ## Fase 2 - Operacion PMS
 
