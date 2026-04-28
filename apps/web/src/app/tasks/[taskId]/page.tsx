@@ -12,10 +12,11 @@ export const dynamic = "force-dynamic";
 
 type TaskDetailPageProps = {
   params: Promise<{ taskId: string }>;
+  searchParams: Promise<{ created?: string }>;
 };
 
-export default async function TaskDetailPage({ params }: TaskDetailPageProps) {
-  const { taskId } = await params;
+export default async function TaskDetailPage({ params, searchParams }: TaskDetailPageProps) {
+  const [{ taskId }, { created }] = await Promise.all([params, searchParams]);
   const task = await getTaskDetail(taskId);
 
   if (!task) {
@@ -35,6 +36,11 @@ export default async function TaskDetailPage({ params }: TaskDetailPageProps) {
         title={task.title}
         description={`${task.property} - ${task.type}`}
       />
+      {created ? (
+        <div className="mb-5 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
+          Tarea creada correctamente.
+        </div>
+      ) : null}
 
       <section className="grid gap-5 xl:grid-cols-[1.1fr_0.7fr]">
         <Card className="rounded-[2rem] border-border/80 bg-card/80">

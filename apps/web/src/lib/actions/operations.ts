@@ -104,7 +104,7 @@ export async function createManualReservationAction(formData: FormData) {
 
   revalidatePath("/reservations");
   revalidatePath("/dashboard");
-  redirect(`/reservations/${reservationId}`);
+  redirect(`/reservations/${reservationId}?created=1`);
 }
 
 export async function updateReservationStatusAction(formData: FormData) {
@@ -126,7 +126,7 @@ export async function updateReservationStatusAction(formData: FormData) {
 
   revalidatePath("/reservations");
   revalidatePath("/dashboard");
-  redirect("/reservations");
+  redirect("/reservations?updated=1");
 }
 
 export async function createTaskAction(formData: FormData) {
@@ -151,7 +151,7 @@ export async function createTaskAction(formData: FormData) {
 
   revalidatePath("/tasks");
   revalidatePath("/dashboard");
-  redirect(`/tasks/${taskId}`);
+  redirect(`/tasks/${taskId}?created=1`);
 }
 
 export async function updateTaskStatusAction(formData: FormData) {
@@ -173,7 +173,7 @@ export async function updateTaskStatusAction(formData: FormData) {
 
   revalidatePath("/tasks");
   revalidatePath("/dashboard");
-  redirect("/tasks");
+  redirect("/tasks?updated=1");
 }
 
 export async function createIncidentAction(formData: FormData) {
@@ -198,7 +198,7 @@ export async function createIncidentAction(formData: FormData) {
 
   revalidatePath("/incidents");
   revalidatePath("/dashboard");
-  redirect(`/incidents/${incidentId}`);
+  redirect(`/incidents/${incidentId}?created=1`);
 }
 
 export async function updateIncidentStatusAction(formData: FormData) {
@@ -220,7 +220,7 @@ export async function updateIncidentStatusAction(formData: FormData) {
 
   revalidatePath("/incidents");
   revalidatePath("/dashboard");
-  redirect("/incidents");
+  redirect("/incidents?updated=1");
 }
 
 export async function sendConversationReplyAction(formData: FormData) {
@@ -245,5 +245,5 @@ export async function sendConversationReplyAction(formData: FormData) {
 
   revalidatePath("/inbox");
   revalidatePath("/dashboard");
-  redirect(`/inbox/${parsed.data.conversationId}`);
+  redirect(`/inbox/${parsed.data.conversationId}?sent=1`);
 }

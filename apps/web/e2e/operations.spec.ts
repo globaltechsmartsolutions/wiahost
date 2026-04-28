@@ -30,7 +30,8 @@ test.describe("operations flows with Supabase @critical @data", () => {
     await page.locator('textarea[name="notes"]').fill("Reserva creada por Playwright para validar el flujo real.");
     await page.getByRole("button", { name: /crear reserva/i }).click();
 
-    await expect(page).toHaveURL(/\/reservations\/[a-f0-9-]+$/);
+    await expect(page).toHaveURL(/\/reservations\/[a-f0-9-]+(\?created=1)?$/);
+    await expect(page.getByText("Reserva creada correctamente.")).toBeVisible();
     await expect(page.getByText(guestName)).toBeVisible();
 
     const response = await page.request.get("/api/reservations");

@@ -36,6 +36,7 @@
 - Implementado: API routes autenticadas para listar/crear reservas, tareas, incidencias, inbox y mensajes.
 - Implementado: paginas de detalle para reservas, tareas, incidencias y conversaciones con fallback demo.
 - Implementado: propiedades con lista, detalle, edicion, PATCH API y archivo controlado mediante Server Action/API.
+- Implementado: feedback visual basico tras crear reservas/tareas/incidencias, enviar respuestas y actualizar estados.
 - Implementado: filtros operativos en reservas, tareas, incidencias e inbox por busqueda y estado/canal/prioridad/severidad segun modulo.
 - Implementado: Supabase local verificado con Auth, seed demo, tipos generados y escrituras reales desde UI/API.
 - Implementado: proteccion de rutas web con `proxy.ts` de Next.js 16 usando Supabase Auth.
@@ -49,7 +50,7 @@
 - Implementado: primera vista del dashboard mas densa, con sidebar/topbar/hero/cards compactos y calendario visible antes.
 - Implementado: memoria versionada en `quality/audit-memory` con reglas visuales, riesgos, rutas y hallazgos previos.
 - Implementado: CI inicial con typecheck, lint, unit tests, build web y Lighthouse CI no bloqueante con reportes como artefacto.
-- Pendiente inmediato: feedback visual de guardado mas fino, edicion completa de reservas/tareas/incidencias, snapshots visuales estables por modulo y endurecer Lighthouse cuando haya baseline historico.
+- Pendiente inmediato: edicion completa de reservas/tareas/incidencias, snapshots visuales estables por modulo y endurecer Lighthouse cuando haya baseline historico.
 
 ## Fase 2 - Operacion PMS
 

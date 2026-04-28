@@ -14,12 +14,14 @@ export const dynamic = "force-dynamic";
 
 type ConversationDetailPageProps = {
   params: Promise<{ conversationId: string }>;
+  searchParams: Promise<{ sent?: string }>;
 };
 
 export default async function ConversationDetailPage({
   params,
+  searchParams,
 }: ConversationDetailPageProps) {
-  const { conversationId } = await params;
+  const [{ conversationId }, { sent }] = await Promise.all([params, searchParams]);
   const conversation = await getConversationDetail(conversationId);
 
   if (!conversation) {
@@ -39,6 +41,11 @@ export default async function ConversationDetailPage({
         title={conversation.guest}
         description={`${conversation.property} - ${conversation.channel} - espera ${conversation.waiting}`}
       />
+      {sent ? (
+        <div className="mb-5 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
+          Respuesta enviada y conversacion actualizada.
+        </div>
+      ) : null}
 
       <section className="grid gap-5 xl:grid-cols-[1.1fr_0.7fr]">
         <Card className="rounded-[2rem] border-border/80 bg-card/80">

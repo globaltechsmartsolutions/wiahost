@@ -12,12 +12,14 @@ export const dynamic = "force-dynamic";
 
 type ReservationDetailPageProps = {
   params: Promise<{ reservationId: string }>;
+  searchParams: Promise<{ created?: string }>;
 };
 
 export default async function ReservationDetailPage({
   params,
+  searchParams,
 }: ReservationDetailPageProps) {
-  const { reservationId } = await params;
+  const [{ reservationId }, { created }] = await Promise.all([params, searchParams]);
   const reservation = await getReservationDetail(reservationId);
 
   if (!reservation) {
@@ -37,6 +39,11 @@ export default async function ReservationDetailPage({
         title={reservation.guest}
         description={`${reservation.property} - ${reservation.dates}`}
       />
+      {created ? (
+        <div className="mb-5 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
+          Reserva creada correctamente.
+        </div>
+      ) : null}
 
       <section className="grid gap-5 xl:grid-cols-[1.1fr_0.7fr]">
         <Card className="rounded-[2rem] border-border/80 bg-card/80">

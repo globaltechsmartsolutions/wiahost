@@ -29,6 +29,7 @@ type IncidentsPageProps = {
     q?: string;
     severity?: string;
     status?: string;
+    updated?: string;
   }>;
 };
 
@@ -84,6 +85,11 @@ export default async function IncidentsPage({
       {params?.error ? (
         <div className="rounded-3xl border border-destructive/30 bg-destructive/10 px-5 py-4 text-sm text-destructive">
           {params.error}
+        </div>
+      ) : null}
+      {params?.updated ? (
+        <div className="mb-5 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
+          Estado de incidencia actualizado.
         </div>
       ) : null}
 

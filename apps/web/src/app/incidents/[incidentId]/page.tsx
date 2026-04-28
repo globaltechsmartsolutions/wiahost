@@ -12,12 +12,14 @@ export const dynamic = "force-dynamic";
 
 type IncidentDetailPageProps = {
   params: Promise<{ incidentId: string }>;
+  searchParams: Promise<{ created?: string }>;
 };
 
 export default async function IncidentDetailPage({
   params,
+  searchParams,
 }: IncidentDetailPageProps) {
-  const { incidentId } = await params;
+  const [{ incidentId }, { created }] = await Promise.all([params, searchParams]);
   const incident = await getIncidentDetail(incidentId);
 
   if (!incident) {
@@ -37,6 +39,11 @@ export default async function IncidentDetailPage({
         title={incident.title}
         description={`${incident.property} - ${incident.cost}`}
       />
+      {created ? (
+        <div className="mb-5 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
+          Incidencia creada correctamente.
+        </div>
+      ) : null}
 
       <section className="grid gap-5 xl:grid-cols-[1.1fr_0.7fr]">
         <Card className="rounded-[2rem] border-border/80 bg-card/80">
