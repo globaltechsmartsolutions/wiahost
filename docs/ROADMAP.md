@@ -69,6 +69,10 @@
 - Pagos iniciales.
 - Auditoria de eventos.
 
+### Estado actual de Fase 2
+
+- Implementado: modulo web de automatizaciones con alta, edicion, pausa/activacion, eliminacion, plantillas, trigger, canal, delay y API GET/POST/GET detail/PATCH/DELETE.
+
 ## Fase 3 - Distribucion y canales
 
 - Publicacion directa.

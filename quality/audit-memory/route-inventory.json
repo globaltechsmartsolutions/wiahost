@@ -25,6 +25,12 @@
       "tests": ["smoke", "visual", "a11y"]
     },
     {
+      "path": "/automations",
+      "auth": "protected",
+      "primaryCheck": "Automation rules can be created, edited, paused and deleted through API/UI",
+      "tests": ["critical", "data", "a11y", "visual"]
+    },
+    {
       "path": "/calendar",
       "auth": "protected",
       "primaryCheck": "Calendar matrix renders real active-property availability and creates, updates and deletes manual blocks without page overflow",

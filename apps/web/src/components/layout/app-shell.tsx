@@ -2,6 +2,7 @@ import Link from "next/link";
 import {
   BarChart3,
   Bell,
+  Bot,
   Building2,
   CalendarDays,
   ClipboardCheck,
@@ -42,6 +43,7 @@ const navSections = [
     title: "Negocio",
     items: [
       { label: "Propietarios", href: "/owners", icon: Landmark },
+      { label: "Automatizaciones", href: "/automations", icon: Bot },
       { label: "Ajustes", href: "/settings", icon: Settings },
     ],
   },
@@ -57,8 +59,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               <Building2 className="size-4" />
             </span>
             <span>
-              <span className="block text-base font-semibold tracking-tight">WIAHost</span>
-              <span className="block text-[0.68rem] text-white/70">Hospitality command center</span>
+              <span className="block text-base font-semibold tracking-tight">
+                WIAHost
+              </span>
+              <span className="block text-[0.68rem] text-white/70">
+                Hospitality command center
+              </span>
             </span>
           </Link>
         </div>
@@ -93,7 +99,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             </div>
             <p className="mt-1.5 text-2xl font-semibold">92%</p>
             <p className="mt-1 text-[0.68rem] leading-4 text-white/70">
-              Canales sincronizados, SLA de mensajes y tareas críticas bajo control.
+              Canales sincronizados, SLA de mensajes y tareas críticas bajo
+              control.
             </p>
           </div>
         </div>
@@ -102,7 +109,10 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       <div className="xl:pl-[15rem] 2xl:pl-[15.5rem]">
         <header className="sticky top-0 z-10 border-b border-[#dfd2bf] bg-[#f6efe4]/86 px-4 py-2 backdrop-blur-xl lg:px-5">
           <div className="mx-auto flex max-w-[1500px] items-center gap-3">
-            <Link href="/" className="flex items-center gap-2 font-semibold xl:hidden">
+            <Link
+              href="/"
+              className="flex items-center gap-2 font-semibold xl:hidden"
+            >
               <span className="flex size-9 items-center justify-center rounded-xl bg-[#160f09] text-white">
                 <Building2 className="size-4" />
               </span>
@@ -116,28 +126,46 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 placeholder="Buscar reserva, huésped, propiedad, canal o tarea..."
               />
             </div>
-            <Button variant="outline" className="hidden rounded-full border-[#dfd2bf] bg-white/70 lg:inline-flex">
+            <Button
+              variant="outline"
+              className="hidden rounded-full border-[#dfd2bf] bg-white/70 lg:inline-flex"
+            >
               Abril 2026
             </Button>
-            <Button variant="outline" className="hidden rounded-full border-[#dfd2bf] bg-white/70 lg:inline-flex">
+            <Button
+              variant="outline"
+              className="hidden rounded-full border-[#dfd2bf] bg-white/70 lg:inline-flex"
+            >
               Portfolio Madrid + Costa
             </Button>
-            <Button variant="outline" size="icon" className="ml-auto rounded-full border-[#dfd2bf] bg-white/70">
+            <Button
+              variant="outline"
+              size="icon"
+              className="ml-auto rounded-full border-[#dfd2bf] bg-white/70"
+            >
               <Bell className="size-4" />
               <span className="sr-only">Abrir notificaciones</span>
             </Button>
             <div className="hidden text-right sm:block">
-              <p className="text-sm font-semibold leading-4">Laura Operaciones</p>
+              <p className="text-sm font-semibold leading-4">
+                Laura Operaciones
+              </p>
               <p className="text-xs text-[#75695b]">Admin demo · WIA</p>
             </div>
             <form action={signOutAction} className="hidden sm:block">
-              <Button type="submit" variant="outline" className="rounded-full border-[#dfd2bf] bg-white/70">
+              <Button
+                type="submit"
+                variant="outline"
+                className="rounded-full border-[#dfd2bf] bg-white/70"
+              >
                 Salir
               </Button>
             </form>
           </div>
         </header>
-        <main className="mx-auto max-w-[1500px] px-4 py-4 lg:px-5">{children}</main>
+        <main className="mx-auto max-w-[1500px] px-4 py-4 lg:px-5">
+          {children}
+        </main>
       </div>
     </div>
   );

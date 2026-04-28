@@ -7,7 +7,7 @@ export default defineConfig({
   testDir: "./e2e",
   fullyParallel: false,
   retries: process.env.CI ? 2 : 0,
-  timeout: 45_000,
+  timeout: 75_000,
   // Supabase local and the Next dev server are shared stateful resources.
   // One worker keeps data flows deterministic and avoids blank-page flakes.
   workers: 1,

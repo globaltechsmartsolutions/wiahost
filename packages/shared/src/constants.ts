@@ -7,7 +7,29 @@ export const bookingChannels = [
   "vrbo",
   "expedia",
   "google_vacation_rentals",
-  "manual"
+  "manual",
+] as const;
+
+export const messageChannels = [
+  "inbox",
+  "email",
+  "whatsapp",
+  "sms",
+  "airbnb",
+  "booking",
+  "vrbo",
+] as const;
+
+export const automationTriggers = [
+  "reservation_confirmed",
+  "checkin_24h",
+  "checkin_1h",
+  "checkout_time",
+  "cleaning_completed",
+  "message_unanswered",
+  "noise_alert",
+  "cancellation",
+  "low_review",
 ] as const;
 
 export const reservationStatuses = [
@@ -17,12 +39,25 @@ export const reservationStatuses = [
   "checked_in",
   "checked_out",
   "cancelled",
-  "no_show"
+  "no_show",
 ] as const;
 
-export const taskStatuses = ["open", "scheduled", "in_progress", "blocked", "done", "cancelled"] as const;
+export const taskStatuses = [
+  "open",
+  "scheduled",
+  "in_progress",
+  "blocked",
+  "done",
+  "cancelled",
+] as const;
 
-export const incidentStatuses = ["open", "investigating", "resolved", "charged", "cancelled"] as const;
+export const incidentStatuses = [
+  "open",
+  "investigating",
+  "resolved",
+  "charged",
+  "cancelled",
+] as const;
 
 export const severities = ["low", "medium", "high", "critical"] as const;
 
@@ -41,7 +76,7 @@ export const aiModelTasks = [
   "visual_audit",
   "functional_audit",
   "document_extraction",
-  "other"
+  "other",
 ] as const;
 
 export const aiPredictionStatuses = [
@@ -50,10 +85,17 @@ export const aiPredictionStatuses = [
   "accepted",
   "rejected",
   "expired",
-  "superseded"
+  "superseded",
 ] as const;
 
-export const aiFeedbackValues = ["accepted", "edited", "rejected", "ignored", "resolved", "failed"] as const;
+export const aiFeedbackValues = [
+  "accepted",
+  "edited",
+  "rejected",
+  "ignored",
+  "resolved",
+  "failed",
+] as const;
 
 export const qualityAuditAreas = [
   "visual",
@@ -62,7 +104,12 @@ export const qualityAuditAreas = [
   "performance",
   "security",
   "copy",
-  "other"
+  "other",
 ] as const;
 
-export const qualityAuditStatuses = ["open", "accepted", "resolved", "ignored"] as const;
+export const qualityAuditStatuses = [
+  "open",
+  "accepted",
+  "resolved",
+  "ignored",
+] as const;

@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import {
   aiAuditLogSchema,
+  automationRuleSchema,
   calendarBlockSchema,
   incidentSchema,
   loginSchema,
@@ -143,6 +144,34 @@ describe("calendar validators", () => {
       propertyId: uuid,
       reason: "Mantenimiento preventivo",
       startDate: "2026-05-07",
+    });
+
+    expect(parsed.success).toBe(false);
+  });
+});
+
+describe("automation validators", () => {
+  it("accepts a message automation rule", () => {
+    const parsed = automationRuleSchema.safeParse({
+      channel: "email",
+      delayMinutes: "60",
+      enabled: true,
+      name: "Enviar instrucciones de llegada",
+      template: "Hola {{guest_name}}, aqui tienes las instrucciones.",
+      trigger: "checkin_24h",
+    });
+
+    expect(parsed.success).toBe(true);
+  });
+
+  it("rejects automation templates that are too short", () => {
+    const parsed = automationRuleSchema.safeParse({
+      channel: "email",
+      delayMinutes: 0,
+      enabled: true,
+      name: "Aviso",
+      template: "Hola",
+      trigger: "reservation_confirmed",
     });
 
     expect(parsed.success).toBe(false);

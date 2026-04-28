@@ -13,6 +13,7 @@ const routes: AccessibilityRoute[] = [
   { name: "landing", path: "/" },
   { name: "login", path: "/login" },
   { name: "register", path: "/register" },
+  { name: "automations", path: "/automations", requiresAuth: true },
   { name: "dashboard", path: "/dashboard", requiresAuth: true },
   { name: "calendar", path: "/calendar", requiresAuth: true },
   { name: "properties", path: "/properties", requiresAuth: true },

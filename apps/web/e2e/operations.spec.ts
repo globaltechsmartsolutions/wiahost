@@ -407,4 +407,70 @@ test.describe("operations flows with Supabase @critical @data", () => {
     await page.goto("/calendar");
     await expect(page.getByText(updatedBlockReason)).not.toBeVisible();
   });
+
+  test("creates, updates and deletes automation rules through API routes", async ({
+    page,
+  }) => {
+    const existingRulesResponse = await page.request.get("/api/automations");
+    if (existingRulesResponse.ok()) {
+      const existingRules = (await existingRulesResponse.json()) as {
+        data: Array<{ id: string; name: string }>;
+      };
+
+      for (const rule of existingRules.data.filter((item) =>
+        item.name.startsWith("E2E Automatizacion"),
+      )) {
+        await page.request.delete(`/api/automations/${rule.id}`);
+      }
+    }
+
+    const ruleName = uniqueName("E2E Automatizacion");
+    const ruleResponse = await page.request.post("/api/automations", {
+      data: {
+        channel: "email",
+        delayMinutes: 30,
+        enabled: true,
+        name: ruleName,
+        template:
+          "Hola {{guest_name}}, aqui tienes una automatizacion validada por E2E.",
+        trigger: "checkin_24h",
+      },
+    });
+    expect(ruleResponse.status()).toBe(201);
+
+    const ruleBody = (await ruleResponse.json()) as { data: { id: string } };
+    const updatedRuleName = `${ruleName} editada`;
+    const rulePatchResponse = await page.request.patch(
+      `/api/automations/${ruleBody.data.id}`,
+      {
+        data: {
+          channel: "inbox",
+          delayMinutes: 0,
+          enabled: false,
+          name: updatedRuleName,
+          template:
+            "Mensaje interno actualizado por Playwright para validar automatizaciones.",
+          trigger: "message_unanswered",
+        },
+      },
+    );
+    expect(rulePatchResponse.status()).toBe(200);
+
+    await page.goto("/automations");
+    await expect(
+      page.getByRole("heading", { name: /reglas operativas/i }),
+    ).toBeVisible();
+    await expect(page.getByText(updatedRuleName)).toBeVisible();
+    await expect(
+      page.getByText("Pausada", { exact: true }).first(),
+    ).toBeVisible();
+
+    const ruleDeleteResponse = await page.request.delete(
+      `/api/automations/${ruleBody.data.id}`,
+    );
+    expect(ruleDeleteResponse.status()).toBe(200);
+
+    await page.goto("/automations");
+    await expect(page.getByText(updatedRuleName)).not.toBeVisible();
+  });
 });

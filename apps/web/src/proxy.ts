@@ -2,6 +2,7 @@ import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
 const protectedRoutes = [
+  "/automations",
   "/calendar",
   "/dashboard",
   "/guests",
@@ -28,15 +29,17 @@ function isSupabaseConfigured() {
 
   return Boolean(
     url &&
-      anonKey &&
-      !url.includes("replace_with") &&
-      !anonKey.includes("replace_with") &&
-      url.startsWith("http"),
+    anonKey &&
+    !url.includes("replace_with") &&
+    !anonKey.includes("replace_with") &&
+    url.startsWith("http"),
   );
 }
 
 function matchesRoute(pathname: string, routes: string[]) {
-  return routes.some((route) => pathname === route || pathname.startsWith(`${route}/`));
+  return routes.some(
+    (route) => pathname === route || pathname.startsWith(`${route}/`),
+  );
 }
 
 function withSyncedCookies(response: NextResponse, cookies: CookieToSync[]) {
@@ -84,7 +87,10 @@ export async function proxy(request: NextRequest) {
           cookies.forEach(({ name, value }) => {
             request.cookies.set(name, value);
           });
-          response = withSyncedCookies(NextResponse.next({ request }), cookiesToSync);
+          response = withSyncedCookies(
+            NextResponse.next({ request }),
+            cookiesToSync,
+          );
         },
       },
     },
@@ -116,6 +122,7 @@ export async function proxy(request: NextRequest) {
 export const config = {
   matcher: [
     "/calendar/:path*",
+    "/automations/:path*",
     "/dashboard/:path*",
     "/guests/:path*",
     "/inbox/:path*",
