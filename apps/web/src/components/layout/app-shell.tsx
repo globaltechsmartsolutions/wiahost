@@ -15,6 +15,7 @@ import {
   Users,
 } from "lucide-react";
 
+import { signOutAction } from "@/lib/auth/actions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
@@ -127,6 +128,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               <p className="text-sm font-semibold">Laura Operaciones</p>
               <p className="text-xs text-[#75695b]">Admin demo · WIA</p>
             </div>
+            <form action={signOutAction} className="hidden sm:block">
+              <Button type="submit" variant="outline" className="rounded-full border-[#dfd2bf] bg-white/70">
+                Salir
+              </Button>
+            </form>
           </div>
         </header>
         <main className="mx-auto max-w-[1500px] px-4 py-6 lg:px-8">{children}</main>

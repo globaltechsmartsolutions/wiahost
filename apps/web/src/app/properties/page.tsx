@@ -1,17 +1,38 @@
+import Link from "next/link";
+
 import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader } from "@/components/page-header";
 import { StatusBadge } from "@/components/status-badge";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { properties } from "@/lib/demo-data";
+import { getProperties } from "@/lib/data/properties";
 
-export default function PropertiesPage() {
+export default async function PropertiesPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ created?: string }>;
+}) {
+  const [{ created }, properties] = await Promise.all([searchParams, getProperties()]);
+
   return (
     <AppShell>
-      <PageHeader
-        eyebrow="Inventario"
-        title="Propiedades preparadas para operar en múltiples canales."
-        description="Cada vivienda concentra estado operativo, publicación, revenue, próxima llegada y preparación para fotos, documentos y reglas de casa."
-      />
+      <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+        <PageHeader
+          eyebrow="Inventario"
+          title="Propiedades preparadas para operar en múltiples canales."
+          description="Cada vivienda concentra estado operativo, publicación, revenue, próxima llegada y preparación para fotos, documentos y reglas de casa."
+        />
+        <Button asChild className="rounded-full bg-[#160f09] px-6 text-white hover:bg-[#2b1d10]">
+          <Link href="/properties/new">Nueva propiedad</Link>
+        </Button>
+      </div>
+
+      {created ? (
+        <div className="mb-5 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
+          Propiedad creada correctamente.
+        </div>
+      ) : null}
+
       <section className="grid auto-rows-fr gap-4 md:grid-cols-2 xl:grid-cols-3">
         {properties.map((property) => (
           <Card key={property.id} className="h-full rounded-[2rem] border-border/80 bg-card/80">
