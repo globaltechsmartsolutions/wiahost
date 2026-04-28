@@ -55,15 +55,51 @@
       "tests": ["critical", "data", "a11y", "visual"]
     },
     {
+      "path": "/reservations/:reservationId",
+      "auth": "protected",
+      "primaryCheck": "Reservation detail shows edited guest, channel, amount and status data",
+      "tests": ["critical", "data", "a11y", "visual"]
+    },
+    {
+      "path": "/reservations/:reservationId/edit",
+      "auth": "protected",
+      "primaryCheck": "Reservation edit form updates guest, dates, pricing and operational status",
+      "tests": ["critical", "data", "a11y", "visual"]
+    },
+    {
       "path": "/tasks",
       "auth": "protected",
       "primaryCheck": "Task create/update API flow works and filters preserve the updated record",
       "tests": ["critical", "data", "a11y", "visual"]
     },
     {
+      "path": "/tasks/:taskId",
+      "auth": "protected",
+      "primaryCheck": "Task detail reflects full edit and status updates",
+      "tests": ["critical", "data", "a11y", "visual"]
+    },
+    {
+      "path": "/tasks/:taskId/edit",
+      "auth": "protected",
+      "primaryCheck": "Task edit form updates priority, due date, reservation link and status",
+      "tests": ["critical", "data", "a11y", "visual"]
+    },
+    {
       "path": "/incidents",
       "auth": "protected",
       "primaryCheck": "Incident create/update API flow works and filters preserve the updated record",
+      "tests": ["critical", "data", "a11y", "visual"]
+    },
+    {
+      "path": "/incidents/:incidentId",
+      "auth": "protected",
+      "primaryCheck": "Incident detail reflects severity, cost and status updates",
+      "tests": ["critical", "data", "a11y", "visual"]
+    },
+    {
+      "path": "/incidents/:incidentId/edit",
+      "auth": "protected",
+      "primaryCheck": "Incident edit form updates cost, severity, description and status",
       "tests": ["critical", "data", "a11y", "visual"]
     },
     {

@@ -44,16 +44,50 @@ export type DetailField = {
 export type ReservationDetail = ReservationListItem & {
   fields: DetailField[];
   notes: string;
+  raw: {
+    channel: string;
+    checkIn: string;
+    checkOut: string;
+    cleaningFee: number;
+    guestEmail?: string;
+    guestFullName: string;
+    guestPhone?: string;
+    guestsCount: number;
+    nightlyRate: number;
+    propertyId: string;
+    securityDeposit: number;
+    status: string;
+    taxesAmount: number;
+  };
 };
 
 export type TaskDetail = TaskListItem & {
   description: string;
   fields: DetailField[];
+  raw: {
+    description?: string;
+    dueAt?: string;
+    priority: string;
+    propertyId: string;
+    reservationId?: string;
+    status: string;
+    title: string;
+    type: string;
+  };
 };
 
 export type IncidentDetail = IncidentListItem & {
   description: string;
   fields: DetailField[];
+  raw: {
+    description: string;
+    estimatedCost?: number;
+    propertyId: string;
+    reservationId?: string;
+    severity: string;
+    status: string;
+    title: string;
+  };
 };
 
 export type ConversationMessageItem = {
@@ -90,6 +124,7 @@ type ReservationRow = {
   status: string;
   check_in: string;
   check_out: string;
+  guest_id?: string | null;
   total_amount: number | string | null;
   properties?: Relation<{
     id?: string;
@@ -97,7 +132,11 @@ type ReservationRow = {
     internal_name?: string | null;
     city?: string | null;
   }>;
-  guests?: Relation<{ full_name: string | null }>;
+  guests?: Relation<{
+    email?: string | null;
+    full_name: string | null;
+    phone?: string | null;
+  }>;
 };
 
 type ConversationRow = {
@@ -125,6 +164,8 @@ type TaskRow = {
   type: string;
   status: string;
   priority: string;
+  property_id?: string | null;
+  reservation_id?: string | null;
   due_at: string | null;
   properties?: Relation<{ name: string | null }>;
 };
@@ -134,6 +175,8 @@ type IncidentRow = {
   title: string;
   status: string;
   severity: string;
+  property_id?: string | null;
+  reservation_id?: string | null;
   estimated_cost: number | string | null;
   description?: string | null;
   charge_amount?: number | string | null;
@@ -286,6 +329,20 @@ function dueLabel(value: string | null | undefined) {
     minute: "2-digit",
     month: "short",
   }).format(new Date(value));
+}
+
+function dateTimeInput(value: string | null | undefined) {
+  if (!value) {
+    return undefined;
+  }
+
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return undefined;
+  }
+
+  return date.toISOString().slice(0, 16);
 }
 
 function isCriticalTask(task: TaskListItem) {
@@ -646,6 +703,19 @@ export async function getReservationDetail(
       ],
       notes:
         "Reserva demo lista para validar el flujo visual antes de conectar Supabase.",
+      raw: {
+        channel: "manual",
+        checkIn: new Date().toISOString().slice(0, 10),
+        checkOut: new Date(Date.now() + 86_400_000).toISOString().slice(0, 10),
+        cleaningFee: 40,
+        guestFullName: reservation.guest,
+        guestsCount: 2,
+        nightlyRate: parseMoney(reservation.amount),
+        propertyId: demoProperties[0]?.id ?? "",
+        securityDeposit: 0,
+        status: "confirmed",
+        taxesAmount: 0,
+      },
     };
   }
 
@@ -654,7 +724,7 @@ export async function getReservationDetail(
     const { data, error } = await supabase
       .from("reservations")
       .select(
-        "id,channel,status,check_in,check_out,guests_count,nightly_rate,cleaning_fee,taxes_amount,total_amount,payout_amount,security_deposit,notes,properties(name,internal_name,city),guests(full_name,email,phone)",
+        "id,property_id,channel,status,check_in,check_out,guests_count,nightly_rate,cleaning_fee,taxes_amount,total_amount,payout_amount,security_deposit,notes,properties(name,internal_name,city),guests(full_name,email,phone)",
       )
       .eq("id", reservationId)
       .single();
@@ -696,6 +766,21 @@ export async function getReservationDetail(
       id: reservation.id,
       notes: reservation.notes ?? "Sin notas internas.",
       property: property?.name ?? "Propiedad sin asignar",
+      raw: {
+        channel: reservation.channel,
+        checkIn: reservation.check_in,
+        checkOut: reservation.check_out,
+        cleaningFee: Number(reservation.cleaning_fee ?? 0),
+        guestEmail: guest?.email ?? undefined,
+        guestFullName: guest?.full_name ?? "Huesped sin nombre",
+        guestPhone: guest?.phone ?? undefined,
+        guestsCount: reservation.guests_count ?? 1,
+        nightlyRate: Number(reservation.nightly_rate ?? 0),
+        propertyId: reservation.property_id ?? "",
+        securityDeposit: Number(reservation.security_deposit ?? 0),
+        status: reservation.status,
+        taxesAmount: Number(reservation.taxes_amount ?? 0),
+      },
       status: label(reservation.status),
     };
   } catch {
@@ -723,6 +808,15 @@ export async function getTaskDetail(
         { label: "Vencimiento", value: task.due },
         { label: "Prioridad", value: task.priority },
       ],
+      raw: {
+        description:
+          "Tarea demo para validar responsable, prioridad y estado antes de conectar Supabase.",
+        priority: "medium",
+        propertyId: demoProperties[0]?.id ?? "",
+        status: "open",
+        title: task.title,
+        type: "cleaning",
+      },
     };
   }
 
@@ -731,7 +825,7 @@ export async function getTaskDetail(
     const { data, error } = await supabase
       .from("tasks")
       .select(
-        "id,title,type,status,priority,due_at,description,properties(name),reservations(id,check_in,check_out)",
+        "id,property_id,reservation_id,title,type,status,priority,due_at,description,properties(name),reservations(id,check_in,check_out)",
       )
       .eq("id", taskId)
       .single();
@@ -770,6 +864,16 @@ export async function getTaskDetail(
       id: task.id,
       priority: label(task.priority),
       property: one(task.properties)?.name ?? "Propiedad sin asignar",
+      raw: {
+        description: task.description ?? undefined,
+        dueAt: dateTimeInput(task.due_at),
+        priority: task.priority,
+        propertyId: task.property_id ?? "",
+        reservationId: task.reservation_id ?? undefined,
+        status: task.status,
+        title: task.title,
+        type: task.type,
+      },
       status: label(task.status),
       title: task.title,
       type: label(task.type),
@@ -799,6 +903,15 @@ export async function getIncidentDetail(
         { label: "Estado", value: incident.status },
         { label: "Coste", value: incident.cost },
       ],
+      raw: {
+        description:
+          "Incidencia demo para revisar el flujo de seguimiento, coste y estado.",
+        estimatedCost: parseMoney(incident.cost),
+        propertyId: demoProperties[0]?.id ?? "",
+        severity: "medium",
+        status: "open",
+        title: incident.title,
+      },
     };
   }
 
@@ -807,7 +920,7 @@ export async function getIncidentDetail(
     const { data, error } = await supabase
       .from("incidents")
       .select(
-        "id,title,status,severity,description,estimated_cost,charge_amount,created_at,properties(name),reservations(id,check_in,check_out)",
+        "id,property_id,reservation_id,title,status,severity,description,estimated_cost,charge_amount,created_at,properties(name),reservations(id,check_in,check_out)",
       )
       .eq("id", incidentId)
       .single();
@@ -850,6 +963,19 @@ export async function getIncidentDetail(
       ],
       id: incident.id,
       property: one(incident.properties)?.name ?? "Propiedad sin asignar",
+      raw: {
+        description: incident.description ?? "",
+        estimatedCost:
+          incident.estimated_cost === null ||
+          incident.estimated_cost === undefined
+            ? undefined
+            : Number(incident.estimated_cost),
+        propertyId: incident.property_id ?? "",
+        reservationId: incident.reservation_id ?? undefined,
+        severity: incident.severity,
+        status: incident.status,
+        title: incident.title,
+      },
       severity: label(incident.severity),
       status: label(incident.status),
       title: incident.title,

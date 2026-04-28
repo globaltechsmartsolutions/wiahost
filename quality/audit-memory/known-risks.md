@@ -18,6 +18,7 @@
 - Server Actions must redirect or revalidate after writes so the UI visibly updates.
 - Playwright E2E needs Supabase local and `apps/web/.env.local`.
 - Vitest must exclude Playwright specs.
+- Full edit forms for reservations, tasks and incidents must keep Server Actions and PATCH Route Handlers aligned so web and future mobile clients do not diverge.
 
 ## Data
 

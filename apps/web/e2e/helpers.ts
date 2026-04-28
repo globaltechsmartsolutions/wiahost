@@ -7,14 +7,18 @@ export const demoOperator = {
 
 export const seedIds = {
   conversationId: "50000000-0000-0000-0000-000000000001",
+  incidentId: "70000000-0000-0000-0000-000000000001",
   propertyId: "20000000-0000-0000-0000-000000000001",
   reservationId: "40000000-0000-0000-0000-000000000001",
+  taskId: "60000000-0000-0000-0000-000000000001",
 };
 
 export async function signInAsDemoOperator(page: Page) {
   await page.goto("/login");
   if (page.url().endsWith("/dashboard")) {
-    await expect(page.getByRole("heading", { name: /prioridades/i })).toBeVisible();
+    await expect(
+      page.getByRole("heading", { name: /prioridades/i }),
+    ).toBeVisible();
     return;
   }
 
@@ -22,7 +26,9 @@ export async function signInAsDemoOperator(page: Page) {
   await page.locator("#password").fill(demoOperator.password);
   await page.getByRole("button", { name: /entrar al panel/i }).click();
   await expect(page).toHaveURL(/\/dashboard$/);
-  await expect(page.getByRole("heading", { name: /prioridades/i })).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: /prioridades/i }),
+  ).toBeVisible();
 }
 
 export function uniqueName(prefix: string) {

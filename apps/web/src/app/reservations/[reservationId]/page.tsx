@@ -12,14 +12,17 @@ export const dynamic = "force-dynamic";
 
 type ReservationDetailPageProps = {
   params: Promise<{ reservationId: string }>;
-  searchParams: Promise<{ created?: string }>;
+  searchParams: Promise<{ created?: string; updated?: string }>;
 };
 
 export default async function ReservationDetailPage({
   params,
   searchParams,
 }: ReservationDetailPageProps) {
-  const [{ reservationId }, { created }] = await Promise.all([params, searchParams]);
+  const [{ reservationId }, { created, updated }] = await Promise.all([
+    params,
+    searchParams,
+  ]);
   const reservation = await getReservationDetail(reservationId);
 
   if (!reservation) {
@@ -29,9 +32,16 @@ export default async function ReservationDetailPage({
   return (
     <AppShell>
       <div className="mb-6">
-        <Button asChild variant="outline" className="rounded-full">
-          <Link href="/reservations">Volver a reservas</Link>
-        </Button>
+        <div className="flex flex-wrap gap-2">
+          <Button asChild variant="outline" className="rounded-full">
+            <Link href="/reservations">Volver a reservas</Link>
+          </Button>
+          <Button asChild className="rounded-full">
+            <Link href={`/reservations/${reservation.id}/edit`}>
+              Editar reserva
+            </Link>
+          </Button>
+        </div>
       </div>
 
       <PageHeader
@@ -42,6 +52,11 @@ export default async function ReservationDetailPage({
       {created ? (
         <div className="mb-5 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
           Reserva creada correctamente.
+        </div>
+      ) : null}
+      {updated ? (
+        <div className="mb-5 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
+          Reserva actualizada correctamente.
         </div>
       ) : null}
 

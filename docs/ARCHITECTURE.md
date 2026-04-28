@@ -68,6 +68,7 @@ La UI combina datos demo con primeras integraciones reales:
 - Login/register usan Supabase Auth.
 - Properties tiene lectura, creacion, detalle, edicion y archivo controlado con Supabase.
 - Dashboard, reservas, calendario, inbox, tareas e incidencias leen de Supabase con fallback demo.
+- Reservas, tareas e incidencias tienen creacion, detalle, edicion completa y actualizacion de estado mediante Server Actions y Route Handlers compartiendo servicios de mutacion.
 - Reservas, tareas, incidencias e inbox tienen filtros GET server-side sobre los datos cargados para proteger deep links y futura app movil.
 - Owners y settings siguen siendo principalmente demo.
 

@@ -12,14 +12,17 @@ export const dynamic = "force-dynamic";
 
 type IncidentDetailPageProps = {
   params: Promise<{ incidentId: string }>;
-  searchParams: Promise<{ created?: string }>;
+  searchParams: Promise<{ created?: string; updated?: string }>;
 };
 
 export default async function IncidentDetailPage({
   params,
   searchParams,
 }: IncidentDetailPageProps) {
-  const [{ incidentId }, { created }] = await Promise.all([params, searchParams]);
+  const [{ incidentId }, { created, updated }] = await Promise.all([
+    params,
+    searchParams,
+  ]);
   const incident = await getIncidentDetail(incidentId);
 
   if (!incident) {
@@ -29,9 +32,16 @@ export default async function IncidentDetailPage({
   return (
     <AppShell>
       <div className="mb-6">
-        <Button asChild variant="outline" className="rounded-full">
-          <Link href="/incidents">Volver a incidencias</Link>
-        </Button>
+        <div className="flex flex-wrap gap-2">
+          <Button asChild variant="outline" className="rounded-full">
+            <Link href="/incidents">Volver a incidencias</Link>
+          </Button>
+          <Button asChild className="rounded-full">
+            <Link href={`/incidents/${incident.id}/edit`}>
+              Editar incidencia
+            </Link>
+          </Button>
+        </div>
       </div>
 
       <PageHeader
@@ -42,6 +52,11 @@ export default async function IncidentDetailPage({
       {created ? (
         <div className="mb-5 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
           Incidencia creada correctamente.
+        </div>
+      ) : null}
+      {updated ? (
+        <div className="mb-5 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
+          Incidencia actualizada correctamente.
         </div>
       ) : null}
 

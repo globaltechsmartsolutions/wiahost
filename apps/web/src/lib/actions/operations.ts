@@ -19,7 +19,10 @@ import {
   createTask,
   OperationMutationError,
   sendConversationReply,
+  updateIncident,
   updateIncidentStatus,
+  updateManualReservation,
+  updateTask,
   updateReservationStatus,
   updateTaskStatus,
 } from "@/lib/services/operations";
@@ -34,10 +37,13 @@ function requiredString(formData: FormData, key: string) {
 }
 
 function formPayload(formData: FormData, keys: string[]) {
-  return keys.reduce<Record<string, FormDataEntryValue | undefined>>((payload, key) => {
-    payload[key] = formData.get(key) ?? undefined;
-    return payload;
-  }, {});
+  return keys.reduce<Record<string, FormDataEntryValue | undefined>>(
+    (payload, key) => {
+      payload[key] = formData.get(key) ?? undefined;
+      return payload;
+    },
+    {},
+  );
 }
 
 function redirectWithError(path: string, message: string): never {
@@ -54,14 +60,19 @@ function mutationMessage(error: unknown, fallback: string) {
 
 async function getMutationContext(path: string) {
   if (!isSupabaseConfigured()) {
-    redirectWithError(path, "Supabase no esta configurado. Levanta Supabase local para guardar cambios.");
+    redirectWithError(
+      path,
+      "Supabase no esta configurado. Levanta Supabase local para guardar cambios.",
+    );
   }
 
   const supabase = await createSupabaseServerClient();
   const { data: userData } = await supabase.auth.getUser();
 
   if (!userData.user) {
-    redirect(`/login?error=${encodeURIComponent("Inicia sesion para modificar la operacion.")}`);
+    redirect(
+      `/login?error=${encodeURIComponent("Inicia sesion para modificar la operacion.")}`,
+    );
   }
 
   return { supabase, userId: userData.user.id };
@@ -89,7 +100,10 @@ export async function createManualReservationAction(formData: FormData) {
   );
 
   if (!parsed.success) {
-    redirectWithError(path, parsed.error.issues[0]?.message ?? "Datos de reserva invalidos.");
+    redirectWithError(
+      path,
+      parsed.error.issues[0]?.message ?? "Datos de reserva invalidos.",
+    );
   }
 
   const { supabase } = await getMutationContext(path);
@@ -99,7 +113,10 @@ export async function createManualReservationAction(formData: FormData) {
     const reservation = await createManualReservation(supabase, parsed.data);
     reservationId = reservation.id;
   } catch (error) {
-    redirectWithError(path, mutationMessage(error, "No se ha podido crear la reserva."));
+    redirectWithError(
+      path,
+      mutationMessage(error, "No se ha podido crear la reserva."),
+    );
   }
 
   revalidatePath("/reservations");
@@ -109,8 +126,12 @@ export async function createManualReservationAction(formData: FormData) {
 
 export async function updateReservationStatusAction(formData: FormData) {
   const path = "/reservations";
-  const reservationId = idSchema.safeParse(requiredString(formData, "reservationId"));
-  const parsed = updateReservationStatusSchema.safeParse({ status: requiredString(formData, "status") });
+  const reservationId = idSchema.safeParse(
+    requiredString(formData, "reservationId"),
+  );
+  const parsed = updateReservationStatusSchema.safeParse({
+    status: requiredString(formData, "status"),
+  });
 
   if (!reservationId.success || !parsed.success) {
     redirectWithError(path, "Estado de reserva invalido.");
@@ -119,9 +140,16 @@ export async function updateReservationStatusAction(formData: FormData) {
   const { supabase } = await getMutationContext(path);
 
   try {
-    await updateReservationStatus(supabase, reservationId.data, parsed.data.status);
+    await updateReservationStatus(
+      supabase,
+      reservationId.data,
+      parsed.data.status,
+    );
   } catch (error) {
-    redirectWithError(path, mutationMessage(error, "No se ha podido actualizar la reserva."));
+    redirectWithError(
+      path,
+      mutationMessage(error, "No se ha podido actualizar la reserva."),
+    );
   }
 
   revalidatePath("/reservations");
@@ -129,14 +157,79 @@ export async function updateReservationStatusAction(formData: FormData) {
   redirect("/reservations?updated=1");
 }
 
-export async function createTaskAction(formData: FormData) {
-  const path = "/tasks";
-  const parsed = taskSchema.safeParse(
-    formPayload(formData, ["propertyId", "reservationId", "title", "description", "type", "status", "dueAt", "priority"]),
+export async function updateManualReservationAction(formData: FormData) {
+  const reservationId = idSchema.safeParse(
+    requiredString(formData, "reservationId"),
+  );
+
+  if (!reservationId.success) {
+    redirectWithError("/reservations", "Reserva no valida.");
+  }
+
+  const path = `/reservations/${reservationId.data}/edit`;
+  const parsed = manualReservationSchema.safeParse(
+    formPayload(formData, [
+      "propertyId",
+      "guestFullName",
+      "guestEmail",
+      "guestPhone",
+      "channel",
+      "status",
+      "checkIn",
+      "checkOut",
+      "guestsCount",
+      "nightlyRate",
+      "cleaningFee",
+      "taxesAmount",
+      "securityDeposit",
+      "notes",
+    ]),
   );
 
   if (!parsed.success) {
-    redirectWithError(path, parsed.error.issues[0]?.message ?? "Datos de tarea invalidos.");
+    redirectWithError(
+      path,
+      parsed.error.issues[0]?.message ?? "Datos de reserva invalidos.",
+    );
+  }
+
+  const { supabase } = await getMutationContext(path);
+
+  try {
+    await updateManualReservation(supabase, reservationId.data, parsed.data);
+  } catch (error) {
+    redirectWithError(
+      path,
+      mutationMessage(error, "No se ha podido actualizar la reserva."),
+    );
+  }
+
+  revalidatePath("/reservations");
+  revalidatePath(`/reservations/${reservationId.data}`);
+  revalidatePath("/dashboard");
+  redirect(`/reservations/${reservationId.data}?updated=1`);
+}
+
+export async function createTaskAction(formData: FormData) {
+  const path = "/tasks";
+  const parsed = taskSchema.safeParse(
+    formPayload(formData, [
+      "propertyId",
+      "reservationId",
+      "title",
+      "description",
+      "type",
+      "status",
+      "dueAt",
+      "priority",
+    ]),
+  );
+
+  if (!parsed.success) {
+    redirectWithError(
+      path,
+      parsed.error.issues[0]?.message ?? "Datos de tarea invalidos.",
+    );
   }
 
   const { supabase, userId } = await getMutationContext(path);
@@ -146,7 +239,10 @@ export async function createTaskAction(formData: FormData) {
     const task = await createTask(supabase, parsed.data, userId);
     taskId = task.id;
   } catch (error) {
-    redirectWithError(path, mutationMessage(error, "No se ha podido crear la tarea."));
+    redirectWithError(
+      path,
+      mutationMessage(error, "No se ha podido crear la tarea."),
+    );
   }
 
   revalidatePath("/tasks");
@@ -157,7 +253,9 @@ export async function createTaskAction(formData: FormData) {
 export async function updateTaskStatusAction(formData: FormData) {
   const path = "/tasks";
   const taskId = idSchema.safeParse(requiredString(formData, "taskId"));
-  const parsed = updateTaskStatusSchema.safeParse({ status: requiredString(formData, "status") });
+  const parsed = updateTaskStatusSchema.safeParse({
+    status: requiredString(formData, "status"),
+  });
 
   if (!taskId.success || !parsed.success) {
     redirectWithError(path, "Estado de tarea invalido.");
@@ -168,7 +266,10 @@ export async function updateTaskStatusAction(formData: FormData) {
   try {
     await updateTaskStatus(supabase, taskId.data, parsed.data.status);
   } catch (error) {
-    redirectWithError(path, mutationMessage(error, "No se ha podido actualizar la tarea."));
+    redirectWithError(
+      path,
+      mutationMessage(error, "No se ha podido actualizar la tarea."),
+    );
   }
 
   revalidatePath("/tasks");
@@ -176,14 +277,70 @@ export async function updateTaskStatusAction(formData: FormData) {
   redirect("/tasks?updated=1");
 }
 
-export async function createIncidentAction(formData: FormData) {
-  const path = "/incidents";
-  const parsed = incidentSchema.safeParse(
-    formPayload(formData, ["propertyId", "reservationId", "title", "description", "severity", "status", "estimatedCost"]),
+export async function updateTaskAction(formData: FormData) {
+  const taskId = idSchema.safeParse(requiredString(formData, "taskId"));
+
+  if (!taskId.success) {
+    redirectWithError("/tasks", "Tarea no valida.");
+  }
+
+  const path = `/tasks/${taskId.data}/edit`;
+  const parsed = taskSchema.safeParse(
+    formPayload(formData, [
+      "propertyId",
+      "reservationId",
+      "title",
+      "description",
+      "type",
+      "status",
+      "dueAt",
+      "priority",
+    ]),
   );
 
   if (!parsed.success) {
-    redirectWithError(path, parsed.error.issues[0]?.message ?? "Datos de incidencia invalidos.");
+    redirectWithError(
+      path,
+      parsed.error.issues[0]?.message ?? "Datos de tarea invalidos.",
+    );
+  }
+
+  const { supabase } = await getMutationContext(path);
+
+  try {
+    await updateTask(supabase, taskId.data, parsed.data);
+  } catch (error) {
+    redirectWithError(
+      path,
+      mutationMessage(error, "No se ha podido actualizar la tarea."),
+    );
+  }
+
+  revalidatePath("/tasks");
+  revalidatePath(`/tasks/${taskId.data}`);
+  revalidatePath("/dashboard");
+  redirect(`/tasks/${taskId.data}?updated=1`);
+}
+
+export async function createIncidentAction(formData: FormData) {
+  const path = "/incidents";
+  const parsed = incidentSchema.safeParse(
+    formPayload(formData, [
+      "propertyId",
+      "reservationId",
+      "title",
+      "description",
+      "severity",
+      "status",
+      "estimatedCost",
+    ]),
+  );
+
+  if (!parsed.success) {
+    redirectWithError(
+      path,
+      parsed.error.issues[0]?.message ?? "Datos de incidencia invalidos.",
+    );
   }
 
   const { supabase, userId } = await getMutationContext(path);
@@ -193,7 +350,10 @@ export async function createIncidentAction(formData: FormData) {
     const incident = await createIncident(supabase, parsed.data, userId);
     incidentId = incident.id;
   } catch (error) {
-    redirectWithError(path, mutationMessage(error, "No se ha podido crear la incidencia."));
+    redirectWithError(
+      path,
+      mutationMessage(error, "No se ha podido crear la incidencia."),
+    );
   }
 
   revalidatePath("/incidents");
@@ -204,7 +364,9 @@ export async function createIncidentAction(formData: FormData) {
 export async function updateIncidentStatusAction(formData: FormData) {
   const path = "/incidents";
   const incidentId = idSchema.safeParse(requiredString(formData, "incidentId"));
-  const parsed = updateIncidentStatusSchema.safeParse({ status: requiredString(formData, "status") });
+  const parsed = updateIncidentStatusSchema.safeParse({
+    status: requiredString(formData, "status"),
+  });
 
   if (!incidentId.success || !parsed.success) {
     redirectWithError(path, "Estado de incidencia invalido.");
@@ -215,12 +377,59 @@ export async function updateIncidentStatusAction(formData: FormData) {
   try {
     await updateIncidentStatus(supabase, incidentId.data, parsed.data.status);
   } catch (error) {
-    redirectWithError(path, mutationMessage(error, "No se ha podido actualizar la incidencia."));
+    redirectWithError(
+      path,
+      mutationMessage(error, "No se ha podido actualizar la incidencia."),
+    );
   }
 
   revalidatePath("/incidents");
   revalidatePath("/dashboard");
   redirect("/incidents?updated=1");
+}
+
+export async function updateIncidentAction(formData: FormData) {
+  const incidentId = idSchema.safeParse(requiredString(formData, "incidentId"));
+
+  if (!incidentId.success) {
+    redirectWithError("/incidents", "Incidencia no valida.");
+  }
+
+  const path = `/incidents/${incidentId.data}/edit`;
+  const parsed = incidentSchema.safeParse(
+    formPayload(formData, [
+      "propertyId",
+      "reservationId",
+      "title",
+      "description",
+      "severity",
+      "status",
+      "estimatedCost",
+    ]),
+  );
+
+  if (!parsed.success) {
+    redirectWithError(
+      path,
+      parsed.error.issues[0]?.message ?? "Datos de incidencia invalidos.",
+    );
+  }
+
+  const { supabase } = await getMutationContext(path);
+
+  try {
+    await updateIncident(supabase, incidentId.data, parsed.data);
+  } catch (error) {
+    redirectWithError(
+      path,
+      mutationMessage(error, "No se ha podido actualizar la incidencia."),
+    );
+  }
+
+  revalidatePath("/incidents");
+  revalidatePath(`/incidents/${incidentId.data}`);
+  revalidatePath("/dashboard");
+  redirect(`/incidents/${incidentId.data}?updated=1`);
 }
 
 export async function sendConversationReplyAction(formData: FormData) {
@@ -232,7 +441,10 @@ export async function sendConversationReplyAction(formData: FormData) {
   });
 
   if (!parsed.success) {
-    redirectWithError(path, parsed.error.issues[0]?.message ?? "Mensaje invalido.");
+    redirectWithError(
+      path,
+      parsed.error.issues[0]?.message ?? "Mensaje invalido.",
+    );
   }
 
   const { supabase, userId } = await getMutationContext(path);
@@ -240,7 +452,10 @@ export async function sendConversationReplyAction(formData: FormData) {
   try {
     await sendConversationReply(supabase, parsed.data, userId);
   } catch (error) {
-    redirectWithError(path, mutationMessage(error, "No se ha podido enviar el mensaje."));
+    redirectWithError(
+      path,
+      mutationMessage(error, "No se ha podido enviar el mensaje."),
+    );
   }
 
   revalidatePath("/inbox");

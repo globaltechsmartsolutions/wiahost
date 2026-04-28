@@ -1,7 +1,14 @@
-import type { IncidentInput, ManualReservationInput, MessageInput, TaskInput } from "@wiahost/shared";
+import type {
+  IncidentInput,
+  ManualReservationInput,
+  MessageInput,
+  TaskInput,
+} from "@wiahost/shared";
 import type { createSupabaseServerClient } from "@/lib/supabase/server";
 
-type SupabaseServerClient = Awaited<ReturnType<typeof createSupabaseServerClient>>;
+type SupabaseServerClient = Awaited<
+  ReturnType<typeof createSupabaseServerClient>
+>;
 
 export class OperationMutationError extends Error {
   code: string;
@@ -17,7 +24,8 @@ function mutationError(code: string, message: string): never {
 }
 
 function nightsBetween(checkIn: string, checkOut: string) {
-  const milliseconds = new Date(checkOut).getTime() - new Date(checkIn).getTime();
+  const milliseconds =
+    new Date(checkOut).getTime() - new Date(checkIn).getTime();
   return Math.max(1, Math.round(milliseconds / 86_400_000));
 }
 
@@ -30,24 +38,31 @@ function toDatabaseDateTime(value: string | undefined) {
   return Number.isNaN(date.getTime()) ? null : date.toISOString();
 }
 
-export async function createManualReservation(supabase: SupabaseServerClient, input: ManualReservationInput) {
+export async function createManualReservation(
+  supabase: SupabaseServerClient,
+  input: ManualReservationInput,
+) {
   const { data: guest, error: guestError } = await supabase
     .from("guests")
     .insert({
-      email: input.guestEmail,
+      email: input.guestEmail ?? null,
       full_name: input.guestFullName,
-      phone: input.guestPhone,
+      phone: input.guestPhone ?? null,
       preferred_language: "es",
     })
     .select("id")
     .single();
 
   if (guestError || !guest) {
-    mutationError("guest_create_failed", "No se ha podido crear el huesped de la reserva.");
+    mutationError(
+      "guest_create_failed",
+      "No se ha podido crear el huesped de la reserva.",
+    );
   }
 
   const nights = nightsBetween(input.checkIn, input.checkOut);
-  const totalAmount = nights * input.nightlyRate + input.cleaningFee + input.taxesAmount;
+  const totalAmount =
+    nights * input.nightlyRate + input.cleaningFee + input.taxesAmount;
 
   const { data, error } = await supabase
     .from("reservations")
@@ -59,7 +74,7 @@ export async function createManualReservation(supabase: SupabaseServerClient, in
       guest_id: guest.id,
       guests_count: input.guestsCount,
       nightly_rate: input.nightlyRate,
-      notes: input.notes,
+      notes: input.notes ?? null,
       payout_amount: totalAmount,
       property_id: input.propertyId,
       security_deposit: input.securityDeposit,
@@ -71,7 +86,10 @@ export async function createManualReservation(supabase: SupabaseServerClient, in
     .single();
 
   if (error || !data) {
-    mutationError("reservation_create_failed", "No se ha podido crear la reserva. Revisa permisos/RLS y disponibilidad.");
+    mutationError(
+      "reservation_create_failed",
+      "No se ha podido crear la reserva. Revisa permisos/RLS y disponibilidad.",
+    );
   }
 
   return data;
@@ -90,22 +108,97 @@ export async function updateReservationStatus(
     .single();
 
   if (error || !data) {
-    mutationError("reservation_update_failed", "No se ha podido actualizar la reserva.");
+    mutationError(
+      "reservation_update_failed",
+      "No se ha podido actualizar la reserva.",
+    );
   }
 
   return data;
 }
 
-export async function createTask(supabase: SupabaseServerClient, input: TaskInput, userId: string) {
+export async function updateManualReservation(
+  supabase: SupabaseServerClient,
+  reservationId: string,
+  input: ManualReservationInput,
+) {
+  const { data: existing, error: existingError } = await supabase
+    .from("reservations")
+    .select("guest_id")
+    .eq("id", reservationId)
+    .single();
+
+  if (existingError || !existing?.guest_id) {
+    mutationError(
+      "reservation_not_found",
+      "No se ha encontrado la reserva para editar.",
+    );
+  }
+
+  const { error: guestError } = await supabase
+    .from("guests")
+    .update({
+      email: input.guestEmail ?? null,
+      full_name: input.guestFullName,
+      phone: input.guestPhone ?? null,
+    })
+    .eq("id", existing.guest_id);
+
+  if (guestError) {
+    mutationError(
+      "guest_update_failed",
+      "No se ha podido actualizar el huesped de la reserva.",
+    );
+  }
+
+  const nights = nightsBetween(input.checkIn, input.checkOut);
+  const totalAmount =
+    nights * input.nightlyRate + input.cleaningFee + input.taxesAmount;
+  const { data, error } = await supabase
+    .from("reservations")
+    .update({
+      channel: input.channel,
+      check_in: input.checkIn,
+      check_out: input.checkOut,
+      cleaning_fee: input.cleaningFee,
+      guests_count: input.guestsCount,
+      nightly_rate: input.nightlyRate,
+      notes: input.notes ?? null,
+      payout_amount: totalAmount,
+      property_id: input.propertyId,
+      security_deposit: input.securityDeposit,
+      status: input.status,
+      taxes_amount: input.taxesAmount,
+      total_amount: totalAmount,
+    })
+    .eq("id", reservationId)
+    .select("id,status,total_amount")
+    .single();
+
+  if (error || !data) {
+    mutationError(
+      "reservation_update_failed",
+      "No se ha podido actualizar la reserva.",
+    );
+  }
+
+  return data;
+}
+
+export async function createTask(
+  supabase: SupabaseServerClient,
+  input: TaskInput,
+  userId: string,
+) {
   const { data, error } = await supabase
     .from("tasks")
     .insert({
       created_by: userId,
-      description: input.description,
+      description: input.description ?? null,
       due_at: toDatabaseDateTime(input.dueAt),
       priority: input.priority,
       property_id: input.propertyId,
-      reservation_id: input.reservationId,
+      reservation_id: input.reservationId ?? null,
       status: input.status,
       title: input.title,
       type: input.type,
@@ -120,7 +213,41 @@ export async function createTask(supabase: SupabaseServerClient, input: TaskInpu
   return data;
 }
 
-export async function updateTaskStatus(supabase: SupabaseServerClient, taskId: string, status: string) {
+export async function updateTask(
+  supabase: SupabaseServerClient,
+  taskId: string,
+  input: TaskInput,
+) {
+  const completedAt = input.status === "done" ? new Date().toISOString() : null;
+  const { data, error } = await supabase
+    .from("tasks")
+    .update({
+      completed_at: completedAt,
+      description: input.description ?? null,
+      due_at: toDatabaseDateTime(input.dueAt),
+      priority: input.priority,
+      property_id: input.propertyId,
+      reservation_id: input.reservationId ?? null,
+      status: input.status,
+      title: input.title,
+      type: input.type,
+    })
+    .eq("id", taskId)
+    .select("id,status")
+    .single();
+
+  if (error || !data) {
+    mutationError("task_update_failed", "No se ha podido actualizar la tarea.");
+  }
+
+  return data;
+}
+
+export async function updateTaskStatus(
+  supabase: SupabaseServerClient,
+  taskId: string,
+  status: string,
+) {
   const completedAt = status === "done" ? new Date().toISOString() : null;
   const { data, error } = await supabase
     .from("tasks")
@@ -136,15 +263,19 @@ export async function updateTaskStatus(supabase: SupabaseServerClient, taskId: s
   return data;
 }
 
-export async function createIncident(supabase: SupabaseServerClient, input: IncidentInput, userId: string) {
+export async function createIncident(
+  supabase: SupabaseServerClient,
+  input: IncidentInput,
+  userId: string,
+) {
   const { data, error } = await supabase
     .from("incidents")
     .insert({
       description: input.description,
-      estimated_cost: input.estimatedCost,
+      estimated_cost: input.estimatedCost ?? null,
       property_id: input.propertyId,
       reported_by: userId,
-      reservation_id: input.reservationId,
+      reservation_id: input.reservationId ?? null,
       severity: input.severity,
       status: input.status,
       title: input.title,
@@ -153,14 +284,57 @@ export async function createIncident(supabase: SupabaseServerClient, input: Inci
     .single();
 
   if (error || !data) {
-    mutationError("incident_create_failed", "No se ha podido crear la incidencia.");
+    mutationError(
+      "incident_create_failed",
+      "No se ha podido crear la incidencia.",
+    );
   }
 
   return data;
 }
 
-export async function updateIncidentStatus(supabase: SupabaseServerClient, incidentId: string, status: string) {
-  const resolvedAt = ["resolved", "charged", "cancelled"].includes(status) ? new Date().toISOString() : null;
+export async function updateIncident(
+  supabase: SupabaseServerClient,
+  incidentId: string,
+  input: IncidentInput,
+) {
+  const resolvedAt = ["resolved", "charged", "cancelled"].includes(input.status)
+    ? new Date().toISOString()
+    : null;
+  const { data, error } = await supabase
+    .from("incidents")
+    .update({
+      description: input.description,
+      estimated_cost: input.estimatedCost ?? null,
+      property_id: input.propertyId,
+      reservation_id: input.reservationId ?? null,
+      resolved_at: resolvedAt,
+      severity: input.severity,
+      status: input.status,
+      title: input.title,
+    })
+    .eq("id", incidentId)
+    .select("id,status")
+    .single();
+
+  if (error || !data) {
+    mutationError(
+      "incident_update_failed",
+      "No se ha podido actualizar la incidencia.",
+    );
+  }
+
+  return data;
+}
+
+export async function updateIncidentStatus(
+  supabase: SupabaseServerClient,
+  incidentId: string,
+  status: string,
+) {
+  const resolvedAt = ["resolved", "charged", "cancelled"].includes(status)
+    ? new Date().toISOString()
+    : null;
   const { data, error } = await supabase
     .from("incidents")
     .update({ resolved_at: resolvedAt, status })
@@ -169,7 +343,10 @@ export async function updateIncidentStatus(supabase: SupabaseServerClient, incid
     .single();
 
   if (error || !data) {
-    mutationError("incident_update_failed", "No se ha podido actualizar la incidencia.");
+    mutationError(
+      "incident_update_failed",
+      "No se ha podido actualizar la incidencia.",
+    );
   }
 
   return data;

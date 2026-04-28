@@ -36,21 +36,22 @@
 - Implementado: API routes autenticadas para listar/crear reservas, tareas, incidencias, inbox y mensajes.
 - Implementado: paginas de detalle para reservas, tareas, incidencias y conversaciones con fallback demo.
 - Implementado: propiedades con lista, detalle, edicion, PATCH API y archivo controlado mediante Server Action/API.
+- Implementado: edicion completa de reservas, tareas e incidencias mediante pantallas protegidas, Server Actions y PATCH API.
 - Implementado: feedback visual basico tras crear reservas/tareas/incidencias, enviar respuestas y actualizar estados.
 - Implementado: filtros operativos en reservas, tareas, incidencias e inbox por busqueda y estado/canal/prioridad/severidad segun modulo.
 - Implementado: Supabase local verificado con Auth, seed demo, tipos generados y escrituras reales desde UI/API.
 - Implementado: proteccion de rutas web con `proxy.ts` de Next.js 16 usando Supabase Auth.
-- Implementado: Playwright E2E inicial para landing/login/register, redireccion anonima, login demo, creacion de reserva UI y mutaciones API de tareas, incidencias e inbox.
-- Implementado: auditoria de accesibilidad con axe sobre rutas publicas y protegidas.
+- Implementado: Playwright E2E inicial para landing/login/register, redireccion anonima, login demo, creacion/edicion de reserva UI/API y mutaciones completas de tareas, incidencias e inbox.
+- Implementado: auditoria de accesibilidad con axe sobre rutas publicas, protegidas, detalle y edicion de operaciones.
 - Implementado: baseline visual inicial para landing/auth y check de alineacion del dashboard.
-- Implementado: visual checks de densidad/overflow para rutas operativas y gestion de propiedades en desktop portatil.
+- Implementado: visual checks de densidad/overflow para rutas operativas, detalle/edicion de operaciones y gestion de propiedades en desktop portatil.
 - Implementado: dashboard sobre grid compartido de 12 columnas para que los huecos entre cards queden alineados aunque cambie el numero de cards por fila.
 - Implementado: breakpoint responsive del dashboard para evitar calendario apretado y scrollbar horizontal interno en 1366, 1440, 1536 y 1920.
 - Implementado: escala compacta de dashboard para portatil, con cuatro metricas por fila y hero menos sobredimensionado.
 - Implementado: primera vista del dashboard mas densa, con sidebar/topbar/hero/cards compactos y calendario visible antes.
 - Implementado: memoria versionada en `quality/audit-memory` con reglas visuales, riesgos, rutas y hallazgos previos.
 - Implementado: CI inicial con typecheck, lint, unit tests, build web y Lighthouse CI no bloqueante con reportes como artefacto.
-- Pendiente inmediato: edicion completa de reservas/tareas/incidencias, snapshots visuales estables por modulo y endurecer Lighthouse cuando haya baseline historico.
+- Pendiente inmediato: conectar owners/settings a Supabase, snapshots visuales estables por modulo y endurecer Lighthouse cuando haya baseline historico.
 
 ## Fase 2 - Operacion PMS
 

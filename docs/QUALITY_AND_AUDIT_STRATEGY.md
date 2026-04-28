@@ -20,9 +20,9 @@ Ya existe:
 - Tests iniciales de validadores compartidos.
 - Test inicial de configuracion Supabase.
 - `playwright.config.ts` formal en `apps/web`.
-- Tests E2E versionados para smoke publico/auth, login demo, creacion de reserva UI y mutaciones API de tareas, incidencias e inbox.
-- Auditoria de accesibilidad con `@axe-core/playwright` sobre rutas publicas y protegidas.
-- Baseline visual inicial para landing/auth y check de overflow/alineacion del dashboard.
+- Tests E2E versionados para smoke publico/auth, login demo, creacion/edicion de reserva UI/API y mutaciones API completas de tareas, incidencias e inbox.
+- Auditoria de accesibilidad con `@axe-core/playwright` sobre rutas publicas, protegidas, detalle y edicion de operaciones.
+- Baseline visual inicial para landing/auth y check de overflow/alineacion del dashboard, operaciones y editores.
 - Memoria versionada en `quality/audit-memory`.
 - Lighthouse CI configurado para landing/login/register con budgets iniciales, reportes en filesystem y wrapper local para estabilizar Chrome en Windows.
 - CI inicial con typecheck, lint, unit tests y build web.
@@ -131,6 +131,16 @@ Rutas iniciales:
 - `/properties/new`
 - `/properties/:propertyId`
 - `/properties/:propertyId/edit`
+- `/reservations`
+- `/reservations/:reservationId`
+- `/reservations/:reservationId/edit`
+- `/tasks`
+- `/tasks/:taskId`
+- `/tasks/:taskId/edit`
+- `/incidents`
+- `/incidents/:incidentId`
+- `/incidents/:incidentId/edit`
+- `/inbox`
 
 ### 6. Performance, SEO and best practices
 
@@ -328,7 +338,7 @@ Un cambio no deberia entrar si:
 - Hecho: crear `playwright.config.ts`.
 - Hecho: crear `apps/web/e2e/smoke.spec.ts`.
 - Hecho: crear `apps/web/e2e/operations.spec.ts`.
-- Hecho: validar landing, login, register, dashboard protegido, login demo, reserva UI y mutaciones API.
+- Hecho: validar landing, login, register, dashboard protegido, login demo, reserva UI/API, tareas, incidencias e inbox.
 - Hecho: guardar traces, screenshots y video en fallo.
 
 ### Paso 2
@@ -337,13 +347,14 @@ Un cambio no deberia entrar si:
 - Hecho: baseline desktop/mobile para landing y pantallas auth.
 - Hecho: check de dashboard sin overflow horizontal y con calendario/cola prioritaria alineados.
 - Hecho: check visual de rutas operativas `/reservations`, `/tasks`, `/incidents` e `/inbox` sin overflow en desktop portatil y con filtros visibles.
+- Hecho: check visual de rutas detalle/edicion de reservas, tareas e incidencias sin overflow en desktop portatil.
 - Hecho: desactivar animaciones en modo test.
 
 ### Paso 3
 
 - Hecho: instalar `@axe-core/playwright`.
 - Hecho: crear `apps/web/e2e/accessibility.spec.ts`.
-- Hecho: ejecutar rutas criticas con WCAG A/AA bloqueando violaciones criticas/serias.
+- Hecho: ejecutar rutas criticas, detalle y edicion con WCAG A/AA bloqueando violaciones criticas/serias.
 
 ### Paso 4
 

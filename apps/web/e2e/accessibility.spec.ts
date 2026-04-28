@@ -16,15 +16,51 @@ const routes: AccessibilityRoute[] = [
   { name: "dashboard", path: "/dashboard", requiresAuth: true },
   { name: "properties", path: "/properties", requiresAuth: true },
   { name: "new property", path: "/properties/new", requiresAuth: true },
-  { name: "property detail", path: `/properties/${seedIds.propertyId}`, requiresAuth: true },
-  { name: "edit property", path: `/properties/${seedIds.propertyId}/edit`, requiresAuth: true },
+  {
+    name: "property detail",
+    path: `/properties/${seedIds.propertyId}`,
+    requiresAuth: true,
+  },
+  {
+    name: "edit property",
+    path: `/properties/${seedIds.propertyId}/edit`,
+    requiresAuth: true,
+  },
   { name: "reservations", path: "/reservations", requiresAuth: true },
+  {
+    name: "reservation detail",
+    path: `/reservations/${seedIds.reservationId}`,
+    requiresAuth: true,
+  },
+  {
+    name: "edit reservation",
+    path: `/reservations/${seedIds.reservationId}/edit`,
+    requiresAuth: true,
+  },
   { name: "inbox", path: "/inbox", requiresAuth: true },
   { name: "tasks", path: "/tasks", requiresAuth: true },
+  { name: "task detail", path: `/tasks/${seedIds.taskId}`, requiresAuth: true },
+  {
+    name: "edit task",
+    path: `/tasks/${seedIds.taskId}/edit`,
+    requiresAuth: true,
+  },
   { name: "incidents", path: "/incidents", requiresAuth: true },
+  {
+    name: "incident detail",
+    path: `/incidents/${seedIds.incidentId}`,
+    requiresAuth: true,
+  },
+  {
+    name: "edit incident",
+    path: `/incidents/${seedIds.incidentId}/edit`,
+    requiresAuth: true,
+  },
 ];
 
-function formatViolations(violations: Awaited<ReturnType<AxeBuilder["analyze"]>>["violations"]) {
+function formatViolations(
+  violations: Awaited<ReturnType<AxeBuilder["analyze"]>>["violations"],
+) {
   return violations.map((violation) => ({
     description: violation.description,
     help: violation.help,

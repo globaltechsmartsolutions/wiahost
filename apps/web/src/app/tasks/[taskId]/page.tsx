@@ -12,11 +12,17 @@ export const dynamic = "force-dynamic";
 
 type TaskDetailPageProps = {
   params: Promise<{ taskId: string }>;
-  searchParams: Promise<{ created?: string }>;
+  searchParams: Promise<{ created?: string; updated?: string }>;
 };
 
-export default async function TaskDetailPage({ params, searchParams }: TaskDetailPageProps) {
-  const [{ taskId }, { created }] = await Promise.all([params, searchParams]);
+export default async function TaskDetailPage({
+  params,
+  searchParams,
+}: TaskDetailPageProps) {
+  const [{ taskId }, { created, updated }] = await Promise.all([
+    params,
+    searchParams,
+  ]);
   const task = await getTaskDetail(taskId);
 
   if (!task) {
@@ -26,9 +32,14 @@ export default async function TaskDetailPage({ params, searchParams }: TaskDetai
   return (
     <AppShell>
       <div className="mb-6">
-        <Button asChild variant="outline" className="rounded-full">
-          <Link href="/tasks">Volver a tareas</Link>
-        </Button>
+        <div className="flex flex-wrap gap-2">
+          <Button asChild variant="outline" className="rounded-full">
+            <Link href="/tasks">Volver a tareas</Link>
+          </Button>
+          <Button asChild className="rounded-full">
+            <Link href={`/tasks/${task.id}/edit`}>Editar tarea</Link>
+          </Button>
+        </div>
       </div>
 
       <PageHeader
@@ -39,6 +50,11 @@ export default async function TaskDetailPage({ params, searchParams }: TaskDetai
       {created ? (
         <div className="mb-5 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
           Tarea creada correctamente.
+        </div>
+      ) : null}
+      {updated ? (
+        <div className="mb-5 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
+          Tarea actualizada correctamente.
         </div>
       ) : null}
 
