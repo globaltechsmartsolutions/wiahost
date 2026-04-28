@@ -38,8 +38,11 @@
 - Implementado: Supabase local verificado con Auth, seed demo, tipos generados y escrituras reales desde UI/API.
 - Implementado: proteccion de rutas web con `proxy.ts` de Next.js 16 usando Supabase Auth.
 - Implementado: Playwright E2E inicial para landing/login/register, redireccion anonima, login demo, creacion de reserva UI y mutaciones API de tareas, incidencias e inbox.
+- Implementado: auditoria de accesibilidad con axe sobre rutas publicas y protegidas.
+- Implementado: baseline visual inicial para landing/auth y check de alineacion del dashboard.
+- Implementado: memoria versionada en `quality/audit-memory` con reglas visuales, riesgos, rutas y hallazgos previos.
 - Implementado: CI inicial con typecheck, lint, unit tests y build web.
-- Pendiente inmediato: edicion completa, borrado/archivo controlado, filtros avanzados, feedback visual de guardado, visual regression, accesibilidad automatizada y memoria de auditoria versionada.
+- Pendiente inmediato: edicion completa, borrado/archivo controlado, filtros avanzados, feedback visual de guardado, Lighthouse CI y ampliar visual regression a mas rutas estables.
 
 ## Fase 2 - Operacion PMS
 

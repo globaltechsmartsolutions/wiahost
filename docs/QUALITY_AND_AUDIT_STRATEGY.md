@@ -21,14 +21,14 @@ Ya existe:
 - Test inicial de configuracion Supabase.
 - `playwright.config.ts` formal en `apps/web`.
 - Tests E2E versionados para smoke publico/auth, login demo, creacion de reserva UI y mutaciones API de tareas, incidencias e inbox.
+- Auditoria de accesibilidad con `@axe-core/playwright` sobre rutas publicas y protegidas.
+- Baseline visual inicial para landing/auth y check de overflow/alineacion del dashboard.
+- Memoria versionada en `quality/audit-memory`.
 - CI inicial con typecheck, lint, unit tests y build web.
 
 Falta:
 
-- Tests visuales con snapshots.
-- Auditoria de accesibilidad con axe.
 - Lighthouse CI con budgets.
-- Memoria de auditoria.
 - Workflow CI de calidad con artefactos Playwright/Lighthouse cuando activemos esas suites en CI.
 
 ## Piramide de calidad propuesta
@@ -175,6 +175,7 @@ quality/
 
 - Reglas visuales del producto.
 - Ejemplo: dashboard profesional, cards alineadas, sidebar sin barras raras, mobile sin overflow.
+- Regla obligatoria: no puede haber huecos muertos entre cards del dashboard; si dos cards comparten fila en desktop, deben alinear borde superior e inferior.
 
 `quality/audit-memory/known-risks.md`
 
@@ -325,15 +326,16 @@ Un cambio no deberia entrar si:
 
 ### Paso 2
 
-- Crear `apps/web/e2e/visual.spec.ts`.
-- Baselines desktop/mobile para landing, dashboard y properties.
-- Desactivar animaciones en modo test.
+- Hecho: crear `apps/web/e2e/visual.spec.ts`.
+- Hecho: baseline desktop/mobile para landing y pantallas auth.
+- Hecho: check de dashboard sin overflow horizontal y con calendario/cola prioritaria alineados.
+- Hecho: desactivar animaciones en modo test.
 
 ### Paso 3
 
-- Instalar `@axe-core/playwright`.
-- Crear `apps/web/e2e/accessibility.spec.ts`.
-- Ejecutar rutas criticas con WCAG A/AA.
+- Hecho: instalar `@axe-core/playwright`.
+- Hecho: crear `apps/web/e2e/accessibility.spec.ts`.
+- Hecho: ejecutar rutas criticas con WCAG A/AA bloqueando violaciones criticas/serias.
 
 ### Paso 4
 
@@ -344,9 +346,9 @@ Un cambio no deberia entrar si:
 
 ### Paso 5
 
-- Crear `quality/audit-memory`.
-- Crear script `pnpm audit:web`.
-- Generar reporte JSON local con rutas, screenshots y resultados.
+- Hecho: crear `quality/audit-memory`.
+- Hecho: crear script `pnpm audit:web`.
+- Pendiente: generar reporte JSON consolidado con rutas, screenshots y resultados.
 
 ### Paso 6
 

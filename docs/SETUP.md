@@ -51,10 +51,14 @@ pnpm typecheck
 pnpm lint
 pnpm test
 pnpm test:e2e
+pnpm test:a11y
+pnpm test:visual
+pnpm audit:web
 pnpm build:web
 ```
 
 `pnpm test:e2e` necesita Supabase local arrancado, `apps/web/.env.local` configurado y usuarios demo creados con `pnpm db:reset`.
+`pnpm test:visual -- --update-snapshots` actualiza capturas base cuando un cambio visual ha sido revisado y aceptado.
 
 ## Estado conocido
 
@@ -66,6 +70,8 @@ En esta fase la web ya funciona contra Supabase local si `.env.local` tiene las 
 - Dashboard, reservas, inbox, tareas e incidencias leen de Supabase con fallback demo si no hay entorno configurado.
 - Reservas manuales, tareas, incidencias y respuestas de inbox tienen escrituras reales verificadas contra Supabase local.
 - Playwright valida smoke publico/auth y flujos reales de reservas, tareas, incidencias e inbox contra Supabase local.
+- Axe valida rutas publicas y protegidas sin violaciones WCAG criticas/serias.
+- Playwright visual valida landing/auth y comprueba que el dashboard no tenga overflow ni huecos por desalineacion entre calendario y cola prioritaria.
 
 Si otro proyecto local ocupa `54321/54322`, paralo antes de arrancar WIAHost. Ejemplo:
 

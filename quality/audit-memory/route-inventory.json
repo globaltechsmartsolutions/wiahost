@@ -1,0 +1,64 @@
+{
+  "routes": [
+    {
+      "path": "/",
+      "auth": "public",
+      "primaryCheck": "Hero command-center headline is visible",
+      "tests": ["smoke", "visual", "a11y"]
+    },
+    {
+      "path": "/login",
+      "auth": "public",
+      "primaryCheck": "Login form accepts email and password",
+      "tests": ["smoke", "visual", "a11y"]
+    },
+    {
+      "path": "/register",
+      "auth": "public",
+      "primaryCheck": "Register form exposes role selection",
+      "tests": ["smoke", "visual", "a11y"]
+    },
+    {
+      "path": "/dashboard",
+      "auth": "protected",
+      "primaryCheck": "Operational command center loads after login",
+      "tests": ["smoke", "visual", "a11y"]
+    },
+    {
+      "path": "/properties",
+      "auth": "protected",
+      "primaryCheck": "Property list is visible",
+      "tests": ["a11y"]
+    },
+    {
+      "path": "/properties/new",
+      "auth": "protected",
+      "primaryCheck": "Property creation form is visible",
+      "tests": ["a11y"]
+    },
+    {
+      "path": "/reservations",
+      "auth": "protected",
+      "primaryCheck": "Reservation creation flow writes to Supabase",
+      "tests": ["critical", "data"]
+    },
+    {
+      "path": "/tasks",
+      "auth": "protected",
+      "primaryCheck": "Task create/update API flow works",
+      "tests": ["critical", "data", "a11y"]
+    },
+    {
+      "path": "/incidents",
+      "auth": "protected",
+      "primaryCheck": "Incident create/update API flow works",
+      "tests": ["critical", "data", "a11y"]
+    },
+    {
+      "path": "/inbox",
+      "auth": "protected",
+      "primaryCheck": "Inbox reply API flow writes a visible outbound message",
+      "tests": ["critical", "data", "a11y"]
+    }
+  ]
+}

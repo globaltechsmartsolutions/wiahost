@@ -15,6 +15,7 @@ El objetivo es centralizar propiedades, reservas, calendario multi-canal, mensaj
 - Supabase Auth implementado y verificado con usuarios demo locales.
 - Reservas, tareas, incidencias e inbox tienen lectura, detalle, API y escrituras reales verificadas contra Supabase local.
 - Rutas protegidas con `proxy.ts` de Next.js 16 y suite Playwright E2E inicial para smoke, login, reservas, tareas, incidencias e inbox.
+- Auditoria de accesibilidad con axe, baseline visual inicial y memoria versionada en `quality/audit-memory`.
 - Paquetes compartidos para tipos y validaciones en `packages/shared`.
 - Paquete de tipos de base de datos en `packages/database`.
 
@@ -81,6 +82,9 @@ pnpm typecheck
 pnpm lint
 pnpm test
 pnpm test:e2e
+pnpm test:a11y
+pnpm test:visual
+pnpm audit:web
 pnpm supabase:start
 pnpm db:reset
 pnpm db:types
@@ -100,6 +104,10 @@ Documentos principales:
 - Setup local: `docs/SETUP.md`
 - Calidad: `docs/QUALITY_AND_AUDIT_STRATEGY.md`
 
+## Regla visual importante
+
+El dashboard no debe tener huecos muertos entre modulos. Si dos cards comparten fila en desktop, sus bordes superiores e inferiores deben quedar alineados. Esta regla vive en `quality/audit-memory/product-rules.md` y se valida parcialmente con Playwright visual.
+
 ## Siguiente paso recomendado
 
-Seguir con edicion completa, filtros, borrado/archivo controlado y ampliar la red de calidad con visual regression, accesibilidad y memoria de auditoria.
+Seguir con edicion completa, filtros, borrado/archivo controlado y Lighthouse CI.

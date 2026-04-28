@@ -1,0 +1,62 @@
+import AxeBuilder from "@axe-core/playwright";
+import { expect, test, type Page } from "@playwright/test";
+
+import { signInAsDemoOperator } from "./helpers";
+
+type AccessibilityRoute = {
+  name: string;
+  path: string;
+  requiresAuth?: boolean;
+};
+
+const routes: AccessibilityRoute[] = [
+  { name: "landing", path: "/" },
+  { name: "login", path: "/login" },
+  { name: "register", path: "/register" },
+  { name: "dashboard", path: "/dashboard", requiresAuth: true },
+  { name: "properties", path: "/properties", requiresAuth: true },
+  { name: "new property", path: "/properties/new", requiresAuth: true },
+  { name: "reservations", path: "/reservations", requiresAuth: true },
+  { name: "inbox", path: "/inbox", requiresAuth: true },
+  { name: "tasks", path: "/tasks", requiresAuth: true },
+  { name: "incidents", path: "/incidents", requiresAuth: true },
+];
+
+function formatViolations(violations: Awaited<ReturnType<AxeBuilder["analyze"]>>["violations"]) {
+  return violations.map((violation) => ({
+    description: violation.description,
+    help: violation.help,
+    id: violation.id,
+    impact: violation.impact,
+    nodes: violation.nodes.map((node) => ({
+      html: node.html,
+      target: node.target,
+    })),
+  }));
+}
+
+async function analyzePage(page: Page) {
+  return new AxeBuilder({ page })
+    .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
+    .analyze();
+}
+
+test.describe("accessibility audit @a11y", () => {
+  for (const route of routes) {
+    test(`${route.name} has no critical WCAG violations`, async ({ page }) => {
+      if (route.requiresAuth) {
+        await signInAsDemoOperator(page);
+      }
+
+      await page.goto(route.path);
+      await page.waitForLoadState("networkidle");
+
+      const result = await analyzePage(page);
+      const blockingViolations = result.violations.filter((violation) =>
+        ["critical", "serious"].includes(violation.impact ?? ""),
+      );
+
+      expect(formatViolations(blockingViolations)).toEqual([]);
+    });
+  }
+});

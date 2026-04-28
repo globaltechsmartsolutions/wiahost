@@ -199,6 +199,7 @@ export default async function IncidentsPage({
                       <Link href={`/incidents/${incident.id}`}>Detalle</Link>
                     </Button>
                     <select
+                      aria-label={`Cambiar estado de incidencia ${incident.title}`}
                       name="status"
                       className="h-8 flex-1 rounded-xl border border-input bg-background px-2 text-xs"
                     >

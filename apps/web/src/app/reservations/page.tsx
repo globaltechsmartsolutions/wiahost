@@ -257,6 +257,7 @@ export default async function ReservationsPage({
                         value={reservation.id}
                       />
                       <select
+                        aria-label={`Cambiar estado de reserva de ${reservation.guest}`}
                         name="status"
                         className="h-8 flex-1 rounded-xl border border-input bg-background px-2 text-xs"
                       >

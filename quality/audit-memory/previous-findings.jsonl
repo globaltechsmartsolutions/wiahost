@@ -1,0 +1,3 @@
+{"date":"2026-04-28","route":"/dashboard","severity":"medium","area":"visual","cause":"Dashboard card rows had inconsistent widths and excess calendar space.","solution":"Normalized grid/card sizing and tightened calendar section spacing."}
+{"date":"2026-04-28","route":"/dashboard","severity":"medium","area":"visual","cause":"Desktop sidebar displayed an unwanted native scrollbar.","solution":"Adjusted sidebar navigation overflow handling and hidden scrollbar styling."}
+{"date":"2026-04-28","route":"/reservations","severity":"medium","area":"functional","cause":"Server Action writes were not visibly reflected after submit.","solution":"Redirected create actions to the created detail pages and status actions back to lists."}

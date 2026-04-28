@@ -206,6 +206,7 @@ export default async function TasksPage({ searchParams }: TasksPageProps) {
                       >
                         <input type="hidden" name="taskId" value={task.id} />
                         <select
+                          aria-label={`Cambiar estado de tarea ${task.title}`}
                           name="status"
                           className="h-8 rounded-xl border border-input bg-background px-2 text-xs"
                         >

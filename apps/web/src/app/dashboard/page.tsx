@@ -9,6 +9,7 @@ import {
   Sparkles,
   Wrench,
 } from "lucide-react";
+import Link from "next/link";
 
 import { AppShell } from "@/components/layout/app-shell";
 import { StatusBadge } from "@/components/status-badge";
@@ -27,7 +28,7 @@ function MetricTile({ metric }: { metric: ExecutiveMetric }) {
         : "bg-[#efe3cf] text-[#3a2a18]";
 
   return (
-    <Card className="rounded-[1.7rem] border-[#dfd2bf] bg-white/72 shadow-sm">
+    <Card className="h-full rounded-[1.7rem] border-[#dfd2bf] bg-white/72 shadow-sm">
       <CardContent className="p-5">
         <div className="flex items-start justify-between gap-3">
           <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#75695b]">{metric.label}</p>
@@ -52,7 +53,7 @@ function CalendarCell({ value }: { value: string }) {
           : "border-[#dfd2bf] bg-white/60 text-[#75695b]";
 
   return (
-    <div className={`min-h-14 rounded-2xl border px-3 py-2 text-xs font-semibold leading-5 ${tone}`}>
+    <div className={`min-h-[4.5rem] rounded-2xl border px-3 py-2 text-xs font-semibold leading-5 ${tone}`}>
       {value}
     </div>
   );
@@ -97,7 +98,7 @@ export default async function DashboardPage() {
             <div className="h-2 overflow-hidden rounded-full bg-white/10">
               <div className="h-full w-[92%] rounded-full bg-[#d8ff74]" />
             </div>
-            <p className="text-xs leading-5 text-white/45">2 mensajes urgentes · 1 canal requiere revisión · 5 tareas críticas.</p>
+            <p className="text-xs leading-5 text-white/70">2 mensajes urgentes · 1 canal requiere revisión · 5 tareas críticas.</p>
           </div>
         </div>
       </section>
@@ -108,8 +109,14 @@ export default async function DashboardPage() {
         ))}
       </section>
 
-      <section className="mt-5 grid items-start gap-5 xl:grid-cols-[1.4fr_0.6fr]">
-        <Card className="self-start overflow-hidden rounded-[2rem] border-[#dfd2bf] bg-white/74 shadow-sm">
+      <section
+        className="mt-5 grid items-stretch gap-5 xl:grid-cols-[1.4fr_0.6fr]"
+        data-testid="dashboard-calendar-priority-grid"
+      >
+        <Card
+          className="flex h-full overflow-hidden rounded-[2rem] border-[#dfd2bf] bg-white/74 shadow-sm"
+          data-testid="dashboard-calendar-card"
+        >
           <CardHeader className="flex flex-row items-center justify-between border-b border-[#eadfce]">
             <div>
               <CardTitle className="flex items-center gap-2 text-xl">
@@ -123,7 +130,12 @@ export default async function DashboardPage() {
             </Button>
           </CardHeader>
           <CardContent className="p-0">
-            <div className="overflow-x-auto">
+            <div
+              aria-label="Multi-calendario operativo por propiedad"
+              className="overflow-x-auto"
+              role="region"
+              tabIndex={0}
+            >
               <div className="min-w-[920px]">
                 <div className="grid grid-cols-[210px_repeat(7,1fr)] border-b border-[#eadfce] bg-[#fbf7ef]">
                   <div className="px-5 py-4 text-xs font-semibold uppercase tracking-[0.22em] text-[#75695b]">Propiedad</div>
@@ -163,7 +175,10 @@ export default async function DashboardPage() {
           </CardContent>
         </Card>
 
-        <Card className="self-start rounded-[2rem] border-[#dfd2bf] bg-white/74 shadow-sm">
+        <Card
+          className="flex h-full flex-col rounded-[2rem] border-[#dfd2bf] bg-white/74 shadow-sm"
+          data-testid="dashboard-priority-card"
+        >
           <CardHeader className="pb-3">
             <CardTitle className="flex items-center gap-2 text-xl">
               <Activity className="size-5" />
@@ -171,8 +186,8 @@ export default async function DashboardPage() {
             </CardTitle>
             <p className="text-sm text-[#75695b]">Siguiente mejor acción para operaciones.</p>
           </CardHeader>
-          <CardContent className="space-y-2.5">
-            {operationQueue.map((item) => (
+          <CardContent className="flex flex-1 flex-col gap-2.5">
+            {operationQueue.slice(0, 2).map((item) => (
               <div key={item.label} className="rounded-3xl border border-[#dfd2bf] bg-[#fbf7ef] p-3.5">
                 <div className="flex items-start justify-between gap-3">
                   <div>
@@ -187,12 +202,15 @@ export default async function DashboardPage() {
                 </div>
               </div>
             ))}
+            <Button variant="outline" className="mt-auto rounded-full border-[#dfd2bf] bg-white" asChild>
+              <Link href="/tasks">Ver cola completa</Link>
+            </Button>
           </CardContent>
         </Card>
       </section>
 
-      <section className="mt-5 grid gap-5 xl:grid-cols-3">
-        <Card className="rounded-[2rem] border-[#dfd2bf] bg-white/74 shadow-sm">
+      <section className="mt-5 grid auto-rows-fr gap-5 xl:grid-cols-3">
+        <Card className="h-full rounded-[2rem] border-[#dfd2bf] bg-white/74 shadow-sm">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Inbox className="size-5" />
@@ -215,7 +233,7 @@ export default async function DashboardPage() {
           </CardContent>
         </Card>
 
-        <Card className="rounded-[2rem] border-[#dfd2bf] bg-white/74 shadow-sm">
+        <Card className="h-full rounded-[2rem] border-[#dfd2bf] bg-white/74 shadow-sm">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <CircleDollarSign className="size-5" />
@@ -241,7 +259,7 @@ export default async function DashboardPage() {
           </CardContent>
         </Card>
 
-        <Card className="rounded-[2rem] border-[#dfd2bf] bg-white/74 shadow-sm">
+        <Card className="h-full rounded-[2rem] border-[#dfd2bf] bg-white/74 shadow-sm">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Sparkles className="size-5" />
@@ -263,8 +281,8 @@ export default async function DashboardPage() {
         </Card>
       </section>
 
-      <section className="mt-5 grid gap-5 xl:grid-cols-[0.75fr_1.25fr]">
-        <Card className="rounded-[2rem] border-[#dfd2bf] bg-white/74 shadow-sm">
+      <section className="mt-5 grid auto-rows-fr gap-5 xl:grid-cols-[0.75fr_1.25fr]">
+        <Card className="h-full rounded-[2rem] border-[#dfd2bf] bg-white/74 shadow-sm">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Wrench className="size-5" />
@@ -284,7 +302,7 @@ export default async function DashboardPage() {
           </CardContent>
         </Card>
 
-        <Card className="rounded-[2rem] border-[#dfd2bf] bg-white/74 shadow-sm">
+        <Card className="h-full rounded-[2rem] border-[#dfd2bf] bg-white/74 shadow-sm">
           <CardHeader>
             <CardTitle>Reservas que mueven la operación</CardTitle>
           </CardHeader>

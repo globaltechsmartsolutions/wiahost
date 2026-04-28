@@ -58,7 +58,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             </span>
             <span>
               <span className="block text-xl font-semibold tracking-tight">WIAHost</span>
-              <span className="block text-xs text-white/55">Hospitality command center</span>
+              <span className="block text-xs text-white/70">Hospitality command center</span>
             </span>
           </Link>
         </div>
@@ -66,7 +66,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         <nav className="min-h-0 flex-1 space-y-5 overflow-y-auto p-4 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {navSections.map((section) => (
             <div key={section.title}>
-              <p className="px-3 text-[0.68rem] font-semibold uppercase tracking-[0.24em] text-white/35">
+              <p className="px-3 text-[0.68rem] font-semibold uppercase tracking-[0.24em] text-white/65">
                 {section.title}
               </p>
               <div className="mt-2 grid gap-1">
@@ -92,7 +92,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               <p className="text-sm font-semibold">Portfolio health</p>
             </div>
             <p className="mt-2 text-3xl font-semibold">92%</p>
-            <p className="mt-1 text-xs leading-5 text-white/55">
+            <p className="mt-1 text-xs leading-5 text-white/70">
               Canales sincronizados, SLA de mensajes y tareas críticas bajo control.
             </p>
           </div>
@@ -111,6 +111,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             <div className="relative hidden flex-1 md:block">
               <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-[#75695b]" />
               <Input
+                aria-label="Buscar reserva, huesped, propiedad, canal o tarea"
                 className="h-11 rounded-full border-[#dfd2bf] bg-white/70 pl-9 shadow-sm"
                 placeholder="Buscar reserva, huésped, propiedad, canal o tarea..."
               />
@@ -123,6 +124,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             </Button>
             <Button variant="outline" size="icon" className="ml-auto rounded-full border-[#dfd2bf] bg-white/70">
               <Bell className="size-4" />
+              <span className="sr-only">Abrir notificaciones</span>
             </Button>
             <div className="hidden text-right sm:block">
               <p className="text-sm font-semibold">Laura Operaciones</p>
