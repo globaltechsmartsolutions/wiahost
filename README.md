@@ -85,6 +85,7 @@ pnpm db:types
 - Investigacion UI: `docs/UI_RESEARCH.md`
 - Calidad y auditoria inteligente: `docs/QUALITY_AND_AUDIT_STRATEGY.md`
 - Oportunidades de Machine Learning: `docs/ML_OPPORTUNITIES_FROM_NOTES.md`
+- Oportunidades de redes neuronales/RNN: `docs/NEURAL_NETWORKS_OPPORTUNITIES_FROM_NOTES.md`
 
 ## Siguiente paso recomendado
 

@@ -69,6 +69,8 @@
 - Pricing insights.
 - Segmentacion de propiedades y reservas con clustering.
 - Deteccion de anomalias operativas.
+- Modelos secuenciales futuros para inbox, ocupacion, pricing y patrones de incidencias.
+- Copiloto operativo con LLM/Transformers y aprobacion humana.
 
 ## Fase 6 - Produccion SaaS
 
