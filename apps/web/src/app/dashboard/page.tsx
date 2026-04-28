@@ -28,13 +28,13 @@ function MetricTile({ metric }: { metric: ExecutiveMetric }) {
         : "bg-[#efe3cf] text-[#3a2a18]";
 
   return (
-    <Card className="h-full rounded-[1.7rem] border-[#dfd2bf] bg-white/72 shadow-sm">
-      <CardContent className="p-5">
+    <Card className="h-full rounded-[1.45rem] border-[#dfd2bf] bg-white/72 py-3 shadow-sm">
+      <CardContent className="px-4 py-3">
         <div className="flex items-start justify-between gap-3">
-          <p className="text-[0.68rem] font-semibold uppercase tracking-[0.18em] text-[#75695b] 2xl:tracking-[0.24em]">{metric.label}</p>
+          <p className="text-[0.64rem] font-semibold uppercase tracking-[0.16em] text-[#75695b] 2xl:tracking-[0.2em]">{metric.label}</p>
           <span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${tone}`}>Live</span>
         </div>
-        <p className="mt-7 text-4xl font-semibold tracking-[-0.04em]">{metric.value}</p>
+        <p className="mt-4 text-3xl font-semibold tracking-[-0.04em] 2xl:text-4xl">{metric.value}</p>
         <p className="mt-2 text-sm text-[#75695b]">{metric.helper}</p>
       </CardContent>
     </Card>
@@ -53,7 +53,7 @@ function CalendarCell({ value }: { value: string }) {
           : "border-[#dfd2bf] bg-white/60 text-[#75695b]";
 
   return (
-    <div className={`min-h-[4.5rem] rounded-2xl border px-3 py-2 text-xs font-semibold leading-5 ${tone}`}>
+    <div className={`min-h-16 rounded-2xl border px-2.5 py-2 text-xs font-semibold leading-5 ${tone}`}>
       {value}
     </div>
   );
@@ -74,23 +74,26 @@ export default async function DashboardPage() {
 
   return (
     <AppShell>
-      <section className="relative overflow-hidden rounded-[2.2rem] border border-[#dfd2bf] bg-[#160f09] p-5 text-white shadow-2xl sm:p-7">
+      <section className="relative overflow-hidden rounded-[1.8rem] border border-[#dfd2bf] bg-[#160f09] p-5 text-white shadow-2xl 2xl:rounded-[2.2rem] 2xl:p-7">
         <div className="absolute -right-24 -top-24 size-72 rounded-full bg-[#d8ff74]/20 blur-3xl" />
-        <div className="relative flex flex-col gap-6 xl:flex-row xl:items-end xl:justify-between">
+        <div className="relative flex flex-col gap-5 xl:flex-row xl:items-end xl:justify-between">
           <div>
-            <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/8 px-3 py-1.5 text-sm text-white/70">
+            <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/8 px-3 py-1.5 text-sm text-white/70">
               <Radio className="size-4 text-[#d8ff74]" />
               Centro de mando en tiempo real
             </div>
-            <h1 className="max-w-4xl text-balance text-4xl font-semibold tracking-[-0.055em] sm:text-5xl lg:text-6xl">
+            <h1
+              className="max-w-4xl text-balance text-[clamp(2.35rem,3.15vw,3.9rem)] font-semibold leading-[0.96] tracking-[-0.055em]"
+              data-testid="dashboard-hero-title"
+            >
               Prioridades, reservas y canales sincronizados en una sola pantalla.
             </h1>
-            <p className="mt-5 max-w-3xl text-pretty text-base leading-7 text-white/62 sm:text-lg">
+            <p className="mt-4 max-w-3xl text-pretty text-base leading-7 text-white/62">
               Diseñado para operar como un PMS profesional: multi-calendario, inbox priorizado, tareas,
               salud de canales, revenue y automatizaciones antes de que haya una incidencia.
             </p>
           </div>
-          <div className="grid min-w-[280px] gap-3 rounded-[1.7rem] border border-white/10 bg-white/8 p-4">
+          <div className="grid min-w-[260px] gap-3 rounded-[1.5rem] border border-white/10 bg-white/8 p-4">
             <div className="flex items-center justify-between">
               <span className="text-sm text-white/60">Estado global</span>
               <span className="rounded-full bg-[#d8ff74] px-3 py-1 text-xs font-bold text-[#160f09]">92% healthy</span>
@@ -108,12 +111,12 @@ export default async function DashboardPage() {
         data-testid="dashboard-content-grid"
       >
         {executiveMetrics.map((metric) => (
-          <div key={metric.label} className="dashboard-span-3 dashboard-wide-3">
+          <div key={metric.label} className="dashboard-metric dashboard-wide-3" data-testid="dashboard-metric-card">
             <MetricTile metric={metric} />
           </div>
         ))}
         <Card
-          className="dashboard-span-6 dashboard-wide-8 flex h-full overflow-hidden rounded-[2rem] border-[#dfd2bf] bg-white/74 shadow-sm"
+          className="dashboard-full dashboard-wide-8 flex h-full overflow-hidden rounded-[1.7rem] border-[#dfd2bf] bg-white/74 shadow-sm 2xl:rounded-[2rem]"
           data-testid="dashboard-calendar-card"
         >
           <CardHeader className="flex flex-row items-center justify-between border-b border-[#eadfce]">
@@ -142,7 +145,7 @@ export default async function DashboardPage() {
                   {calendarDays.map((day) => (
                     <div key={day.date} className="border-l border-[#eadfce] px-3 py-4 text-center">
                       <p className="text-xs text-[#75695b]">{day.day}</p>
-                      <p className="text-2xl font-semibold">{day.date}</p>
+                      <p className="text-xl font-semibold 2xl:text-2xl">{day.date}</p>
                     </div>
                   ))}
                 </div>
@@ -176,7 +179,7 @@ export default async function DashboardPage() {
         </Card>
 
         <Card
-          className="dashboard-span-6 dashboard-wide-4 flex h-full flex-col rounded-[2rem] border-[#dfd2bf] bg-white/74 shadow-sm"
+          className="dashboard-third dashboard-wide-4 flex h-full flex-col rounded-[1.7rem] border-[#dfd2bf] bg-white/74 shadow-sm 2xl:rounded-[2rem]"
           data-testid="dashboard-priority-card"
         >
           <CardHeader className="pb-3">
@@ -208,7 +211,7 @@ export default async function DashboardPage() {
           </CardContent>
         </Card>
 
-        <Card className="dashboard-span-3 dashboard-wide-4 h-full rounded-[2rem] border-[#dfd2bf] bg-white/74 shadow-sm">
+        <Card className="dashboard-third dashboard-wide-4 h-full rounded-[1.7rem] border-[#dfd2bf] bg-white/74 shadow-sm 2xl:rounded-[2rem]">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Inbox className="size-5" />
@@ -231,7 +234,7 @@ export default async function DashboardPage() {
           </CardContent>
         </Card>
 
-        <Card className="dashboard-span-3 dashboard-wide-4 h-full rounded-[2rem] border-[#dfd2bf] bg-white/74 shadow-sm">
+        <Card className="dashboard-third dashboard-wide-4 h-full rounded-[1.7rem] border-[#dfd2bf] bg-white/74 shadow-sm 2xl:rounded-[2rem]">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <CircleDollarSign className="size-5" />
@@ -257,7 +260,7 @@ export default async function DashboardPage() {
           </CardContent>
         </Card>
 
-        <Card className="dashboard-span-6 dashboard-wide-4 h-full rounded-[2rem] border-[#dfd2bf] bg-white/74 shadow-sm">
+        <Card className="dashboard-half dashboard-wide-4 h-full rounded-[1.7rem] border-[#dfd2bf] bg-white/74 shadow-sm 2xl:rounded-[2rem]">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Sparkles className="size-5" />
@@ -278,7 +281,7 @@ export default async function DashboardPage() {
           </CardContent>
         </Card>
 
-        <Card className="dashboard-span-6 dashboard-wide-4 h-full rounded-[2rem] border-[#dfd2bf] bg-white/74 shadow-sm">
+        <Card className="dashboard-half dashboard-wide-4 h-full rounded-[1.7rem] border-[#dfd2bf] bg-white/74 shadow-sm 2xl:rounded-[2rem]">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Wrench className="size-5" />
@@ -298,7 +301,7 @@ export default async function DashboardPage() {
           </CardContent>
         </Card>
 
-        <Card className="dashboard-span-6 dashboard-wide-8 h-full rounded-[2rem] border-[#dfd2bf] bg-white/74 shadow-sm">
+        <Card className="dashboard-full dashboard-wide-8 h-full rounded-[1.7rem] border-[#dfd2bf] bg-white/74 shadow-sm 2xl:rounded-[2rem]">
           <CardHeader>
             <CardTitle>Reservas que mueven la operación</CardTitle>
           </CardHeader>

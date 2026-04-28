@@ -50,20 +50,20 @@ const navSections = [
 export function AppShell({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen bg-[#f6efe4] text-[#1b130b]">
-      <aside className="fixed inset-y-3 left-3 z-20 hidden w-72 flex-col overflow-hidden rounded-[2rem] border border-white/10 bg-[#160f09] text-white shadow-2xl xl:flex">
-        <div className="border-b border-white/10 p-5">
+      <aside className="fixed inset-y-2 left-2 z-20 hidden w-64 flex-col overflow-hidden rounded-[1.7rem] border border-white/10 bg-[#160f09] text-white shadow-2xl 2xl:inset-y-3 2xl:left-3 2xl:w-72 2xl:rounded-[2rem] xl:flex">
+        <div className="border-b border-white/10 p-4 2xl:p-5">
           <Link href="/" className="flex items-center gap-3">
-            <span className="flex size-12 items-center justify-center rounded-2xl bg-[#d8ff74] text-[#160f09]">
+            <span className="flex size-10 items-center justify-center rounded-2xl bg-[#d8ff74] text-[#160f09] 2xl:size-12">
               <Building2 className="size-5" />
             </span>
             <span>
-              <span className="block text-xl font-semibold tracking-tight">WIAHost</span>
+              <span className="block text-lg font-semibold tracking-tight 2xl:text-xl">WIAHost</span>
               <span className="block text-xs text-white/70">Hospitality command center</span>
             </span>
           </Link>
         </div>
 
-        <nav className="min-h-0 flex-1 space-y-5 overflow-y-auto p-4 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        <nav className="min-h-0 flex-1 space-y-4 overflow-y-auto p-3.5 [-ms-overflow-style:none] [scrollbar-width:none] 2xl:space-y-5 2xl:p-4 [&::-webkit-scrollbar]:hidden">
           {navSections.map((section) => (
             <div key={section.title}>
               <p className="px-3 text-[0.68rem] font-semibold uppercase tracking-[0.24em] text-white/65">
@@ -74,7 +74,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                   <Link
                     key={item.href}
                     href={item.href}
-                    className="group flex items-center gap-3 rounded-2xl px-3 py-2.5 text-sm font-medium text-white/68 transition hover:bg-white/10 hover:text-white"
+                    className="group flex items-center gap-3 rounded-2xl px-3 py-2 text-sm font-medium text-white/68 transition hover:bg-white/10 hover:text-white 2xl:py-2.5"
                   >
                     <item.icon className="size-4 text-white/40 transition group-hover:text-[#d8ff74]" />
                     {item.label}
@@ -85,13 +85,13 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           ))}
         </nav>
 
-        <div className="p-3">
-          <div className="rounded-[1.5rem] border border-[#d8ff74]/25 bg-[#d8ff74]/10 p-3.5">
+        <div className="p-2.5 2xl:p-3">
+          <div className="rounded-[1.35rem] border border-[#d8ff74]/25 bg-[#d8ff74]/10 p-3 2xl:rounded-[1.5rem] 2xl:p-3.5">
             <div className="flex items-center gap-2 text-[#d8ff74]">
               <BarChart3 className="size-4" />
               <p className="text-sm font-semibold">Portfolio health</p>
             </div>
-            <p className="mt-2 text-3xl font-semibold">92%</p>
+            <p className="mt-2 text-2xl font-semibold 2xl:text-3xl">92%</p>
             <p className="mt-1 text-xs leading-5 text-white/70">
               Canales sincronizados, SLA de mensajes y tareas críticas bajo control.
             </p>
@@ -99,8 +99,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         </div>
       </aside>
 
-      <div className="xl:pl-[19rem]">
-        <header className="sticky top-0 z-10 border-b border-[#dfd2bf] bg-[#f6efe4]/86 px-4 py-3 backdrop-blur-xl lg:px-8">
+      <div className="xl:pl-[17rem] 2xl:pl-[19rem]">
+        <header className="sticky top-0 z-10 border-b border-[#dfd2bf] bg-[#f6efe4]/86 px-4 py-2.5 backdrop-blur-xl lg:px-6 2xl:px-8 2xl:py-3">
           <div className="mx-auto flex max-w-[1500px] items-center gap-3">
             <Link href="/" className="flex items-center gap-2 font-semibold xl:hidden">
               <span className="flex size-9 items-center justify-center rounded-xl bg-[#160f09] text-white">
@@ -112,7 +112,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-[#75695b]" />
               <Input
                 aria-label="Buscar reserva, huesped, propiedad, canal o tarea"
-                className="h-11 rounded-full border-[#dfd2bf] bg-white/70 pl-9 shadow-sm"
+                className="h-10 rounded-full border-[#dfd2bf] bg-white/70 pl-9 shadow-sm 2xl:h-11"
                 placeholder="Buscar reserva, huésped, propiedad, canal o tarea..."
               />
             </div>
@@ -137,7 +137,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             </form>
           </div>
         </header>
-        <main className="mx-auto max-w-[1500px] px-4 py-6 lg:px-8">{children}</main>
+        <main className="mx-auto max-w-[1500px] px-4 py-5 lg:px-6 2xl:px-8 2xl:py-6">{children}</main>
       </div>
     </div>
   );

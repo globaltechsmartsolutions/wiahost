@@ -178,6 +178,7 @@ quality/
 - Regla obligatoria: no puede haber huecos muertos entre cards del dashboard; si dos cards comparten fila en desktop, deben alinear borde superior e inferior.
 - Regla obligatoria: el numero de cards puede variar, pero los huecos entre ellas deben caer sobre la misma rejilla/gutter del dashboard.
 - Regla obligatoria: responsive validado en tamanos estandar 1366, 1440, 1536 y 1920; el multi-calendario no debe mostrar scrollbar horizontal interno en esos anchos.
+- Regla obligatoria: en portatil el dashboard no debe parecer ampliado; las metricas deben entrar en cuatro columnas y el hero debe mantener una escala compacta.
 
 `quality/audit-memory/known-risks.md`
 

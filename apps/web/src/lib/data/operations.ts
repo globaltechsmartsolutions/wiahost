@@ -478,8 +478,8 @@ export async function getReservations(): Promise<ReservationListItem[]> {
       .select(
         "id,channel,status,check_in,check_out,total_amount,properties(name),guests(full_name)",
       )
-      .order("check_in", { ascending: true })
-      .limit(12);
+      .order("created_at", { ascending: false })
+      .limit(50);
 
     if (error || !data) {
       return demoReservations;

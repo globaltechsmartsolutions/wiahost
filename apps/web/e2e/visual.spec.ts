@@ -101,6 +101,25 @@ async function expectDashboardGridGaps(page: Page) {
   }
 }
 
+async function expectDashboardLaptopScale(page: Page) {
+  const scale = await page.evaluate(() => {
+    const heroTitle = document.querySelector("[data-testid='dashboard-hero-title']");
+    const metricCards = Array.from(document.querySelectorAll("[data-testid='dashboard-metric-card']"));
+    const metricRects = metricCards.map((card) => card.getBoundingClientRect());
+    const firstMetricTop = Math.round(metricRects[0]?.top ?? 0);
+
+    return {
+      heroFontSize: Number.parseFloat(window.getComputedStyle(heroTitle!).fontSize),
+      metricHeights: metricRects.map((rect) => rect.height),
+      metricsInFirstRow: metricRects.filter((rect) => Math.abs(Math.round(rect.top) - firstMetricTop) <= 2).length,
+    };
+  });
+
+  expect(scale.heroFontSize).toBeLessThanOrEqual(56);
+  expect(Math.max(...scale.metricHeights)).toBeLessThanOrEqual(160);
+  expect(scale.metricsInFirstRow).toBe(4);
+}
+
 test.describe("visual regression baseline @visual", () => {
   test("landing desktop stays visually stable", async ({ page }) => {
     await page.setViewportSize({ height: 900, width: 1440 });
@@ -178,6 +197,9 @@ test.describe("visual regression baseline @visual", () => {
       await expectNoHorizontalOverflow(page);
       await expectNoElementHorizontalOverflow(page, "dashboard-calendar-scroll");
       await expectDashboardGridGaps(page);
+      if (viewport.width < 1800) {
+        await expectDashboardLaptopScale(page);
+      }
     }
   });
 });

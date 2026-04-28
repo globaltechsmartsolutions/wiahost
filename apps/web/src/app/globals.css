@@ -135,35 +135,53 @@
 @layer components {
   .dashboard-grid {
     display: grid;
-    gap: 1rem;
+    gap: 0.875rem;
   }
 
   .dashboard-calendar-inner {
-    min-width: 860px;
+    min-width: 820px;
   }
 
   .dashboard-calendar-row {
-    grid-template-columns: 180px repeat(7, minmax(0, 1fr));
+    grid-template-columns: 170px repeat(7, minmax(0, 1fr));
   }
 
   @media (min-width: 48rem) {
     .dashboard-grid {
-      grid-template-columns: repeat(6, minmax(0, 1fr));
+      grid-template-columns: repeat(12, minmax(0, 1fr));
     }
 
-    .dashboard-span-3 {
+    .dashboard-metric {
+      grid-column: span 6 / span 6;
+    }
+
+    .dashboard-full {
+      grid-column: span 12 / span 12;
+    }
+
+    .dashboard-half,
+    .dashboard-third {
+      grid-column: span 6 / span 6;
+    }
+  }
+
+  @media (min-width: 80rem) {
+    .dashboard-grid {
+      gap: 1rem;
+    }
+
+    .dashboard-metric {
       grid-column: span 3 / span 3;
     }
 
-    .dashboard-span-6 {
-      grid-column: span 6 / span 6;
+    .dashboard-third {
+      grid-column: span 4 / span 4;
     }
   }
 
   @media (min-width: 112.5rem) {
     .dashboard-grid {
       gap: 1.25rem;
-      grid-template-columns: repeat(12, minmax(0, 1fr));
     }
 
     .dashboard-wide-3 {
@@ -179,11 +197,11 @@
     }
 
     .dashboard-calendar-inner {
-      min-width: 920px;
+      min-width: 900px;
     }
 
     .dashboard-calendar-row {
-      grid-template-columns: 210px repeat(7, minmax(0, 1fr));
+      grid-template-columns: 190px repeat(7, minmax(0, 1fr));
     }
   }
 }

@@ -8,6 +8,7 @@ Current baseline strategy:
 - Dynamic dashboards are captured as run artifacts and checked for horizontal overflow, but not yet snapshotted because dates, SLA times and seed-relative values change.
 - Dashboard grid gutters are tested directly: horizontal and vertical gaps must match the shared grid rhythm even when rows have different card counts.
 - Dashboard responsive desktop sizes are tested at 1366, 1440, 1536 and 1920 pixels to prevent zoom-like cramped layouts and internal calendar scrollbars.
+- Laptop scale is tested directly: hero title size is capped and the four metric cards must remain in one row on standard desktop laptop widths.
 
 Promotion rule:
 
