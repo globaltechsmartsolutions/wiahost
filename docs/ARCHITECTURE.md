@@ -67,6 +67,8 @@ La UI combina datos demo con primeras integraciones reales:
 
 - Login/register usan Supabase Auth.
 - Properties tiene lectura/creacion inicial con Supabase.
-- Dashboard, reservas, calendario, inbox, tareas, incidencias, owners y settings siguen siendo principalmente demo.
+- Dashboard, reservas, calendario, inbox, tareas e incidencias leen de Supabase con fallback demo.
+- Reservas, tareas, incidencias e inbox tienen filtros GET server-side sobre los datos cargados para proteger deep links y futura app movil.
+- Owners y settings siguen siendo principalmente demo.
 
 La prioridad tecnica actual es conectar cada pantalla PMS a Supabase manteniendo RLS, validadores compartidos y tests.

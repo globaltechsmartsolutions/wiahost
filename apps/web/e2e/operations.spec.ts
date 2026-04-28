@@ -40,6 +40,10 @@ test.describe("operations flows with Supabase @critical @data", () => {
       data: Array<{ guest: string }>;
     };
     expect(body.data.some((reservation) => reservation.guest === guestName)).toBe(true);
+
+    await page.goto(`/reservations?q=${encodeURIComponent(guestName)}`);
+    await expect(page.getByText(`Mostrando 1 de`)).toBeVisible();
+    await expect(page.getByText(guestName)).toBeVisible();
   });
 
   test("creates and updates task, incident and inbox records through authenticated API routes", async ({
@@ -70,6 +74,10 @@ test.describe("operations flows with Supabase @critical @data", () => {
     await page.goto(`/tasks/${taskBody.data.id}`);
     await expect(page.getByText(taskTitle)).toBeVisible();
 
+    await page.goto(`/tasks?q=${encodeURIComponent(taskTitle)}&status=Cerrada`);
+    await expect(page.getByText(`Mostrando 1 de`)).toBeVisible();
+    await expect(page.getByText(taskTitle)).toBeVisible();
+
     const incidentTitle = uniqueName("E2E Incidencia");
     const incidentResponse = await page.request.post("/api/incidents", {
       data: {
@@ -96,6 +104,10 @@ test.describe("operations flows with Supabase @critical @data", () => {
     await page.goto(`/incidents/${incidentBody.data.id}`);
     await expect(page.getByText(incidentTitle)).toBeVisible();
 
+    await page.goto(`/incidents?q=${encodeURIComponent(incidentTitle)}&status=Investigando`);
+    await expect(page.getByText(`Mostrando 1 de`)).toBeVisible();
+    await expect(page.getByText(incidentTitle)).toBeVisible();
+
     const replyBody = uniqueName("Respuesta E2E inbox");
     const messageResponse = await page.request.post(
       `/api/inbox/${seedIds.conversationId}/messages`,
@@ -109,6 +121,10 @@ test.describe("operations flows with Supabase @critical @data", () => {
     expect(messageResponse.status()).toBe(201);
 
     await page.goto(`/inbox/${seedIds.conversationId}`);
+    await expect(page.getByText(replyBody)).toBeVisible();
+
+    await page.goto(`/inbox?q=${encodeURIComponent(replyBody)}`);
+    await expect(page.getByText(`Mostrando 1 de`)).toBeVisible();
     await expect(page.getByText(replyBody)).toBeVisible();
   });
 });

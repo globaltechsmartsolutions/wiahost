@@ -479,7 +479,7 @@ export async function getReservations(): Promise<ReservationListItem[]> {
         "id,channel,status,check_in,check_out,total_amount,properties(name),guests(full_name)",
       )
       .order("created_at", { ascending: false })
-      .limit(50);
+      .limit(100);
 
     if (error || !data) {
       return demoReservations;
@@ -516,12 +516,12 @@ export async function getInboxThreads(): Promise<InboxThreadItem[]> {
           "id,status,last_message_at,properties(name),guests(full_name),reservations(channel,check_in)",
         )
         .order("last_message_at", { ascending: false })
-        .limit(12),
+        .limit(100),
       supabase
         .from("conversation_messages")
         .select("conversation_id,channel,body,sent_at,direction")
         .order("sent_at", { ascending: false })
-        .limit(40),
+        .limit(200),
     ]);
 
     if (conversationsError || messagesError || !conversations) {
@@ -572,7 +572,7 @@ export async function getTasks(): Promise<TaskListItem[]> {
       .from("tasks")
       .select("id,title,type,status,priority,due_at,properties(name)")
       .order("due_at", { ascending: true, nullsFirst: false })
-      .limit(12);
+      .limit(100);
 
     if (error || !data) {
       return demoTasks;
@@ -603,7 +603,7 @@ export async function getIncidents(): Promise<IncidentListItem[]> {
       .from("incidents")
       .select("id,title,status,severity,estimated_cost,properties(name)")
       .order("created_at", { ascending: false })
-      .limit(12);
+      .limit(100);
 
     if (error || !data) {
       return demoIncidents;

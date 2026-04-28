@@ -34,5 +34,6 @@ These rules describe the quality bar WIAHost should preserve as the product grow
 ## Operations
 
 - Reservation, task, incident and inbox actions should show a clear result: detail redirect, updated status or visible new message.
+- Operational list pages must keep filter controls visible near the top: search plus the most relevant status/channel/priority/severity dimension.
 - Data writes must go through Supabase with RLS, not only local demo state.
 - Demo fallback is acceptable for navigation, but real Supabase mode must remain the main product path.

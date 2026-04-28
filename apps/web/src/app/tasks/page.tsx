@@ -24,7 +24,13 @@ import { getOperationFormOptions, getTasks } from "@/lib/data/operations";
 export const dynamic = "force-dynamic";
 
 type TasksPageProps = {
-  searchParams?: Promise<{ error?: string }>;
+  searchParams?: Promise<{
+    error?: string;
+    priority?: string;
+    q?: string;
+    status?: string;
+    type?: string;
+  }>;
 };
 
 const taskTypes = [
@@ -51,12 +57,31 @@ const priorities = [
   { label: "Critica", value: "critical" },
 ];
 
+function matches(value: string, query: string) {
+  return value.toLowerCase().includes(query.toLowerCase());
+}
+
 export default async function TasksPage({ searchParams }: TasksPageProps) {
   const [options, tasks, params] = await Promise.all([
     getOperationFormOptions(),
     getTasks(),
     searchParams,
   ]);
+  const filters = {
+    priority: params?.priority?.trim() ?? "",
+    q: params?.q?.trim() ?? "",
+    status: params?.status?.trim() ?? "",
+    type: params?.type?.trim() ?? "",
+  };
+  const filteredTasks = tasks.filter((task) => {
+    const text = `${task.title} ${task.property} ${task.due}`;
+    return (
+      (!filters.q || matches(text, filters.q)) &&
+      (!filters.status || task.status === filters.status) &&
+      (!filters.priority || task.priority === filters.priority) &&
+      (!filters.type || task.type === filters.type)
+    );
+  });
 
   return (
     <AppShell>
@@ -71,6 +96,81 @@ export default async function TasksPage({ searchParams }: TasksPageProps) {
           {params.error}
         </div>
       ) : null}
+
+      <Card className="mb-5 rounded-[1.6rem] border-border/80 bg-card/80">
+        <CardContent className="p-4">
+          <form className="grid gap-3 xl:grid-cols-[1.3fr_0.75fr_0.75fr_0.8fr_auto] xl:items-end">
+            <div className="grid gap-2">
+              <Label htmlFor="taskSearch">Buscar</Label>
+              <Input
+                id="taskSearch"
+                name="q"
+                defaultValue={filters.q}
+                placeholder="Titulo, propiedad o vencimiento"
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="taskStatus">Estado</Label>
+              <select
+                id="taskStatus"
+                name="status"
+                defaultValue={filters.status}
+                className="h-9 rounded-xl border border-input bg-background px-3 text-sm"
+              >
+                <option value="">Todos</option>
+                {taskStatuses.map((status) => (
+                  <option key={status.label} value={status.label}>
+                    {status.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="taskPriority">Prioridad</Label>
+              <select
+                id="taskPriority"
+                name="priority"
+                defaultValue={filters.priority}
+                className="h-9 rounded-xl border border-input bg-background px-3 text-sm"
+              >
+                <option value="">Todas</option>
+                {priorities.map((priority) => (
+                  <option key={priority.label} value={priority.label}>
+                    {priority.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="taskType">Tipo</Label>
+              <select
+                id="taskType"
+                name="type"
+                defaultValue={filters.type}
+                className="h-9 rounded-xl border border-input bg-background px-3 text-sm"
+              >
+                <option value="">Todos</option>
+                {taskTypes.map((type) => (
+                  <option key={type.label} value={type.label}>
+                    {type.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="flex gap-2">
+              <Button type="submit" className="rounded-full">
+                Filtrar
+              </Button>
+              <Button asChild variant="outline" className="rounded-full">
+                <Link href="/tasks">Limpiar</Link>
+              </Button>
+            </div>
+          </form>
+          <p className="mt-3 text-xs text-muted-foreground">
+            Mostrando {filteredTasks.length} de {tasks.length} tareas.
+          </p>
+        </CardContent>
+      </Card>
 
       <section className="grid gap-5 xl:grid-cols-[0.85fr_1.4fr]">
         <Card className="rounded-[2rem] border-border/80 bg-card/80">
@@ -171,9 +271,9 @@ export default async function TasksPage({ searchParams }: TasksPageProps) {
           </CardContent>
         </Card>
 
-        {tasks.length ? (
+        {filteredTasks.length ? (
           <section className="grid auto-rows-fr gap-4 md:grid-cols-2">
-            {tasks.map((task) => (
+            {filteredTasks.map((task) => (
               <Card
                 key={task.id}
                 className="h-full rounded-[2rem] border-border/80 bg-card/80"
@@ -233,8 +333,12 @@ export default async function TasksPage({ searchParams }: TasksPageProps) {
           </section>
         ) : (
           <EmptyState
-            title="No hay tareas abiertas"
-            description="Las tareas de limpieza, mantenimiento e inspeccion apareceran aqui."
+            title={tasks.length ? "Sin tareas para esos filtros" : "No hay tareas abiertas"}
+            description={
+              tasks.length
+                ? "Prueba a limpiar filtros o buscar por otro tipo, prioridad o estado."
+                : "Las tareas de limpieza, mantenimiento e inspeccion apareceran aqui."
+            }
           />
         )}
       </section>

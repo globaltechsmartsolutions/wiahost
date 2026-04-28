@@ -39,26 +39,26 @@
     {
       "path": "/reservations",
       "auth": "protected",
-      "primaryCheck": "Reservation creation flow writes to Supabase",
-      "tests": ["critical", "data"]
+      "primaryCheck": "Reservation creation flow writes to Supabase and filters preserve the new record",
+      "tests": ["critical", "data", "a11y", "visual"]
     },
     {
       "path": "/tasks",
       "auth": "protected",
-      "primaryCheck": "Task create/update API flow works",
-      "tests": ["critical", "data", "a11y"]
+      "primaryCheck": "Task create/update API flow works and filters preserve the updated record",
+      "tests": ["critical", "data", "a11y", "visual"]
     },
     {
       "path": "/incidents",
       "auth": "protected",
-      "primaryCheck": "Incident create/update API flow works",
-      "tests": ["critical", "data", "a11y"]
+      "primaryCheck": "Incident create/update API flow works and filters preserve the updated record",
+      "tests": ["critical", "data", "a11y", "visual"]
     },
     {
       "path": "/inbox",
       "auth": "protected",
-      "primaryCheck": "Inbox reply API flow writes a visible outbound message",
-      "tests": ["critical", "data", "a11y"]
+      "primaryCheck": "Inbox reply API flow writes a visible outbound message and filters preserve the conversation",
+      "tests": ["critical", "data", "a11y", "visual"]
     }
   ]
 }

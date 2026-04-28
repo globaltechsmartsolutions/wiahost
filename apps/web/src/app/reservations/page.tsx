@@ -27,7 +27,12 @@ import {
 export const dynamic = "force-dynamic";
 
 type ReservationsPageProps = {
-  searchParams?: Promise<{ error?: string }>;
+  searchParams?: Promise<{
+    channel?: string;
+    error?: string;
+    q?: string;
+    status?: string;
+  }>;
 };
 
 const reservationStatuses = [
@@ -50,6 +55,10 @@ const channels = [
   { label: "Google", value: "google_vacation_rentals" },
 ];
 
+function matches(value: string, query: string) {
+  return value.toLowerCase().includes(query.toLowerCase());
+}
+
 export default async function ReservationsPage({
   searchParams,
 }: ReservationsPageProps) {
@@ -58,6 +67,19 @@ export default async function ReservationsPage({
     getReservations(),
     searchParams,
   ]);
+  const filters = {
+    channel: params?.channel?.trim() ?? "",
+    q: params?.q?.trim() ?? "",
+    status: params?.status?.trim() ?? "",
+  };
+  const filteredReservations = reservations.filter((reservation) => {
+    const text = `${reservation.guest} ${reservation.property} ${reservation.dates} ${reservation.amount}`;
+    return (
+      (!filters.q || matches(text, filters.q)) &&
+      (!filters.status || reservation.status === filters.status) &&
+      (!filters.channel || reservation.channel === filters.channel)
+    );
+  });
 
   return (
     <AppShell>
@@ -72,6 +94,65 @@ export default async function ReservationsPage({
           {params.error}
         </div>
       ) : null}
+
+      <Card className="mb-5 rounded-[1.6rem] border-border/80 bg-card/80">
+        <CardContent className="p-4">
+          <form className="grid gap-3 lg:grid-cols-[1.4fr_0.8fr_0.8fr_auto] lg:items-end">
+            <div className="grid gap-2">
+              <Label htmlFor="reservationSearch">Buscar</Label>
+              <Input
+                id="reservationSearch"
+                name="q"
+                defaultValue={filters.q}
+                placeholder="Huesped, propiedad, fecha o importe"
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="reservationStatus">Estado</Label>
+              <select
+                id="reservationStatus"
+                name="status"
+                defaultValue={filters.status}
+                className="h-9 rounded-xl border border-input bg-background px-3 text-sm"
+              >
+                <option value="">Todos</option>
+                {reservationStatuses.map((status) => (
+                  <option key={status.label} value={status.label}>
+                    {status.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="reservationChannel">Canal</Label>
+              <select
+                id="reservationChannel"
+                name="channel"
+                defaultValue={filters.channel}
+                className="h-9 rounded-xl border border-input bg-background px-3 text-sm"
+              >
+                <option value="">Todos</option>
+                {channels.map((channel) => (
+                  <option key={channel.label} value={channel.label}>
+                    {channel.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="flex gap-2">
+              <Button type="submit" className="rounded-full">
+                Filtrar
+              </Button>
+              <Button asChild variant="outline" className="rounded-full">
+                <Link href="/reservations">Limpiar</Link>
+              </Button>
+            </div>
+          </form>
+          <p className="mt-3 text-xs text-muted-foreground">
+            Mostrando {filteredReservations.length} de {reservations.length} reservas.
+          </p>
+        </CardContent>
+      </Card>
 
       <section className="grid gap-5 xl:grid-cols-[0.85fr_1.4fr]">
         <Card className="rounded-[2rem] border-border/80 bg-card/80">
@@ -219,10 +300,10 @@ export default async function ReservationsPage({
           </CardContent>
         </Card>
 
-        {reservations.length ? (
+        {filteredReservations.length ? (
           <Card className="rounded-[2rem] border-border/80 bg-card/80">
             <CardContent className="divide-y divide-border p-0">
-              {reservations.map((reservation) => (
+              {filteredReservations.map((reservation) => (
                 <div
                   key={reservation.id}
                   className="grid gap-4 p-5 lg:grid-cols-[1.1fr_0.8fr_0.6fr_0.6fr_0.9fr] lg:items-center"
@@ -283,8 +364,12 @@ export default async function ReservationsPage({
           </Card>
         ) : (
           <EmptyState
-            title="No hay reservas todavia"
-            description="Cuando conectes canales o crees reservas manuales apareceran aqui."
+            title={reservations.length ? "Sin reservas para esos filtros" : "No hay reservas todavia"}
+            description={
+              reservations.length
+                ? "Prueba a limpiar filtros o buscar por otro huesped, canal o estado."
+                : "Cuando conectes canales o crees reservas manuales apareceran aqui."
+            }
           />
         )}
       </section>

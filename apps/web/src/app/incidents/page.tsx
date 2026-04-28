@@ -24,7 +24,12 @@ import { getIncidents, getOperationFormOptions } from "@/lib/data/operations";
 export const dynamic = "force-dynamic";
 
 type IncidentsPageProps = {
-  searchParams?: Promise<{ error?: string }>;
+  searchParams?: Promise<{
+    error?: string;
+    q?: string;
+    severity?: string;
+    status?: string;
+  }>;
 };
 
 const severities = [
@@ -42,6 +47,10 @@ const incidentStatuses = [
   { label: "Cancelada", value: "cancelled" },
 ];
 
+function matches(value: string, query: string) {
+  return value.toLowerCase().includes(query.toLowerCase());
+}
+
 export default async function IncidentsPage({
   searchParams,
 }: IncidentsPageProps) {
@@ -50,6 +59,19 @@ export default async function IncidentsPage({
     getIncidents(),
     searchParams,
   ]);
+  const filters = {
+    q: params?.q?.trim() ?? "",
+    severity: params?.severity?.trim() ?? "",
+    status: params?.status?.trim() ?? "",
+  };
+  const filteredIncidents = incidents.filter((incident) => {
+    const text = `${incident.title} ${incident.property} ${incident.cost}`;
+    return (
+      (!filters.q || matches(text, filters.q)) &&
+      (!filters.status || incident.status === filters.status) &&
+      (!filters.severity || incident.severity === filters.severity)
+    );
+  });
 
   return (
     <AppShell>
@@ -64,6 +86,65 @@ export default async function IncidentsPage({
           {params.error}
         </div>
       ) : null}
+
+      <Card className="mb-5 rounded-[1.6rem] border-border/80 bg-card/80">
+        <CardContent className="p-4">
+          <form className="grid gap-3 lg:grid-cols-[1.4fr_0.8fr_0.8fr_auto] lg:items-end">
+            <div className="grid gap-2">
+              <Label htmlFor="incidentSearch">Buscar</Label>
+              <Input
+                id="incidentSearch"
+                name="q"
+                defaultValue={filters.q}
+                placeholder="Titulo, propiedad o coste"
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="incidentStatus">Estado</Label>
+              <select
+                id="incidentStatus"
+                name="status"
+                defaultValue={filters.status}
+                className="h-9 rounded-xl border border-input bg-background px-3 text-sm"
+              >
+                <option value="">Todos</option>
+                {incidentStatuses.map((status) => (
+                  <option key={status.label} value={status.label}>
+                    {status.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="incidentSeverity">Severidad</Label>
+              <select
+                id="incidentSeverity"
+                name="severity"
+                defaultValue={filters.severity}
+                className="h-9 rounded-xl border border-input bg-background px-3 text-sm"
+              >
+                <option value="">Todas</option>
+                {severities.map((severity) => (
+                  <option key={severity.label} value={severity.label}>
+                    {severity.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="flex gap-2">
+              <Button type="submit" className="rounded-full">
+                Filtrar
+              </Button>
+              <Button asChild variant="outline" className="rounded-full">
+                <Link href="/incidents">Limpiar</Link>
+              </Button>
+            </div>
+          </form>
+          <p className="mt-3 text-xs text-muted-foreground">
+            Mostrando {filteredIncidents.length} de {incidents.length} incidencias.
+          </p>
+        </CardContent>
+      </Card>
 
       <section className="grid gap-5 xl:grid-cols-[0.85fr_1.4fr]">
         <Card className="rounded-[2rem] border-border/80 bg-card/80">
@@ -158,9 +239,9 @@ export default async function IncidentsPage({
           </CardContent>
         </Card>
 
-        {incidents.length ? (
+        {filteredIncidents.length ? (
           <section className="grid gap-4 md:grid-cols-2">
-            {incidents.map((incident) => (
+            {filteredIncidents.map((incident) => (
               <Card
                 key={incident.id}
                 className="rounded-[2rem] border-border/80 bg-card/80"
@@ -224,8 +305,12 @@ export default async function IncidentsPage({
           </section>
         ) : (
           <EmptyState
-            title="No hay incidencias abiertas"
-            description="Los danos, problemas tecnicos y reclamaciones apareceran aqui."
+            title={incidents.length ? "Sin incidencias para esos filtros" : "No hay incidencias abiertas"}
+            description={
+              incidents.length
+                ? "Prueba a limpiar filtros o buscar por otra severidad o estado."
+                : "Los danos, problemas tecnicos y reclamaciones apareceran aqui."
+            }
           />
         )}
       </section>
