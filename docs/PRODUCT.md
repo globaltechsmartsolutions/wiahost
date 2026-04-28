@@ -43,3 +43,21 @@ La UI actual usa datos demo. La logica real contra Supabase se implementa en la 
 WIAHost debe ayudar a responder una pregunta clave cada manana:
 
 > Que puede bloquear hoy una reserva, un check-in, una limpieza, una respuesta al huesped o el revenue?
+
+## Posicionamiento IA
+
+La IA no se plantea como una capa decorativa, sino como asistencia operativa para anticipar bloqueos, reducir tiempos de respuesta y proteger activos.
+
+Mensaje recomendado:
+
+> El PMS que anticipa la operacion antes de que se convierta en problema.
+
+Modulos IA prioritarios:
+
+- Inbox inteligente.
+- Automatizaciones contextuales.
+- Operaciones de limpieza y mantenimiento.
+- Revenue advisor.
+- Riesgo operativo e incidencias.
+
+Detalle en `docs/AI_PRODUCT_STRATEGY.md`.

@@ -87,6 +87,7 @@ pnpm db:types
 - Oportunidades de Machine Learning: `docs/ML_OPPORTUNITIES_FROM_NOTES.md`
 - Oportunidades de redes neuronales/RNN: `docs/NEURAL_NETWORKS_OPPORTUNITIES_FROM_NOTES.md`
 - Revision completa del Modulo 3 de IA: `docs/AI_MODULE_3_FULL_REVIEW.md`
+- Estrategia de producto IA: `docs/AI_PRODUCT_STRATEGY.md`
 
 ## Siguiente paso recomendado
 
