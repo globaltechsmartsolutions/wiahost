@@ -36,7 +36,10 @@
 - Implementado: API routes autenticadas para listar/crear reservas, tareas, incidencias, inbox y mensajes.
 - Implementado: paginas de detalle para reservas, tareas, incidencias y conversaciones con fallback demo.
 - Implementado: Supabase local verificado con Auth, seed demo, tipos generados y escrituras reales desde UI/API.
-- Pendiente inmediato: edicion completa, borrado/archivo controlado, filtros avanzados, feedback visual de guardado y convertir las pruebas manuales Supabase en E2E automatizadas.
+- Implementado: proteccion de rutas web con `proxy.ts` de Next.js 16 usando Supabase Auth.
+- Implementado: Playwright E2E inicial para landing/login/register, redireccion anonima, login demo, creacion de reserva UI y mutaciones API de tareas, incidencias e inbox.
+- Implementado: CI inicial con typecheck, lint, unit tests y build web.
+- Pendiente inmediato: edicion completa, borrado/archivo controlado, filtros avanzados, feedback visual de guardado, visual regression, accesibilidad automatizada y memoria de auditoria versionada.
 
 ## Fase 2 - Operacion PMS
 

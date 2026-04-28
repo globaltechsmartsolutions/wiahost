@@ -49,17 +49,23 @@ Usuarios demo tras `pnpm db:reset`:
 ```bash
 pnpm typecheck
 pnpm lint
+pnpm test
+pnpm test:e2e
 pnpm build:web
 ```
+
+`pnpm test:e2e` necesita Supabase local arrancado, `apps/web/.env.local` configurado y usuarios demo creados con `pnpm db:reset`.
 
 ## Estado conocido
 
 En esta fase la web ya funciona contra Supabase local si `.env.local` tiene las claves generadas por `pnpm supabase:start`:
 
 - Login/register usan Supabase Auth.
+- Dashboard, reservas, inbox, tareas, incidencias, properties, calendar, guests, owners y settings quedan protegidas por `proxy.ts`.
 - Properties tiene lectura/creacion inicial contra Supabase.
 - Dashboard, reservas, inbox, tareas e incidencias leen de Supabase con fallback demo si no hay entorno configurado.
 - Reservas manuales, tareas, incidencias y respuestas de inbox tienen escrituras reales verificadas contra Supabase local.
+- Playwright valida smoke publico/auth y flujos reales de reservas, tareas, incidencias e inbox contra Supabase local.
 
 Si otro proyecto local ocupa `54321/54322`, paralo antes de arrancar WIAHost. Ejemplo:
 

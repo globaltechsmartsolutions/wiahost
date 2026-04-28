@@ -16,20 +16,20 @@ Ya existe:
 
 - Vitest en `packages/shared`, `packages/database` y `apps/web`.
 - Playwright instalado en `apps/web`.
-- `pnpm typecheck`, `pnpm lint`, `pnpm test` y `pnpm build:web`.
+- `pnpm typecheck`, `pnpm lint`, `pnpm test`, `pnpm test:e2e` y `pnpm build:web`.
 - Tests iniciales de validadores compartidos.
 - Test inicial de configuracion Supabase.
-- Verificacion manual con Playwright para rutas principales.
+- `playwright.config.ts` formal en `apps/web`.
+- Tests E2E versionados para smoke publico/auth, login demo, creacion de reserva UI y mutaciones API de tareas, incidencias e inbox.
+- CI inicial con typecheck, lint, unit tests y build web.
 
 Falta:
 
-- `playwright.config.ts` formal.
-- Tests E2E versionados.
 - Tests visuales con snapshots.
 - Auditoria de accesibilidad con axe.
 - Lighthouse CI con budgets.
 - Memoria de auditoria.
-- Workflow CI de calidad con artefactos.
+- Workflow CI de calidad con artefactos Playwright/Lighthouse cuando activemos esas suites en CI.
 
 ## Piramide de calidad propuesta
 
@@ -317,10 +317,11 @@ Un cambio no deberia entrar si:
 
 ### Paso 1
 
-- Crear `playwright.config.ts`.
-- Crear `apps/web/e2e/smoke.spec.ts`.
-- Validar landing, login, register, dashboard, properties y new property.
-- Guardar traces en fallo.
+- Hecho: crear `playwright.config.ts`.
+- Hecho: crear `apps/web/e2e/smoke.spec.ts`.
+- Hecho: crear `apps/web/e2e/operations.spec.ts`.
+- Hecho: validar landing, login, register, dashboard protegido, login demo, reserva UI y mutaciones API.
+- Hecho: guardar traces, screenshots y video en fallo.
 
 ### Paso 2
 

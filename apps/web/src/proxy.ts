@@ -1,36 +1,76 @@
+import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
-import { createServerClient } from "@supabase/ssr";
 
-import { isSupabaseConfigured } from "@/lib/supabase/config";
-
-const protectedPrefixes = [
-  "/dashboard",
-  "/properties",
+const protectedRoutes = [
   "/calendar",
-  "/reservations",
-  "/inbox",
+  "/dashboard",
   "/guests",
-  "/tasks",
+  "/inbox",
   "/incidents",
   "/owners",
+  "/properties",
+  "/reservations",
   "/settings",
+  "/tasks",
 ];
 
-const authPrefixes = ["/login", "/register"];
+const authRoutes = ["/login", "/register"];
 
-function matchesPrefix(pathname: string, prefixes: string[]) {
-  return prefixes.some((prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`));
+type CookieToSync = {
+  name: string;
+  options: CookieOptions;
+  value: string;
+};
+
+function isSupabaseConfigured() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+  return Boolean(
+    url &&
+      anonKey &&
+      !url.includes("replace_with") &&
+      !anonKey.includes("replace_with") &&
+      url.startsWith("http"),
+  );
+}
+
+function matchesRoute(pathname: string, routes: string[]) {
+  return routes.some((route) => pathname === route || pathname.startsWith(`${route}/`));
+}
+
+function withSyncedCookies(response: NextResponse, cookies: CookieToSync[]) {
+  cookies.forEach(({ name, value, options }) => {
+    response.cookies.set(name, value, options);
+  });
+
+  return response;
 }
 
 export async function proxy(request: NextRequest) {
-  if (!isSupabaseConfigured()) {
+  const pathname = request.nextUrl.pathname;
+  const isProtectedRoute = matchesRoute(pathname, protectedRoutes);
+  const isAuthRoute = matchesRoute(pathname, authRoutes);
+
+  if (!isProtectedRoute && !isAuthRoute) {
     return NextResponse.next();
   }
 
-  let response = NextResponse.next({
-    request,
-  });
+  if (!isSupabaseConfigured()) {
+    if (!isProtectedRoute) {
+      return NextResponse.next();
+    }
 
+    const url = request.nextUrl.clone();
+    url.pathname = "/login";
+    url.searchParams.set("next", pathname);
+    url.searchParams.set("error", "Supabase no esta configurado.");
+
+    return NextResponse.redirect(url);
+  }
+
+  const cookiesToSync: CookieToSync[] = [];
+  let response = NextResponse.next({ request });
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -39,12 +79,12 @@ export async function proxy(request: NextRequest) {
         getAll() {
           return request.cookies.getAll();
         },
-        setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value));
-          response = NextResponse.next({ request });
-          cookiesToSet.forEach(({ name, value, options }) => {
-            response.cookies.set(name, value, options);
+        setAll(cookies) {
+          cookiesToSync.push(...cookies);
+          cookies.forEach(({ name, value }) => {
+            request.cookies.set(name, value);
           });
+          response = withSyncedCookies(NextResponse.next({ request }), cookiesToSync);
         },
       },
     },
@@ -54,20 +94,20 @@ export async function proxy(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const pathname = request.nextUrl.pathname;
+  if (!user && isProtectedRoute) {
+    const url = request.nextUrl.clone();
+    url.pathname = "/login";
+    url.searchParams.set("next", pathname);
 
-  if (!user && matchesPrefix(pathname, protectedPrefixes)) {
-    const redirectUrl = request.nextUrl.clone();
-    redirectUrl.pathname = "/login";
-    redirectUrl.searchParams.set("next", pathname);
-    return NextResponse.redirect(redirectUrl);
+    return withSyncedCookies(NextResponse.redirect(url), cookiesToSync);
   }
 
-  if (user && matchesPrefix(pathname, authPrefixes)) {
-    const redirectUrl = request.nextUrl.clone();
-    redirectUrl.pathname = "/dashboard";
-    redirectUrl.search = "";
-    return NextResponse.redirect(redirectUrl);
+  if (user && isAuthRoute) {
+    const url = request.nextUrl.clone();
+    url.pathname = "/dashboard";
+    url.search = "";
+
+    return withSyncedCookies(NextResponse.redirect(url), cookiesToSync);
   }
 
   return response;
@@ -75,17 +115,17 @@ export async function proxy(request: NextRequest) {
 
 export const config = {
   matcher: [
-    "/dashboard/:path*",
-    "/properties/:path*",
     "/calendar/:path*",
-    "/reservations/:path*",
-    "/inbox/:path*",
+    "/dashboard/:path*",
     "/guests/:path*",
-    "/tasks/:path*",
+    "/inbox/:path*",
     "/incidents/:path*",
-    "/owners/:path*",
-    "/settings/:path*",
     "/login",
+    "/owners/:path*",
+    "/properties/:path*",
     "/register",
+    "/reservations/:path*",
+    "/settings/:path*",
+    "/tasks/:path*",
   ],
 };
