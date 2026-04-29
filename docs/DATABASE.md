@@ -128,6 +128,10 @@ La tabla `owner_statements` ya esta conectada desde `/statements` y `/api/owner-
 
 La fase posterior puede generar PDFs, notificaciones al propietario y pago automatizado, pero el dato financiero base ya queda normalizado.
 
+## Notificaciones
+
+La tabla `notifications` ya esta conectada desde `/notifications`, la campana del shell y `/api/notifications`. En el MVP permite crear avisos internos para el usuario autenticado y marcar uno o todos como leidos. Sirve como base para eventos de mensajes, pagos, incidencias, owner statements y automatizaciones.
+
 ## Storage
 
 Buckets preparados:

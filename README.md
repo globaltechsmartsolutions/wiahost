@@ -10,7 +10,7 @@ El objetivo es centralizar propiedades, reservas, calendario multi-canal, mensaj
 - Web app con Next.js App Router en `apps/web`.
 - UI profesional tipo hospitality command center.
 - Dashboard navegable con datos Supabase y fallback demo.
-- Rutas web iniciales: landing, dashboard, properties, reservations, calendar, guests, inbox, tasks, incidents, owners, settings, login y register.
+- Rutas web iniciales: landing, dashboard, properties, reservations, calendar, guests, inbox, leads, notifications, tasks, incidents, owners, settings, login y register.
 - Supabase preparado con migraciones SQL, RLS, storage, seed demo y base de datos preparada para IA futura.
 - Supabase Auth implementado y verificado con usuarios demo locales.
 - Propiedades tienen lectura, detalle, creacion, edicion, API y archivo controlado contra Supabase local.

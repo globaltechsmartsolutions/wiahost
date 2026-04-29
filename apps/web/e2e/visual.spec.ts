@@ -355,6 +355,7 @@ test.describe("visual regression baseline @visual", () => {
       "/automations",
       "/documents",
       "/distribution",
+      "/notifications",
       "/owners",
       "/payments",
       "/pricing",

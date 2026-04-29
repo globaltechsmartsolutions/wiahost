@@ -860,6 +860,41 @@ test.describe("operations flows with Supabase @critical @data", () => {
     await expect(page.getByText(`${updatedAmount} EUR`)).not.toBeVisible();
   });
 
+  test("creates and marks notifications as read", async ({ page }) => {
+    const title = uniqueName("E2E Notificacion");
+    const notificationResponse = await page.request.post("/api/notifications", {
+      data: {
+        body: "Aviso creado por Playwright para validar el centro de notificaciones.",
+        title,
+      },
+    });
+    expect(notificationResponse.status()).toBe(201);
+
+    const notificationBody = (await notificationResponse.json()) as {
+      data: { id: string };
+    };
+
+    await page.goto("/notifications");
+    await expect(
+      page.getByRole("heading", { name: /notificaciones operativas/i }),
+    ).toBeVisible();
+    await expect(page.getByText(title)).toBeVisible();
+    await expect(
+      page.locator("span").filter({ hasText: "Sin leer" }).first(),
+    ).toBeVisible();
+
+    const readResponse = await page.request.patch(
+      `/api/notifications/${notificationBody.data.id}`,
+    );
+    expect(readResponse.status()).toBe(200);
+
+    await page.goto("/notifications");
+    await expect(page.getByText(title)).toBeVisible();
+    await expect(
+      page.locator("span").filter({ hasText: "Leida" }).first(),
+    ).toBeVisible();
+  });
+
   test("creates, updates and deletes pricing observations through API routes", async ({
     page,
   }) => {

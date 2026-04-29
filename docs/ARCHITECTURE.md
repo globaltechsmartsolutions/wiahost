@@ -80,6 +80,7 @@ La UI combina datos demo con primeras integraciones reales:
 - Documents gestiona evidencias y referencias de storage vinculadas a propiedades, reservas e incidencias mediante Server Actions y API REST preparada para mobile.
 - Statements gestiona liquidaciones de propietario con ingresos, costes, fees, periodo, estado y API REST preparada para mobile.
 - Payments gestiona pagos manuales vinculados a reservas con estado, proveedor, importe y fecha mediante Server Actions y API REST preparada para mobile.
+- Notifications activa la campana del shell y la ruta `/notifications` sobre la tabla `notifications`, con API REST para crear avisos internos y marcar leidos.
 - Distribution gestiona publicaciones por canal con `property_listings` y registra sincronizaciones con `channel_sync_events`. Es la base para publicar anuncios, motor de reserva directa, import/export iCal y mensajes entrantes por canal.
 - Direct booking expone `/book/[slug]` como pagina publica. Lee anuncios publicados con service role en servidor, crea solicitudes como `reservations.status = inquiry`, abre conversacion inbound y registra evento de canal directo sin exponer secretos al cliente.
 - Leads centraliza solicitudes directas en `/leads`, reutilizando `reservations`, `guests`, `properties` y `conversations`. El paso "preparar pago" crea un `payments` pendiente con proveedor `direct_checkout`, cambia consultas a `pending` y registra `channel_sync_events` para dejar trazabilidad antes de Stripe/checkout real.

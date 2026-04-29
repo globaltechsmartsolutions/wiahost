@@ -8,6 +8,7 @@ export * from "./direct-booking";
 export * from "./guest";
 export * from "./incident";
 export * from "./message";
+export * from "./notification";
 export * from "./owner-statement";
 export * from "./payment";
 export * from "./pricing";

@@ -78,6 +78,7 @@
 - Implementado: modulo web de documentos y evidencias con alta, edicion, eliminacion, vinculacion a propiedad/reserva/incidencia y API GET/POST/GET detail/PATCH/DELETE.
 - Implementado: modulo web de owner statements con alta, edicion, eliminacion, periodos, costes, payout neto y API GET/POST/GET detail/PATCH/DELETE.
 - Implementado: modulo web de pagos iniciales con alta, edicion, eliminacion, estados, proveedor, importe, fecha de pago y API GET/POST/GET detail/PATCH/DELETE.
+- Implementado: centro de notificaciones `/notifications` con campana en topbar, contador de no leidas, marcado como leido y API GET/POST/PATCH.
 
 ## Fase 3 - Distribucion y canales
 

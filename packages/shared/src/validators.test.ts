@@ -14,6 +14,7 @@ import {
   manualReservationSchema,
   messageLabelSchema,
   modelPredictionSchema,
+  notificationSchema,
   operationalEventSchema,
   ownerStatementSchema,
   paymentSchema,
@@ -317,6 +318,25 @@ describe("payment validators", () => {
       provider: "manual",
       reservationId: uuid,
       status: "paid",
+    });
+
+    expect(parsed.success).toBe(false);
+  });
+});
+
+describe("notification validators", () => {
+  it("accepts short operational notifications", () => {
+    const parsed = notificationSchema.safeParse({
+      body: "Hay un mensaje pendiente de respuesta.",
+      title: "Nuevo mensaje urgente",
+    });
+
+    expect(parsed.success).toBe(true);
+  });
+
+  it("rejects empty notification titles", () => {
+    const parsed = notificationSchema.safeParse({
+      title: "",
     });
 
     expect(parsed.success).toBe(false);

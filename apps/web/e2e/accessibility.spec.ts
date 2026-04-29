@@ -46,6 +46,7 @@ const routes: AccessibilityRoute[] = [
   },
   { name: "inbox", path: "/inbox", requiresAuth: true },
   { name: "leads", path: "/leads", requiresAuth: true },
+  { name: "notifications", path: "/notifications", requiresAuth: true },
   { name: "guests", path: "/guests", requiresAuth: true },
   {
     name: "guest detail",

@@ -14,6 +14,8 @@ const toneByValue: Record<string, string> = {
   "En estancia": "border-blue-300 bg-blue-50 text-blue-800",
   Pendiente: "border-amber-300 bg-amber-50 text-amber-800",
   Reservado: "border-emerald-300 bg-emerald-50 text-emerald-800",
+  "Sin leer": "border-amber-300 bg-amber-50 text-amber-800",
+  Leida: "border-zinc-300 bg-zinc-50 text-zinc-700",
   Visto: "border-blue-300 bg-blue-50 text-blue-800",
   Perdido: "border-red-300 bg-red-50 text-red-800",
   Cancelado: "border-zinc-300 bg-zinc-50 text-zinc-700",

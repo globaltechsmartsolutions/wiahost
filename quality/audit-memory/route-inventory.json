@@ -171,7 +171,13 @@
     {
       "path": "/leads",
       "auth": "protected",
-      "primaryCheck": "Direct booking leads can be reviewed, opened in inbox and converted to confirmed reservations",
+      "primaryCheck": "Direct booking leads can be reviewed, opened in inbox, prepared for payment and converted to confirmed reservations",
+      "tests": ["critical", "data", "a11y", "visual"]
+    },
+    {
+      "path": "/notifications",
+      "auth": "protected",
+      "primaryCheck": "Notifications can be listed and marked as read while keeping the bell counter useful",
       "tests": ["critical", "data", "a11y", "visual"]
     },
     {

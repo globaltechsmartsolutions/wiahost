@@ -24,7 +24,16 @@ import {
 } from "lucide-react";
 
 import { signOutAction } from "@/lib/auth/actions";
+import { getNotificationSummary } from "@/lib/data/notifications";
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 
 const navSections = [
@@ -53,6 +62,7 @@ const navSections = [
       { label: "Propietarios", href: "/owners", icon: Landmark },
       { label: "Liquidaciones", href: "/statements", icon: CreditCard },
       { label: "Distribucion", href: "/distribution", icon: RadioTower },
+      { label: "Notificaciones", href: "/notifications", icon: Bell },
       { label: "Precios", href: "/pricing", icon: TrendingUp },
       { label: "Automatizaciones", href: "/automations", icon: Bot },
       { label: "Check-in/out", href: "/workflows", icon: Send },
@@ -64,7 +74,9 @@ const navSections = [
   },
 ];
 
-export function AppShell({ children }: { children: React.ReactNode }) {
+export async function AppShell({ children }: { children: React.ReactNode }) {
+  const notificationSummary = await getNotificationSummary();
+
   return (
     <div className="min-h-screen bg-[#f6efe4] text-[#1b130b]">
       <aside className="fixed inset-y-2 left-2 z-20 hidden w-56 flex-col overflow-hidden rounded-[1.45rem] border border-white/10 bg-[#160f09] text-white shadow-2xl 2xl:w-60 xl:flex">
@@ -153,14 +165,70 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             >
               Portfolio Madrid + Costa
             </Button>
-            <Button
-              variant="outline"
-              size="icon"
-              className="ml-auto rounded-full border-[#dfd2bf] bg-white/70"
-            >
-              <Bell className="size-4" />
-              <span className="sr-only">Abrir notificaciones</span>
-            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="relative ml-auto rounded-full border-[#dfd2bf] bg-white/70"
+                >
+                  <Bell className="size-4" />
+                  {notificationSummary.unreadCount > 0 ? (
+                    <span className="absolute -right-1 -top-1 flex size-5 items-center justify-center rounded-full bg-[#d8ff74] text-[0.65rem] font-bold text-[#160f09]">
+                      {notificationSummary.unreadCount}
+                    </span>
+                  ) : null}
+                  <span className="sr-only">Abrir notificaciones</span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent
+                align="end"
+                className="w-80 rounded-2xl border-[#dfd2bf] bg-[#fffaf2] p-2"
+              >
+                <DropdownMenuLabel className="px-3 py-2 text-xs uppercase tracking-[0.2em] text-[#75695b]">
+                  Notificaciones
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                {notificationSummary.latest.length ? (
+                  notificationSummary.latest.map((notification) => (
+                    <DropdownMenuItem
+                      key={notification.id}
+                      asChild
+                      className="cursor-pointer rounded-xl p-0"
+                    >
+                      <Link
+                        href="/notifications"
+                        className="block w-full px-3 py-2"
+                      >
+                        <span className="flex items-center justify-between gap-3">
+                          <span className="text-sm font-semibold">
+                            {notification.title}
+                          </span>
+                          {notification.isUnread ? (
+                            <span className="rounded-full bg-[#d8ff74] px-2 py-0.5 text-[0.65rem] font-bold text-[#160f09]">
+                              Nuevo
+                            </span>
+                          ) : null}
+                        </span>
+                        <span className="mt-1 line-clamp-2 block text-xs leading-5 text-[#75695b]">
+                          {notification.body}
+                        </span>
+                      </Link>
+                    </DropdownMenuItem>
+                  ))
+                ) : (
+                  <div className="px-3 py-4 text-sm text-[#75695b]">
+                    No hay notificaciones pendientes.
+                  </div>
+                )}
+                <DropdownMenuSeparator />
+                <DropdownMenuItem asChild className="cursor-pointer rounded-xl">
+                  <Link href="/notifications">
+                    Ver centro de notificaciones
+                  </Link>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
             <div className="hidden text-right sm:block">
               <p className="text-sm font-semibold leading-4">
                 Laura Operaciones
