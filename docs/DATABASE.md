@@ -119,6 +119,10 @@ Los canales `email`, `whatsapp`, `sms` e `inbox` se registran como sync `manual`
 
 La tabla `message_labels` ya se usa desde el detalle de inbox y desde `POST /api/inbox/:conversationId/labels`. Operaciones puede capturar categoria, urgencia, sentimiento, intencion, idioma y una justificacion breve. Estas etiquetas no automatizan respuestas; sirven para auditoria, reglas futuras, evals y datasets de IA revisados por humanos.
 
+## Resultados de tareas y SLA
+
+La tabla `task_outcomes` se actualiza al crear, editar o cambiar estado de una tarea. Guarda propiedad, reserva, prioridad, vencimiento, cierre, desviacion en minutos y resultado (`pending`, `completed_on_time`, `completed_late`, `blocked`, `cancelled`). El detalle de tarea muestra esta medicion para que operaciones pueda auditar limpieza, mantenimiento y cumplimiento de SLA.
+
 ## Pricing y revenue
 
 El modulo `/pricing` activa la tabla `pricing_observations`. Cada registro guarda propiedad, fecha, origen/canal, precio actual, sugerido, aprobado, final, ocupacion, booking pace, lead time y estado de conversion.

@@ -68,6 +68,87 @@ function toDatabaseDateTime(value: string | undefined) {
   return Number.isNaN(date.getTime()) ? null : date.toISOString();
 }
 
+function taskOutcome(status: string, dueAt: string | null, completedAt: string | null) {
+  if (status === "cancelled") {
+    return "cancelled";
+  }
+
+  if (status === "blocked") {
+    return "blocked";
+  }
+
+  if (status !== "done") {
+    return "pending";
+  }
+
+  if (!dueAt || !completedAt) {
+    return "completed_on_time";
+  }
+
+  return new Date(completedAt).getTime() <= new Date(dueAt).getTime()
+    ? "completed_on_time"
+    : "completed_late";
+}
+
+function slaMinutesDelta(dueAt: string | null, completedAt: string | null) {
+  if (!dueAt || !completedAt) {
+    return null;
+  }
+
+  const dueTime = new Date(dueAt).getTime();
+  const completedTime = new Date(completedAt).getTime();
+
+  if (Number.isNaN(dueTime) || Number.isNaN(completedTime)) {
+    return null;
+  }
+
+  return Math.round((completedTime - dueTime) / 60000);
+}
+
+async function syncTaskOutcome(
+  supabase: SupabaseServerClient,
+  input: {
+    assignedTo?: string | null;
+    completedAt?: string | null;
+    dueAt?: string | null;
+    priority: string;
+    propertyId: string;
+    reservationId?: string | null;
+    status: string;
+    taskId: string;
+  },
+) {
+  const { error } = await supabase.from("task_outcomes").upsert(
+    {
+      assigned_to: input.assignedTo ?? null,
+      completed_at: input.completedAt ?? null,
+      outcome: taskOutcome(
+        input.status,
+        input.dueAt ?? null,
+        input.completedAt ?? null,
+      ),
+      priority: input.priority,
+      property_id: input.propertyId,
+      reservation_id: input.reservationId ?? null,
+      sla_due_at: input.dueAt ?? null,
+      sla_minutes_delta: slaMinutesDelta(
+        input.dueAt ?? null,
+        input.completedAt ?? null,
+      ),
+      status: input.status,
+      task_id: input.taskId,
+    },
+    { onConflict: "task_id" },
+  );
+
+  if (error) {
+    mutationError(
+      "task_outcome_sync_failed",
+      "No se ha podido actualizar el resultado operativo de la tarea.",
+    );
+  }
+}
+
 export async function createManualReservation(
   supabase: SupabaseServerClient,
   input: ManualReservationInput,
@@ -353,12 +434,25 @@ export async function createTask(
       title: input.title,
       type: input.type,
     })
-    .select("id,status")
+    .select(
+      "id,status,property_id,reservation_id,assigned_to,priority,due_at,completed_at",
+    )
     .single();
 
   if (error || !data) {
     mutationError("task_create_failed", "No se ha podido crear la tarea.");
   }
+
+  await syncTaskOutcome(supabase, {
+    assignedTo: data.assigned_to,
+    completedAt: data.completed_at,
+    dueAt: data.due_at,
+    priority: data.priority,
+    propertyId: data.property_id,
+    reservationId: data.reservation_id,
+    status: data.status,
+    taskId: data.id,
+  });
 
   return data;
 }
@@ -383,12 +477,25 @@ export async function updateTask(
       type: input.type,
     })
     .eq("id", taskId)
-    .select("id,status")
+    .select(
+      "id,status,property_id,reservation_id,assigned_to,priority,due_at,completed_at",
+    )
     .single();
 
   if (error || !data) {
     mutationError("task_update_failed", "No se ha podido actualizar la tarea.");
   }
+
+  await syncTaskOutcome(supabase, {
+    assignedTo: data.assigned_to,
+    completedAt: data.completed_at,
+    dueAt: data.due_at,
+    priority: data.priority,
+    propertyId: data.property_id,
+    reservationId: data.reservation_id,
+    status: data.status,
+    taskId: data.id,
+  });
 
   return data;
 }
@@ -403,12 +510,25 @@ export async function updateTaskStatus(
     .from("tasks")
     .update({ completed_at: completedAt, status })
     .eq("id", taskId)
-    .select("id,status")
+    .select(
+      "id,status,property_id,reservation_id,assigned_to,priority,due_at,completed_at",
+    )
     .single();
 
   if (error || !data) {
     mutationError("task_update_failed", "No se ha podido actualizar la tarea.");
   }
+
+  await syncTaskOutcome(supabase, {
+    assignedTo: data.assigned_to,
+    completedAt: data.completed_at,
+    dueAt: data.due_at,
+    priority: data.priority,
+    propertyId: data.property_id,
+    reservationId: data.reservation_id,
+    status: data.status,
+    taskId: data.id,
+  });
 
   return data;
 }

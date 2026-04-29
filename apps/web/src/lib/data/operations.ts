@@ -66,6 +66,10 @@ export type ReservationDetail = ReservationListItem & {
 export type TaskDetail = TaskListItem & {
   description: string;
   fields: DetailField[];
+  outcome?: {
+    label: string;
+    slaDelta: string;
+  };
   raw: {
     description?: string;
     dueAt?: string;
@@ -197,6 +201,14 @@ type TaskRow = {
   properties?: Relation<{ name: string | null }>;
 };
 
+type TaskOutcomeRow = {
+  completed_at: string | null;
+  outcome: string;
+  sla_due_at: string | null;
+  sla_minutes_delta: number | null;
+  status: string;
+};
+
 type IncidentRow = {
   id: string;
   title: string;
@@ -303,6 +315,15 @@ const taskTypeLabels: Record<string, string> = {
   maintenance: "Mantenimiento",
 };
 
+const taskOutcomeLabels: Record<string, string> = {
+  blocked: "Bloqueada",
+  cancelled: "Cancelada",
+  completed_late: "Completada tarde",
+  completed_on_time: "Completada a tiempo",
+  failed: "Fallida",
+  pending: "Pendiente",
+};
+
 function label(value: string | null | undefined) {
   if (!value) {
     return "Pendiente";
@@ -314,6 +335,7 @@ function label(value: string | null | undefined) {
     sentimentLabels[value] ??
     aiSourceLabels[value] ??
     taskTypeLabels[value] ??
+    taskOutcomeLabels[value] ??
     value
   );
 }
@@ -419,6 +441,18 @@ function dateTimeInput(value: string | null | undefined) {
   }
 
   return date.toISOString().slice(0, 16);
+}
+
+function slaDeltaLabel(value: number | null | undefined) {
+  if (value === null || value === undefined) {
+    return "Sin SLA cerrado";
+  }
+
+  if (value <= 0) {
+    return `${Math.abs(value)} min antes del SLA`;
+  }
+
+  return `${value} min tarde`;
 }
 
 function isCriticalTask(task: TaskListItem) {
@@ -909,13 +943,20 @@ export async function getTaskDetail(
 
   try {
     const supabase = await createSupabaseServerClient();
-    const { data, error } = await supabase
-      .from("tasks")
-      .select(
-        "id,property_id,reservation_id,title,type,status,priority,due_at,description,properties(name),reservations(id,check_in,check_out)",
-      )
-      .eq("id", taskId)
-      .single();
+    const [{ data, error }, { data: outcome }] = await Promise.all([
+      supabase
+        .from("tasks")
+        .select(
+          "id,property_id,reservation_id,title,type,status,priority,due_at,description,properties(name),reservations(id,check_in,check_out)",
+        )
+        .eq("id", taskId)
+        .single(),
+      supabase
+        .from("task_outcomes")
+        .select("status,outcome,sla_due_at,completed_at,sla_minutes_delta")
+        .eq("task_id", taskId)
+        .maybeSingle(),
+    ]);
 
     if (error || !data) {
       return null;
@@ -930,6 +971,7 @@ export async function getTaskDetail(
       }>;
     };
     const reservation = one(task.reservations);
+    const taskOutcomeRow = outcome as TaskOutcomeRow | null;
 
     return {
       description: task.description ?? "Sin descripcion ampliada.",
@@ -947,8 +989,24 @@ export async function getTaskDetail(
         },
         { label: "Tipo", value: label(task.type) },
         { label: "Vencimiento", value: dueLabel(task.due_at) },
+        {
+          label: "Resultado SLA",
+          value: taskOutcomeRow
+            ? label(taskOutcomeRow.outcome)
+            : "Pendiente de medicion",
+        },
+        {
+          label: "Desviacion SLA",
+          value: slaDeltaLabel(taskOutcomeRow?.sla_minutes_delta),
+        },
       ],
       id: task.id,
+      outcome: taskOutcomeRow
+        ? {
+            label: label(taskOutcomeRow.outcome),
+            slaDelta: slaDeltaLabel(taskOutcomeRow.sla_minutes_delta),
+          }
+        : undefined,
       priority: label(task.priority),
       property: one(task.properties)?.name ?? "Propiedad sin asignar",
       raw: {

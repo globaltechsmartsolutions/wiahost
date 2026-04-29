@@ -70,6 +70,7 @@ La UI combina datos demo con primeras integraciones reales:
 - Dashboard, reservas, calendario, inbox, tareas e incidencias leen de Supabase con fallback demo.
 - Reservas, tareas e incidencias tienen creacion, detalle, edicion completa y actualizacion de estado mediante Server Actions y Route Handlers compartiendo servicios de mutacion.
 - Reservas, tareas, incidencias e inbox tienen filtros GET server-side sobre los datos cargados para proteger deep links y futura app movil.
+- Tareas sincronizan `task_outcomes` desde los servicios de mutacion para medir SLA y alimentar reporting/IA futura sin depender solo de la vista.
 - Owners lee owner accounts, propiedades, reservas e incidencias desde Supabase con fallback demo.
 - Settings lee el perfil autenticado desde Supabase y permite actualizar nombre/telefono mediante Server Action.
 - Settings muestra readiness tecnico de URL publica, Supabase, service role, base de datos y Stripe sin exponer secretos. El mismo snapshot alimenta `/api/health`.

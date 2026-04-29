@@ -37,6 +37,7 @@
 - Implementado: paginas de detalle para reservas, tareas, incidencias y conversaciones con fallback demo.
 - Implementado: propiedades con lista, detalle, edicion, PATCH API y archivo controlado mediante Server Action/API.
 - Implementado: edicion completa de reservas, tareas e incidencias mediante pantallas protegidas, Server Actions y PATCH API.
+- Implementado: medicion de resultados de tareas en `task_outcomes`, con SLA, desviacion y resultado visible en detalle.
 - Implementado: owners conectado a Supabase con resumen de propietarios, activos, ingresos, payout e incidencias.
 - Implementado: settings conectado a Supabase con lectura, actualizacion del perfil operativo y readiness tecnico compartido con `/api/health`.
 - Implementado: CRM de huespedes conectado a Supabase con listado, filtro, alta y API GET/POST.

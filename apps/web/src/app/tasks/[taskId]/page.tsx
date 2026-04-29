@@ -67,10 +67,24 @@ export default async function TaskDetailPage({
             <div className="flex flex-wrap items-center gap-3">
               <StatusBadge value={task.status} />
               <StatusBadge value={task.priority} />
+              {task.outcome ? <StatusBadge value={task.outcome.label} /> : null}
             </div>
             <p className="rounded-3xl bg-background/70 p-5 text-sm leading-6 text-muted-foreground">
               {task.description}
             </p>
+            {task.outcome ? (
+              <div className="rounded-3xl border border-[#dfd2bf] bg-white/60 p-4">
+                <p className="text-xs font-semibold uppercase tracking-[0.22em] text-muted-foreground">
+                  Medicion SLA
+                </p>
+                <p className="mt-2 text-sm font-semibold">
+                  {task.outcome.label}
+                </p>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  {task.outcome.slaDelta}
+                </p>
+              </div>
+            ) : null}
           </CardContent>
         </Card>
 

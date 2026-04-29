@@ -132,6 +132,8 @@ test.describe("operations flows with Supabase @critical @data", () => {
 
     await page.goto(`/tasks/${taskBody.data.id}`);
     await expect(page.getByText(updatedTaskTitle)).toBeVisible();
+    await expect(page.getByText("Completada a tiempo").first()).toBeVisible();
+    await expect(page.getByText("Medicion SLA")).toBeVisible();
 
     await page.goto(
       `/tasks?q=${encodeURIComponent(updatedTaskTitle)}&status=Cerrada`,
@@ -236,7 +238,9 @@ test.describe("operations flows with Supabase @critical @data", () => {
 
     await page.goto(`/inbox/${seedIds.conversationId}`);
     await expect(page.getByText(labelCategory)).toBeVisible();
-    await expect(page.getByText("validar trazabilidad del hilo")).toBeVisible();
+    await expect(
+      page.getByText("validar trazabilidad del hilo").first(),
+    ).toBeVisible();
 
     const auditEventsResponse = await page.request.get("/api/audit-events");
     expect(auditEventsResponse.status()).toBe(200);

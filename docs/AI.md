@@ -166,6 +166,8 @@ Tablas ya preparadas:
 
 `automation_runs` ya registra pruebas manuales de reglas con preview renderizado y variables pendientes. Sera una fuente clave para medir que automatizaciones se usan, fallan o necesitan aprobacion humana antes de hacerlas autonomas.
 
+`task_outcomes` ya se alimenta desde el flujo real de tareas y mide cumplimiento de SLA. Esto permite modelos futuros de prediccion de retrasos, calidad de limpieza/mantenimiento y priorizacion operativa con datos historicos limpios.
+
 Tablas futuras recomendadas:
 
 - `ai_prompt_templates`
