@@ -1,3 +1,5 @@
+import { router } from "expo-router";
+
 import { Card, EmptyState, ListItem, SectionTitle } from "@/src/components/cards";
 import { Screen } from "@/src/components/screen";
 import { useMobileDashboard } from "@/src/hooks/use-mobile-dashboard";
@@ -25,6 +27,12 @@ export default function PropertiesScreen() {
               helper={`${property.basePrice} EUR base`}
               key={property.id}
               meta={`${property.city} - ${property.internalName}`}
+              onPress={() =>
+                router.push({
+                  pathname: "/properties/[propertyId]",
+                  params: { propertyId: property.id },
+                })
+              }
               title={property.name}
             />
           ))

@@ -1,3 +1,5 @@
+import { router } from "expo-router";
+
 import { Card, EmptyState, ListItem, SectionTitle } from "@/src/components/cards";
 import { Screen } from "@/src/components/screen";
 import { useMobileDashboard } from "@/src/hooks/use-mobile-dashboard";
@@ -25,6 +27,12 @@ export default function InboxScreen() {
               helper={`${thread.message} - ${thread.waiting}`}
               key={thread.id}
               meta={`${thread.property} - ${thread.channel}`}
+              onPress={() =>
+                router.push({
+                  pathname: "/inbox/[conversationId]",
+                  params: { conversationId: thread.id },
+                })
+              }
               title={thread.guest}
             />
           ))

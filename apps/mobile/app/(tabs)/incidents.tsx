@@ -1,3 +1,5 @@
+import { router } from "expo-router";
+
 import { Card, EmptyState, ListItem, SectionTitle } from "@/src/components/cards";
 import { Screen } from "@/src/components/screen";
 import { useMobileDashboard } from "@/src/hooks/use-mobile-dashboard";
@@ -46,6 +48,12 @@ export default function IncidentsScreen() {
               helper={`${incident.status} - ${incident.cost}`}
               key={incident.id}
               meta={incident.property}
+              onPress={() =>
+                router.push({
+                  pathname: "/incidents/[incidentId]",
+                  params: { incidentId: incident.id },
+                })
+              }
               title={incident.title}
             />
           ))

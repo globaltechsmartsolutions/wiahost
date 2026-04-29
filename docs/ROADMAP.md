@@ -140,10 +140,11 @@
 - Implementado: configuracion de Metro para monorepo, NativeWind preparado, package Android `com.globaltech.wiahost` y variables `EXPO_PUBLIC_*`.
 - Implementado: Supabase Auth movil con persistencia de sesion en AsyncStorage, login, registro y perfil.
 - Implementado: tabs moviles de Dashboard, Activos, Reservas, Inbox, Riesgo y Ajustes con UI nativa responsive.
+- Implementado: fichas moviles navegables para activos, reservas, conversaciones e incidencias, con contexto operativo y fallback demo.
 - Implementado: TanStack Query para cache/refresco de datos operativos y lectura directa de Supabase con RLS.
 - Implementado: fallback demo para poder revisar la experiencia movil aunque no esten copiadas las variables.
 - Implementado: typecheck movil limpio.
-- Pendiente inmediato: detalles y formularios nativos de creacion/edicion, envio de mensajes, subida de evidencias, push notifications y EAS Build.
+- Pendiente inmediato: formularios nativos de creacion/edicion, envio de mensajes, subida de evidencias, push notifications y EAS Build.
 
 ## Fase 5 - IA y automatizacion avanzada
 
