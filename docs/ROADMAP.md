@@ -60,6 +60,7 @@
 - Implementado: escala compacta de dashboard para portatil, con cuatro metricas por fila y hero menos sobredimensionado.
 - Implementado: primera vista del dashboard mas densa, con sidebar/topbar/hero/cards compactos y calendario visible antes.
 - Implementado: navegacion responsive del shell protegido con menu lateral mobile/tablet y prueba visual contra overflow horizontal.
+- Implementado: headers compactos de modulos protegidos, con descripcion lateral en desktop y test visual para evitar paginas sobredimensionadas en portatil.
 - Implementado: estados globales de carga/error para rutas Next.js, con fallback visual de producto y codigo de seguimiento de errores.
 - Implementado: memoria versionada en `quality/audit-memory` con reglas visuales, riesgos, rutas y hallazgos previos.
 - Implementado: auditor estatico `pnpm quality:routes` para verificar que el inventario de rutas mantiene cobertura visual/accesibilidad.

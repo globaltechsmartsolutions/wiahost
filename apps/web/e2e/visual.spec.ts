@@ -153,6 +153,26 @@ async function expectDashboardLaptopScale(page: Page) {
   expect(scale.metricsInFirstRow).toBe(4);
 }
 
+async function expectProtectedHeaderScale(page: Page) {
+  const header = page.getByTestId("page-header");
+  await expect(header).toBeVisible();
+
+  const scale = await header.evaluate((element) => {
+    const title = element.querySelector("h1");
+    const rect = element.getBoundingClientRect();
+
+    return {
+      fontSize: title
+        ? Number.parseFloat(window.getComputedStyle(title).fontSize)
+        : 0,
+      height: rect.height,
+    };
+  });
+
+  expect(scale.fontSize).toBeLessThanOrEqual(44);
+  expect(scale.height).toBeLessThanOrEqual(145);
+}
+
 const protectedModuleSnapshots = [
   {
     heading: /prioridades, reservas y canales/i,
@@ -308,6 +328,9 @@ test.describe("visual regression baseline @visual", () => {
       await page.goto(moduleSnapshot.route);
       await prepareVisualPage(page);
       await expectNoHorizontalOverflow(page);
+      if (moduleSnapshot.route !== "/dashboard") {
+        await expectProtectedHeaderScale(page);
+      }
       await expect(
         page.getByRole("heading", { name: moduleSnapshot.heading }).first(),
       ).toBeVisible();
@@ -346,6 +369,7 @@ test.describe("visual regression baseline @visual", () => {
       await page.goto(route);
       await prepareVisualPage(page);
       await expectNoHorizontalOverflow(page);
+      await expectProtectedHeaderScale(page);
       await expect(
         page.getByRole("button", { name: /filtrar/i }),
       ).toBeVisible();
@@ -365,6 +389,7 @@ test.describe("visual regression baseline @visual", () => {
     await page.goto("/leads");
     await prepareVisualPage(page);
     await expectNoHorizontalOverflow(page);
+    await expectProtectedHeaderScale(page);
     await expect(
       page.getByRole("heading", { name: /solicitudes web/i }),
     ).toBeVisible();
@@ -388,6 +413,7 @@ test.describe("visual regression baseline @visual", () => {
       await page.goto(route);
       await prepareVisualPage(page);
       await expectNoHorizontalOverflow(page);
+      await expectProtectedHeaderScale(page);
       await captureVisualArtifact(
         page,
         testInfo,
@@ -410,6 +436,7 @@ test.describe("visual regression baseline @visual", () => {
       await page.goto(route);
       await prepareVisualPage(page);
       await expectNoHorizontalOverflow(page);
+      await expectProtectedHeaderScale(page);
       await captureVisualArtifact(
         page,
         testInfo,
@@ -440,6 +467,7 @@ test.describe("visual regression baseline @visual", () => {
       await page.goto(route);
       await prepareVisualPage(page);
       await expectNoHorizontalOverflow(page);
+      await expectProtectedHeaderScale(page);
       await captureVisualArtifact(
         page,
         testInfo,
@@ -463,6 +491,7 @@ test.describe("visual regression baseline @visual", () => {
       await page.goto(route);
       await prepareVisualPage(page);
       await expectNoHorizontalOverflow(page);
+      await expectProtectedHeaderScale(page);
       await captureVisualArtifact(
         page,
         testInfo,

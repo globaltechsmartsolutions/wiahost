@@ -12,6 +12,7 @@ Current baseline strategy:
 - Dashboard responsive desktop sizes are tested at 1366, 1440, 1536 and 1920 pixels to prevent zoom-like cramped layouts and internal calendar scrollbars.
 - Laptop scale is tested directly: hero title size is capped and the four metric cards must remain in one row on standard desktop laptop widths.
 - First viewport density is tested by checking that calendar context starts early enough on laptop desktop widths.
+- Protected module header scale is tested directly so title/description blocks do not recreate the oversized laptop viewport issue outside dashboard.
 - Property list/detail/edit routes are covered by artifact-only visual checks for laptop overflow until we can freeze dynamic data for strict screenshots.
 - Operation list/detail/edit routes for reservations, tasks and incidents are covered by artifact-only visual checks for laptop overflow and responsive density.
 - Commercial lead route `/leads` is covered by artifact-only visual checks for laptop overflow and responsive density.

@@ -23,6 +23,8 @@ These rules describe the quality bar WIAHost should preserve as the product grow
 - Responsive decisions must be validated against standard sizes, not only the developer's current monitor or browser zoom.
 - Laptop dashboards must not feel over-zoomed: metrics should fit four per row from standard laptop desktop widths and hero typography must stay compact enough for operations work.
 - The first dashboard viewport must prioritize operational density over marketing scale: compact sidebar, compact topbar, restrained hero and visible calendar context.
+- Protected module headers must stay compact on laptop viewports: title, eyebrow and description should not push operational forms/cards too far below the fold.
+- Long module descriptions should sit beside the title on desktop when that preserves first-viewport density without hurting readability.
 - Mobile layouts must not create horizontal overflow.
 
 ## Forms
