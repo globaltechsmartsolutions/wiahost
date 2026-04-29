@@ -14,6 +14,15 @@ Puerto alternativo:
 pnpm --filter web exec next dev --port 3002
 ```
 
+## Mobile
+
+```bash
+cp apps/mobile/.env.example apps/mobile/.env
+pnpm dev:mobile
+```
+
+Expo mostrara las opciones para abrir Android, iOS, Expo Go o web. Si pruebas desde un movil fisico, usa la IP LAN del ordenador para `EXPO_PUBLIC_SUPABASE_URL` en lugar de `127.0.0.1`.
+
 ## Supabase
 
 La CLI de Supabase queda instalada como devDependency del monorepo, asi que no hace falta instalarla globalmente. Comprobar:
@@ -33,6 +42,7 @@ pnpm db:types
 URLs locales verificadas:
 
 - Web: `http://localhost:3002`
+- Mobile: la URL/QR que muestre Expo con `pnpm dev:mobile`
 - Supabase Studio: `http://127.0.0.1:54323`
 - Supabase API: `http://127.0.0.1:54321`
 - Database: `postgresql://postgres:postgres@127.0.0.1:54322/postgres`
@@ -50,6 +60,7 @@ Usuarios demo tras `pnpm db:reset`:
 pnpm typecheck
 pnpm lint
 pnpm test
+pnpm --filter mobile typecheck
 pnpm test:e2e
 pnpm test:a11y
 pnpm test:visual

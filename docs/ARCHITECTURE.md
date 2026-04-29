@@ -2,12 +2,13 @@
 
 ## Resumen
 
-WIAHost esta planteado como monorepo para soportar web, app movil futura, backend Supabase y paquetes compartidos.
+WIAHost esta planteado como monorepo para soportar web, app movil, backend Supabase y paquetes compartidos.
 
 ```text
 wiahost/
   apps/
     web/
+    mobile/
   packages/
     shared/
     database/
@@ -32,11 +33,19 @@ Responsabilidades:
 - Route handlers para health, properties, reservas, tareas, incidencias e inbox.
 - Integracion progresiva con Supabase.
 
-### `apps/mobile` futuro
+### `apps/mobile`
 
-App movil real con Expo React Native.
+App movil real con Expo React Native y Expo Router.
 
-No sera WebView. Usara Supabase Auth, Supabase Postgres con RLS y paquetes compartidos de validacion/tipos.
+No es WebView. Usa Supabase Auth, Supabase Postgres con RLS, TanStack Query y paquetes compartidos de validacion/tipos.
+
+Responsabilidades actuales:
+
+- Login y registro nativos.
+- Dashboard operativo movil.
+- Tabs de activos, reservas, inbox, riesgo y ajustes.
+- Queries directas contra Supabase con fallback demo.
+- Preparacion para Play Store mediante `com.globaltech.wiahost`.
 
 ## Packages
 
@@ -103,4 +112,4 @@ La UI combina datos demo con primeras integraciones reales:
 - El detalle de inbox permite guardar etiquetas humanas en `message_labels`; esta memoria revisada por personas alimentara reglas, evals y modelos futuros sin automatizar decisiones sensibles.
 - Pricing conecta `/pricing` y `/api/pricing/observations` con `pricing_observations`. Permite guardar recomendaciones manuales o importadas por canal y registrar un `price_update` outbound en `channel_sync_events` antes de conectar PriceLabs, Beyond, Wheelhouse o motores propios.
 
-La prioridad tecnica actual es conectar cada pantalla PMS a Supabase manteniendo RLS, validadores compartidos y tests.
+La prioridad tecnica actual es completar acciones moviles sobre los modulos ya conectados en web manteniendo RLS, validadores compartidos y tests.

@@ -6,8 +6,10 @@
   "scripts": {
     "dev": "turbo dev",
     "dev:web": "pnpm --filter web exec next dev --port 3002",
+    "dev:mobile": "pnpm --filter mobile start",
     "build": "turbo build",
     "build:web": "pnpm --filter web build",
+    "build:mobile": "pnpm --filter mobile build",
     "lint": "turbo lint",
     "typecheck": "turbo typecheck",
     "test": "turbo test",

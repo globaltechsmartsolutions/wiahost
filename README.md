@@ -8,6 +8,7 @@ El objetivo es centralizar propiedades, reservas, calendario multi-canal, mensaj
 
 - Monorepo con pnpm workspaces y Turborepo.
 - Web app con Next.js App Router en `apps/web`.
+- Mobile app con Expo React Native y Expo Router en `apps/mobile`.
 - UI profesional tipo hospitality command center.
 - Dashboard navegable con datos Supabase y fallback demo.
 - Rutas web actuales: landing, dashboard, properties, reservations, calendar, guests, inbox, leads, notifications, tasks, incidents, owners, statements, payments, pricing, distribution, documents, audit, workflows, automations, settings, login y register.
@@ -37,7 +38,7 @@ Importante: la web mantiene fallback demo para poder navegar sin entorno local, 
 - Formularios futuros: React Hook Form + Zod resolver.
 - Testing preparado: Vitest y Playwright.
 - Deploy web futuro: Vercel.
-- Mobile futuro: Expo React Native + EAS Build para Play Store/App Store.
+- Mobile: Expo React Native + Expo Router + TanStack Query + EAS Build futuro para Play Store/App Store.
 
 ## Instalacion local
 
@@ -46,10 +47,12 @@ git clone https://github.com/globaltechsmartsolutions/wiahost.git
 cd wiahost
 pnpm install
 cp apps/web/.env.example apps/web/.env.local
+cp apps/mobile/.env.example apps/mobile/.env
 pnpm supabase:start
 pnpm db:reset
 pnpm db:types
 pnpm --filter web exec next dev --port 3002
+pnpm dev:mobile
 ```
 
 Para usar el puerto 3002:
@@ -79,7 +82,9 @@ El seed crea usuarios y datos demo para operaciones PMS:
 
 ```bash
 pnpm dev:web
+pnpm dev:mobile
 pnpm build:web
+pnpm build:mobile
 pnpm typecheck
 pnpm lint
 pnpm test
@@ -113,6 +118,7 @@ Documentos principales:
 - Setup local: `docs/SETUP.md`
 - Seguridad/readiness: `docs/SECURITY.md`
 - Calidad: `docs/QUALITY_AND_AUDIT_STRATEGY.md`
+- Mobile: `docs/MOBILE.md`
 
 ## Regla visual importante
 

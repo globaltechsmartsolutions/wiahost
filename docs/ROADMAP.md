@@ -134,6 +134,17 @@
 - Play Store internal testing.
 - Publicacion Android.
 
+### Estado actual de Fase 4
+
+- Implementado: `apps/mobile` con Expo React Native, Expo Router, TypeScript strict y scripts integrados en Turborepo.
+- Implementado: configuracion de Metro para monorepo, NativeWind preparado, package Android `com.globaltech.wiahost` y variables `EXPO_PUBLIC_*`.
+- Implementado: Supabase Auth movil con persistencia de sesion en AsyncStorage, login, registro y perfil.
+- Implementado: tabs moviles de Dashboard, Activos, Reservas, Inbox, Riesgo y Ajustes con UI nativa responsive.
+- Implementado: TanStack Query para cache/refresco de datos operativos y lectura directa de Supabase con RLS.
+- Implementado: fallback demo para poder revisar la experiencia movil aunque no esten copiadas las variables.
+- Implementado: typecheck movil limpio.
+- Pendiente inmediato: detalles y formularios nativos de creacion/edicion, envio de mensajes, subida de evidencias, push notifications y EAS Build.
+
 ## Fase 5 - IA y automatizacion avanzada
 
 - Documento canonico: `AI.md`.
