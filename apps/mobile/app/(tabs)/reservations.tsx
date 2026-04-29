@@ -1,6 +1,7 @@
 import { router } from "expo-router";
 
 import { Card, EmptyState, ListItem, SectionTitle } from "@/src/components/cards";
+import { PrimaryButton } from "@/src/components/form";
 import { Screen } from "@/src/components/screen";
 import { useMobileDashboard } from "@/src/hooks/use-mobile-dashboard";
 
@@ -15,6 +16,11 @@ export default function ReservationsScreen() {
       refreshing={isRefetching}
       subtitle="Reservas confirmadas, consultas y estancias para operar llegadas y salidas."
       title="Reservas"
+      action={
+        <PrimaryButton onPress={() => router.push("/reservations/new")}>
+          Nueva
+        </PrimaryButton>
+      }
     >
       <Card>
         <SectionTitle helper="Ordenadas por entrada o actividad reciente.">

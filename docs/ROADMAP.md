@@ -144,10 +144,11 @@
 - Implementado: alta nativa de activos desde mobile con validacion compartida `propertySchema`, TanStack Query, Supabase insert y cache invalidation.
 - Implementado: alta nativa de incidencias desde mobile con validacion compartida `incidentSchema`, seleccion de activo, severidad, coste estimado y Supabase insert.
 - Implementado: envio de respuesta desde ficha de inbox mobile con validacion compartida `messageSchema`, insercion en `conversation_messages` y actualizacion de estado de conversacion.
+- Implementado: alta nativa de reservas desde mobile con validacion compartida `manualReservationSchema`, creacion de huesped y reserva con calculo de noches/importes.
 - Implementado: TanStack Query para cache/refresco de datos operativos y lectura directa de Supabase con RLS.
 - Implementado: fallback demo para poder revisar la experiencia movil aunque no esten copiadas las variables.
 - Implementado: typecheck movil limpio.
-- Pendiente inmediato: edicion nativa de activos, formularios de reservas/tareas, historial completo de mensajes, subida de evidencias, push notifications y EAS Build.
+- Pendiente inmediato: edicion nativa de activos, formulario de tareas, historial completo de mensajes, subida de evidencias, push notifications y EAS Build.
 
 ## Fase 5 - IA y automatizacion avanzada
 
