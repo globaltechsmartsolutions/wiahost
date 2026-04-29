@@ -640,6 +640,72 @@ test.describe("operations flows with Supabase @critical @data", () => {
     await expect(page.getByText(updatedListingTitle)).not.toBeVisible();
   });
 
+  test("converts direct booking leads through the commercial pipeline", async ({
+    page,
+  }) => {
+    const guestName = uniqueName("E2E Lead Directo");
+    const inquiryResponse = await page.request.post(
+      "/api/book/loft-malaga-centro/inquiries",
+      {
+        data: {
+          checkIn: isoDateFromToday(60),
+          checkOut: isoDateFromToday(63),
+          consent: true,
+          guestEmail: `${guestName.toLowerCase().replaceAll(" ", ".")}@example.com`,
+          guestFullName: guestName,
+          guestPhone: "+34611111111",
+          guestsCount: 2,
+          message:
+            "Lead directo creado por Playwright para validar conversion comercial.",
+        },
+      },
+    );
+    expect(inquiryResponse.status()).toBe(201);
+
+    const inquiryBody = (await inquiryResponse.json()) as {
+      data: { reservationId: string };
+    };
+
+    const leadsResponse = await page.request.get("/api/leads");
+    expect(leadsResponse.status()).toBe(200);
+    const leadsBody = (await leadsResponse.json()) as {
+      data: Array<{ guest: string; id: string; status: string }>;
+    };
+    expect(
+      leadsBody.data.some(
+        (lead) => lead.guest === guestName && lead.status === "Consulta",
+      ),
+    ).toBe(true);
+
+    await page.goto("/leads");
+    await expect(
+      page.getByRole("heading", { name: /solicitudes web/i }),
+    ).toBeVisible();
+    await expect(
+      page
+        .locator('[data-slot="card-title"]')
+        .filter({ hasText: guestName })
+        .first(),
+    ).toBeVisible();
+
+    const leadPatchResponse = await page.request.patch(
+      `/api/leads/${inquiryBody.data.reservationId}/status`,
+      { data: { status: "confirmed" } },
+    );
+    expect(leadPatchResponse.status()).toBe(200);
+
+    await page.goto("/leads");
+    await expect(
+      page
+        .locator('[data-slot="card-title"]')
+        .filter({ hasText: guestName })
+        .first(),
+    ).toBeVisible();
+    await expect(
+      page.locator("span").filter({ hasText: "Confirmada" }).first(),
+    ).toBeVisible();
+  });
+
   test("creates, updates and deletes payments through API routes", async ({
     page,
   }) => {

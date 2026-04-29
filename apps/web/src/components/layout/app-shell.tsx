@@ -13,6 +13,7 @@ import {
   KeyRound,
   Landmark,
   MessageSquareWarning,
+  MousePointerClick,
   RadioTower,
   ScrollText,
   Search,
@@ -33,6 +34,7 @@ const navSections = [
       { label: "Calendario", href: "/calendar", icon: CalendarDays },
       { label: "Reservas", href: "/reservations", icon: ClipboardCheck },
       { label: "Inbox", href: "/inbox", icon: Inbox },
+      { label: "Leads", href: "/leads", icon: MousePointerClick },
     ],
   },
   {

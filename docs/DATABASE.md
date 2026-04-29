@@ -77,6 +77,19 @@ Al enviar el formulario se crean registros conectados:
 
 La confirmacion no es automatica. Operaciones revisa disponibilidad, condiciones y precio final antes de aceptar.
 
+## Pipeline de leads directos
+
+El modulo `/leads` no crea una tabla nueva en el MVP. Usa `reservations` como fuente de verdad para solicitudes directas con `channel = direct` y estados `inquiry`, `pending`, `confirmed` o `cancelled`.
+
+La pantalla combina datos de:
+
+- `reservations`: fechas, importe, canal, estado y numero de huespedes.
+- `guests`: nombre, email y telefono del contacto.
+- `properties`: activo solicitado.
+- `conversations`: hilo operativo para responder desde inbox.
+
+Convertir un lead a confirmado o cancelado actualiza `reservations.status` mediante Server Action/API. No procesa pagos ni sincroniza canales externos todavia; esas capas quedan para fases posteriores.
+
 ## Auditoria operativa
 
 La tabla `operational_events` ya tiene modulo web en `/audit` y API REST en `/api/audit-events`. Permite registrar eventos manuales o de sistema con `event_name`, `entity_type`, entidad vinculada, fuente, actor y `metadata`.

@@ -117,6 +117,30 @@ export async function updateReservationStatus(
   return data;
 }
 
+export async function updateDirectLeadStatus(
+  supabase: SupabaseServerClient,
+  reservationId: string,
+  status: "pending" | "confirmed" | "cancelled",
+) {
+  const { data, error } = await supabase
+    .from("reservations")
+    .update({ status })
+    .eq("id", reservationId)
+    .eq("channel", "direct")
+    .in("status", ["inquiry", "pending", "confirmed", "cancelled"])
+    .select("id,status")
+    .single();
+
+  if (error || !data) {
+    mutationError(
+      "lead_update_failed",
+      "No se ha podido actualizar el lead directo.",
+    );
+  }
+
+  return data;
+}
+
 export async function updateManualReservation(
   supabase: SupabaseServerClient,
   reservationId: string,

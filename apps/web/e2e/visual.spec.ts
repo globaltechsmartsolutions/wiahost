@@ -278,6 +278,23 @@ test.describe("visual regression baseline @visual", () => {
     }
   });
 
+  test("commercial lead route keeps responsive density without desktop overflow", async ({
+    page,
+  }, testInfo) => {
+    await page.setViewportSize({ height: 768, width: 1366 });
+    await signInAsDemoOperator(page);
+    await page.goto("/leads");
+    await prepareVisualPage(page);
+    await expectNoHorizontalOverflow(page);
+    await expect(
+      page.getByRole("heading", { name: /solicitudes web/i }),
+    ).toBeVisible();
+    await page.screenshot({
+      fullPage: false,
+      path: testInfo.outputPath("leads-density.png"),
+    });
+  });
+
   test("operation detail and edit routes keep responsive density without desktop overflow", async ({
     page,
   }, testInfo) => {

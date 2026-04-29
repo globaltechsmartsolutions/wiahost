@@ -169,6 +169,12 @@
       "tests": ["critical", "data", "a11y", "visual"]
     },
     {
+      "path": "/leads",
+      "auth": "protected",
+      "primaryCheck": "Direct booking leads can be reviewed, opened in inbox and converted to confirmed reservations",
+      "tests": ["critical", "data", "a11y", "visual"]
+    },
+    {
       "path": "/owners",
       "auth": "protected",
       "primaryCheck": "Owner portal reads owner accounts, assets, revenue, payouts and open incidents from Supabase",

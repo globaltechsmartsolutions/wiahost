@@ -82,5 +82,6 @@ La UI combina datos demo con primeras integraciones reales:
 - Payments gestiona pagos manuales vinculados a reservas con estado, proveedor, importe y fecha mediante Server Actions y API REST preparada para mobile.
 - Distribution gestiona publicaciones por canal con `property_listings` y registra sincronizaciones con `channel_sync_events`. Es la base para publicar anuncios, motor de reserva directa, import/export iCal y mensajes entrantes por canal.
 - Direct booking expone `/book/[slug]` como pagina publica. Lee anuncios publicados con service role en servidor, crea solicitudes como `reservations.status = inquiry`, abre conversacion inbound y registra evento de canal directo sin exponer secretos al cliente.
+- Leads centraliza solicitudes directas en `/leads`, reutilizando `reservations`, `guests`, `properties` y `conversations`. La conversion comercial solo cambia el estado de reserva; no confirma automaticamente pagos ni disponibilidad externa.
 
 La prioridad tecnica actual es conectar cada pantalla PMS a Supabase manteniendo RLS, validadores compartidos y tests.
