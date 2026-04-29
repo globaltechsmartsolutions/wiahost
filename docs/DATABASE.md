@@ -94,6 +94,17 @@ La pantalla combina datos de:
 
 Convertir un lead a confirmado o cancelado actualiza `reservations.status` mediante Server Action/API. No procesa pagos ni sincroniza canales externos todavia; esas capas quedan para fases posteriores.
 
+## Mensajes entrantes de canales
+
+La normalizacion de mensajes entrantes no crea tablas nuevas. El endpoint `/api/channels/messages` y el formulario de `/inbox` reutilizan:
+
+- `guests`: crea o reutiliza contacto por email cuando existe.
+- `conversations`: abre o reutiliza hilo por reserva o por propiedad/contacto.
+- `conversation_messages`: guarda el mensaje con `direction = inbound` y canal original.
+- `channel_sync_events`: registra accion `inbound_message` para auditoria e integraciones futuras.
+
+Los canales `email`, `whatsapp`, `sms` e `inbox` se registran como sync `manual` porque `channel_sync_events.channel` representa canales de distribucion. Airbnb, Booking y Vrbo conservan su canal.
+
 ## Auditoria operativa
 
 La tabla `operational_events` ya tiene modulo web en `/audit` y API REST en `/api/audit-events`. Permite registrar eventos manuales o de sistema con `event_name`, `entity_type`, entidad vinculada, fuente, actor y `metadata`.

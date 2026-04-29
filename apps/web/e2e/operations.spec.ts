@@ -210,6 +210,37 @@ test.describe("operations flows with Supabase @critical @data", () => {
     await expect(page.getByText(replyBody)).toBeVisible();
   });
 
+  test("normalizes inbound channel messages into the unified inbox", async ({
+    page,
+  }) => {
+    const guestName = uniqueName("E2E Canal");
+    const inboundResponse = await page.request.post("/api/channels/messages", {
+      data: {
+        body: "Mensaje entrante creado por Playwright desde Airbnb.",
+        channel: "airbnb",
+        externalMessageId: `airbnb-${Date.now()}`,
+        guestEmail: `${guestName.toLowerCase().replaceAll(" ", ".")}@example.com`,
+        guestFullName: guestName,
+        guestPhone: "+34622222222",
+        propertyId: seedIds.propertyId,
+      },
+    });
+    expect(inboundResponse.status()).toBe(201);
+
+    const inboundBody = (await inboundResponse.json()) as {
+      data: { conversationId: string; messageId: string };
+    };
+    expect(inboundBody.data.conversationId).toBeTruthy();
+    expect(inboundBody.data.messageId).toBeTruthy();
+
+    await page.goto(`/inbox?q=${encodeURIComponent(guestName)}`);
+    await expect(page.getByText(guestName).first()).toBeVisible();
+    await expect(page.getByText("Airbnb").first()).toBeVisible();
+    await expect(
+      page.getByText("Mensaje entrante creado por Playwright desde Airbnb."),
+    ).toBeVisible();
+  });
+
   test("updates and archives a property through authenticated API routes", async ({
     page,
   }) => {

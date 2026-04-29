@@ -1,4 +1,5 @@
 import type {
+  ChannelInboundMessageInput,
   IncidentInput,
   ManualReservationInput,
   MessageInput,
@@ -405,4 +406,163 @@ export async function sendConversationReply(
     .eq("id", input.conversationId);
 
   return data;
+}
+
+function channelSyncChannel(channel: string) {
+  return ["airbnb", "booking", "vrbo"].includes(channel) ? channel : "manual";
+}
+
+function validSentAt(value: string | undefined) {
+  if (!value) {
+    return new Date().toISOString();
+  }
+
+  const date = new Date(value);
+  return Number.isNaN(date.getTime())
+    ? new Date().toISOString()
+    : date.toISOString();
+}
+
+export async function ingestChannelMessage(
+  supabase: SupabaseServerClient,
+  input: ChannelInboundMessageInput,
+) {
+  const sentAt = validSentAt(input.sentAt);
+  let guestId: string | null = null;
+
+  if (input.guestEmail) {
+    const { data: existingGuest } = await supabase
+      .from("guests")
+      .select("id")
+      .eq("email", input.guestEmail)
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    guestId = existingGuest?.id ?? null;
+  }
+
+  if (!guestId) {
+    const { data: guest, error: guestError } = await supabase
+      .from("guests")
+      .insert({
+        email: input.guestEmail ?? null,
+        full_name: input.guestFullName,
+        notes: `Creado desde mensaje entrante ${input.channel}.`,
+        phone: input.guestPhone ?? null,
+        preferred_language: "es",
+        tags: ["channel_inbound"],
+      })
+      .select("id")
+      .single();
+
+    if (guestError || !guest) {
+      mutationError(
+        "inbound_guest_create_failed",
+        "No se ha podido crear el contacto del mensaje.",
+      );
+    }
+
+    guestId = guest.id;
+  }
+
+  let conversationId: string | null = null;
+
+  if (input.reservationId) {
+    const { data: existingConversation } = await supabase
+      .from("conversations")
+      .select("id")
+      .eq("reservation_id", input.reservationId)
+      .limit(1)
+      .maybeSingle();
+
+    conversationId = existingConversation?.id ?? null;
+  }
+
+  if (!conversationId) {
+    const { data: existingConversation } = await supabase
+      .from("conversations")
+      .select("id")
+      .eq("property_id", input.propertyId)
+      .eq("guest_id", guestId)
+      .neq("status", "archived")
+      .order("last_message_at", { ascending: false, nullsFirst: false })
+      .limit(1)
+      .maybeSingle();
+
+    conversationId = existingConversation?.id ?? null;
+  }
+
+  if (!conversationId) {
+    const { data: conversation, error: conversationError } = await supabase
+      .from("conversations")
+      .insert({
+        guest_id: guestId,
+        last_message_at: sentAt,
+        property_id: input.propertyId,
+        reservation_id: input.reservationId ?? null,
+        status: "pending_team",
+      })
+      .select("id")
+      .single();
+
+    if (conversationError || !conversation) {
+      mutationError(
+        "inbound_conversation_create_failed",
+        "No se ha podido crear la conversacion entrante.",
+      );
+    }
+
+    conversationId = conversation.id;
+  }
+
+  const { data: message, error: messageError } = await supabase
+    .from("conversation_messages")
+    .insert({
+      body: input.body,
+      channel: input.channel,
+      conversation_id: conversationId,
+      direction: "inbound",
+      external_message_id: input.externalMessageId ?? null,
+      metadata: {
+        source: "channel_message_ingestion",
+      },
+      sent_at: sentAt,
+    })
+    .select("id,conversation_id")
+    .single();
+
+  if (messageError || !message) {
+    mutationError(
+      "inbound_message_create_failed",
+      "No se ha podido guardar el mensaje entrante.",
+    );
+  }
+
+  await supabase
+    .from("conversations")
+    .update({ last_message_at: sentAt, status: "pending_team" })
+    .eq("id", conversationId);
+
+  await supabase.from("channel_sync_events").insert({
+    channel: channelSyncChannel(input.channel),
+    direction: "inbound",
+    payload: {
+      action: "inbound_message",
+      channel: input.channel,
+      conversationId,
+      externalMessageId: input.externalMessageId,
+      guestId,
+      messageId: message.id,
+      reservationId: input.reservationId,
+    },
+    property_id: input.propertyId,
+    status: "synced",
+  });
+
+  return {
+    conversationId,
+    guestId,
+    messageId: message.id,
+  };
 }

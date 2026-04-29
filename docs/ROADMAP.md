@@ -95,7 +95,8 @@
 - Implementado: pipeline comercial `/leads` para revisar solicitudes directas, abrir el hilo de inbox, ver la reserva y convertir/cancelar leads mediante Server Action y API PATCH.
 - Implementado: export iCal publico `/api/ical/[slug]` para disponibilidad de anuncios publicados, sin exponer datos personales de huespedes.
 - Implementado: import iCal basico `/api/ical/import` y formulario en `/distribution` para convertir VEVENT externos en bloqueos de calendario y registrar sync inbound.
-- Pendiente: confirmacion/pago online, APIs oficiales por canal, normalizacion de mensajes entrantes y control de precios por canal.
+- Implementado: normalizacion de mensajes entrantes `/api/channels/messages` y formulario en `/inbox` para convertir mensajes de Airbnb/Booking/Vrbo/email/WhatsApp en contacto, conversacion, mensaje inbound y evento de sync.
+- Pendiente: confirmacion/pago online, APIs oficiales por canal y control de precios por canal.
 
 ## Fase 4 - App movil
 

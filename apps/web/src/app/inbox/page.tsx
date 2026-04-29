@@ -9,8 +9,12 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { ingestChannelMessageAction } from "@/lib/actions/channel-messages";
 import { sendConversationReplyAction } from "@/lib/actions/operations";
-import { getInboxThreads } from "@/lib/data/operations";
+import {
+  getInboxThreads,
+  getOperationFormOptions,
+} from "@/lib/data/operations";
 
 export const dynamic = "force-dynamic";
 
@@ -19,6 +23,7 @@ type InboxPageProps = {
     channel?: string;
     error?: string;
     q?: string;
+    received?: string;
     status?: string;
   }>;
 };
@@ -34,8 +39,9 @@ function uniqueValues(values: string[]) {
 }
 
 export default async function InboxPage({ searchParams }: InboxPageProps) {
-  const [inboxThreads, params] = await Promise.all([
+  const [inboxThreads, options, params] = await Promise.all([
     getInboxThreads(),
+    getOperationFormOptions(),
     searchParams,
   ]);
   const filters = {
@@ -67,6 +73,106 @@ export default async function InboxPage({ searchParams }: InboxPageProps) {
           {params.error}
         </div>
       ) : null}
+      {params?.received ? (
+        <div className="rounded-3xl border border-emerald-200 bg-emerald-50 px-5 py-4 text-sm text-emerald-800">
+          Mensaje entrante normalizado correctamente.
+        </div>
+      ) : null}
+
+      <Card className="rounded-[1.8rem] border-border/80 bg-card/80">
+        <CardContent className="p-5">
+          <div className="mb-4">
+            <p className="text-sm font-semibold">Entrada manual de canal</p>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Simula o registra mensajes que llegan desde Airbnb, Booking, Vrbo,
+              email o WhatsApp. El sistema crea contacto, conversacion, mensaje
+              inbound y evento de sincronizacion.
+            </p>
+          </div>
+          <form
+            action={ingestChannelMessageAction}
+            className="grid gap-4 xl:grid-cols-4"
+          >
+            <Field label="Propiedad" id="inboundPropertyId">
+              <SelectField
+                id="inboundPropertyId"
+                name="propertyId"
+                options={options.properties}
+                placeholder="Selecciona propiedad"
+              />
+            </Field>
+            <Field label="Reserva opcional" id="inboundReservationId">
+              <SelectField
+                id="inboundReservationId"
+                name="reservationId"
+                options={options.reservations}
+                placeholder="Sin reserva vinculada"
+              />
+            </Field>
+            <Field label="Canal" id="inboundChannel">
+              <OptionSelect
+                id="inboundChannel"
+                name="channel"
+                options={[
+                  { label: "Airbnb", value: "airbnb" },
+                  { label: "Booking", value: "booking" },
+                  { label: "Vrbo", value: "vrbo" },
+                  { label: "Email", value: "email" },
+                  { label: "WhatsApp", value: "whatsapp" },
+                  { label: "SMS", value: "sms" },
+                ]}
+                value="airbnb"
+              />
+            </Field>
+            <Field label="ID externo" id="externalMessageId">
+              <Input
+                id="externalMessageId"
+                name="externalMessageId"
+                placeholder="airbnb-msg-123"
+              />
+            </Field>
+            <Field label="Nombre huesped" id="guestFullName">
+              <Input
+                id="guestFullName"
+                name="guestFullName"
+                placeholder="Sofia Martin"
+                required
+              />
+            </Field>
+            <Field label="Email" id="guestEmail">
+              <Input
+                id="guestEmail"
+                name="guestEmail"
+                placeholder="sofia@example.com"
+                type="email"
+              />
+            </Field>
+            <Field label="Telefono" id="guestPhone">
+              <Input
+                id="guestPhone"
+                name="guestPhone"
+                placeholder="+34 600 000 000"
+              />
+            </Field>
+            <div className="xl:col-span-4">
+              <Field label="Mensaje" id="inboundBody">
+                <Textarea
+                  id="inboundBody"
+                  name="body"
+                  placeholder="Hola, llegamos tarde al check-in. ¿Podemos entrar a las 23:30?"
+                  required
+                  rows={3}
+                />
+              </Field>
+            </div>
+            <div className="xl:col-span-4">
+              <Button type="submit" className="rounded-full">
+                Normalizar mensaje
+              </Button>
+            </div>
+          </form>
+        </CardContent>
+      </Card>
 
       <Card className="mb-5 rounded-[1.6rem] border-border/80 bg-card/80">
         <CardContent className="p-4">
@@ -122,7 +228,8 @@ export default async function InboxPage({ searchParams }: InboxPageProps) {
             </div>
           </form>
           <p className="mt-3 text-xs text-muted-foreground">
-            Mostrando {filteredThreads.length} de {inboxThreads.length} conversaciones.
+            Mostrando {filteredThreads.length} de {inboxThreads.length}{" "}
+            conversaciones.
           </p>
         </CardContent>
       </Card>
@@ -188,7 +295,11 @@ export default async function InboxPage({ searchParams }: InboxPageProps) {
         </Card>
       ) : (
         <EmptyState
-          title={inboxThreads.length ? "Sin conversaciones para esos filtros" : "Inbox sin conversaciones"}
+          title={
+            inboxThreads.length
+              ? "Sin conversaciones para esos filtros"
+              : "Inbox sin conversaciones"
+          }
           description={
             inboxThreads.length
               ? "Prueba a limpiar filtros o buscar por otro canal, huesped o estado."
@@ -197,5 +308,77 @@ export default async function InboxPage({ searchParams }: InboxPageProps) {
         />
       )}
     </AppShell>
+  );
+}
+
+function SelectField({
+  id,
+  name,
+  options,
+  placeholder,
+}: {
+  id: string;
+  name: string;
+  options: Array<{ helper?: string; id: string; label: string }>;
+  placeholder: string;
+}) {
+  return (
+    <select
+      id={id}
+      name={name}
+      className="h-10 rounded-xl border border-input bg-background px-3 text-sm"
+      defaultValue=""
+    >
+      <option value="">{placeholder}</option>
+      {options.map((option) => (
+        <option key={option.id} value={option.id}>
+          {option.helper ? `${option.label} - ${option.helper}` : option.label}
+        </option>
+      ))}
+    </select>
+  );
+}
+
+function OptionSelect({
+  id,
+  name,
+  options,
+  value,
+}: {
+  id: string;
+  name: string;
+  options: Array<{ label: string; value: string }>;
+  value: string;
+}) {
+  return (
+    <select
+      id={id}
+      name={name}
+      defaultValue={value}
+      className="h-10 rounded-xl border border-input bg-background px-3 text-sm"
+    >
+      {options.map((option) => (
+        <option key={option.value} value={option.value}>
+          {option.label}
+        </option>
+      ))}
+    </select>
+  );
+}
+
+function Field({
+  children,
+  id,
+  label,
+}: {
+  children: React.ReactNode;
+  id: string;
+  label: string;
+}) {
+  return (
+    <div className="grid gap-2">
+      <Label htmlFor={id}>{label}</Label>
+      {children}
+    </div>
   );
 }
