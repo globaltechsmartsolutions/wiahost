@@ -85,6 +85,7 @@ export async function PATCH(request: Request, { params }: RouteContext) {
       context.supabase,
       result.incidentId,
       parsed.data,
+      context.userId,
     );
     return NextResponse.json({ data: incident });
   } catch (error) {

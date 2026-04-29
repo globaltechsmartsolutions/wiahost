@@ -35,7 +35,7 @@ async function requireLeadContext() {
     );
   }
 
-  return { supabase };
+  return { supabase, userId: userData.user.id };
 }
 
 export async function updateLeadStatusAction(formData: FormData) {
@@ -50,13 +50,14 @@ export async function updateLeadStatusAction(formData: FormData) {
     redirectWithError("Estado de lead no valido.");
   }
 
-  const { supabase } = await requireLeadContext();
+  const { supabase, userId } = await requireLeadContext();
 
   try {
     await updateDirectLeadStatus(
       supabase,
       reservationId.data,
       parsed.data.status,
+      userId,
     );
   } catch (error) {
     if (error instanceof OperationMutationError) {
@@ -81,10 +82,10 @@ export async function prepareLeadPaymentAction(formData: FormData) {
     redirectWithError("Lead no valido para preparar pago.");
   }
 
-  const { supabase } = await requireLeadContext();
+  const { supabase, userId } = await requireLeadContext();
 
   try {
-    await prepareDirectLeadPayment(supabase, reservationId.data);
+    await prepareDirectLeadPayment(supabase, reservationId.data, userId);
   } catch (error) {
     if (error instanceof OperationMutationError) {
       redirectWithError(error.message);

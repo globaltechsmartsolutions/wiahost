@@ -168,6 +168,8 @@ Tablas ya preparadas:
 
 `task_outcomes` ya se alimenta desde el flujo real de tareas y mide cumplimiento de SLA. Esto permite modelos futuros de prediccion de retrasos, calidad de limpieza/mantenimiento y priorizacion operativa con datos historicos limpios.
 
+`operational_events` ya captura mutaciones clave de reservas, leads, tareas, incidencias, inbox y automatizaciones. Esta memoria temporal permite construir features de secuencia, tiempos de reaccion y causa/efecto sin depender de logs externos.
+
 Tablas futuras recomendadas:
 
 - `ai_prompt_templates`

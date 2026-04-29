@@ -245,8 +245,25 @@ test.describe("operations flows with Supabase @critical @data", () => {
     const auditEventsResponse = await page.request.get("/api/audit-events");
     expect(auditEventsResponse.status()).toBe(200);
     const auditEventsBody = (await auditEventsResponse.json()) as {
-      data: Array<{ raw?: { conversationId?: string }; title: string }>;
+      data: Array<{
+        raw?: { conversationId?: string; incidentId?: string; taskId?: string };
+        title: string;
+      }>;
     };
+    expect(
+      auditEventsBody.data.some(
+        (event) =>
+          event.title === "task.status_updated" &&
+          event.raw?.taskId === taskBody.data.id,
+      ),
+    ).toBe(true);
+    expect(
+      auditEventsBody.data.some(
+        (event) =>
+          event.title === "incident.status_updated" &&
+          event.raw?.incidentId === incidentBody.data.id,
+      ),
+    ).toBe(true);
     expect(
       auditEventsBody.data.some(
         (event) =>

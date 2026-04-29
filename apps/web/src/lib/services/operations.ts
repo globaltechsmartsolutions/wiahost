@@ -33,7 +33,11 @@ async function recordOperationalEvent(
     entityId?: string;
     entityType: string;
     eventName: string;
+    incidentId?: string | null;
     metadata?: Record<string, unknown>;
+    propertyId?: string | null;
+    reservationId?: string | null;
+    taskId?: string | null;
     userId: string;
   },
 ) {
@@ -45,8 +49,12 @@ async function recordOperationalEvent(
       entity_id: input.entityId ?? input.conversationId ?? null,
       entity_type: input.entityType,
       event_name: input.eventName,
+      incident_id: input.incidentId ?? null,
       metadata: input.metadata ?? {},
+      property_id: input.propertyId ?? null,
+      reservation_id: input.reservationId ?? null,
       source: "web",
+      task_id: input.taskId ?? null,
     });
   } catch {
     // Audit events must never block the operation they describe.
@@ -152,6 +160,7 @@ async function syncTaskOutcome(
 export async function createManualReservation(
   supabase: SupabaseServerClient,
   input: ManualReservationInput,
+  userId: string,
 ) {
   const { data: guest, error: guestError } = await supabase
     .from("guests")
@@ -193,7 +202,7 @@ export async function createManualReservation(
       taxes_amount: input.taxesAmount,
       total_amount: totalAmount,
     })
-    .select("id,status,total_amount")
+    .select("id,status,total_amount,property_id,guest_id,channel")
     .single();
 
   if (error || !data) {
@@ -203,6 +212,21 @@ export async function createManualReservation(
     );
   }
 
+  await recordOperationalEvent(supabase, {
+    entityId: data.id,
+    entityType: "reservation",
+    eventName: "reservation.created",
+    metadata: {
+      channel: data.channel,
+      guestId: data.guest_id,
+      status: data.status,
+      totalAmount: Number(data.total_amount ?? 0),
+    },
+    propertyId: data.property_id,
+    reservationId: data.id,
+    userId,
+  });
+
   return data;
 }
 
@@ -210,12 +234,13 @@ export async function updateReservationStatus(
   supabase: SupabaseServerClient,
   reservationId: string,
   status: string,
+  userId: string,
 ) {
   const { data, error } = await supabase
     .from("reservations")
     .update({ status })
     .eq("id", reservationId)
-    .select("id,status")
+    .select("id,status,property_id,channel")
     .single();
 
   if (error || !data) {
@@ -225,6 +250,19 @@ export async function updateReservationStatus(
     );
   }
 
+  await recordOperationalEvent(supabase, {
+    entityId: data.id,
+    entityType: "reservation",
+    eventName: "reservation.status_updated",
+    metadata: {
+      channel: data.channel,
+      status: data.status,
+    },
+    propertyId: data.property_id,
+    reservationId: data.id,
+    userId,
+  });
+
   return data;
 }
 
@@ -232,6 +270,7 @@ export async function updateDirectLeadStatus(
   supabase: SupabaseServerClient,
   reservationId: string,
   status: "pending" | "confirmed" | "cancelled",
+  userId: string,
 ) {
   const { data, error } = await supabase
     .from("reservations")
@@ -239,7 +278,7 @@ export async function updateDirectLeadStatus(
     .eq("id", reservationId)
     .eq("channel", "direct")
     .in("status", ["inquiry", "pending", "confirmed", "cancelled"])
-    .select("id,status")
+    .select("id,status,property_id,channel")
     .single();
 
   if (error || !data) {
@@ -249,12 +288,26 @@ export async function updateDirectLeadStatus(
     );
   }
 
+  await recordOperationalEvent(supabase, {
+    entityId: data.id,
+    entityType: "reservation",
+    eventName: "lead.status_updated",
+    metadata: {
+      channel: data.channel,
+      status: data.status,
+    },
+    propertyId: data.property_id,
+    reservationId: data.id,
+    userId,
+  });
+
   return data;
 }
 
 export async function prepareDirectLeadPayment(
   supabase: SupabaseServerClient,
   reservationId: string,
+  userId: string,
 ) {
   const { data: reservation, error: reservationError } = await supabase
     .from("reservations")
@@ -340,6 +393,21 @@ export async function prepareDirectLeadPayment(
 
   const checkout = await createPaymentCheckoutLink(supabase, payment.id);
 
+  await recordOperationalEvent(supabase, {
+    entityId: reservationId,
+    entityType: "reservation",
+    eventName: "lead.payment_requested",
+    metadata: {
+      created,
+      paymentId: payment.id,
+      provider: checkout.provider,
+      status: payment.status,
+    },
+    propertyId: reservation.property_id,
+    reservationId,
+    userId,
+  });
+
   return {
     checkoutUrl: checkout.checkoutUrl,
     created,
@@ -352,6 +420,7 @@ export async function updateManualReservation(
   supabase: SupabaseServerClient,
   reservationId: string,
   input: ManualReservationInput,
+  userId: string,
 ) {
   const { data: existing, error: existingError } = await supabase
     .from("reservations")
@@ -403,7 +472,7 @@ export async function updateManualReservation(
       total_amount: totalAmount,
     })
     .eq("id", reservationId)
-    .select("id,status,total_amount")
+    .select("id,status,total_amount,property_id,guest_id,channel")
     .single();
 
   if (error || !data) {
@@ -412,6 +481,21 @@ export async function updateManualReservation(
       "No se ha podido actualizar la reserva.",
     );
   }
+
+  await recordOperationalEvent(supabase, {
+    entityId: data.id,
+    entityType: "reservation",
+    eventName: "reservation.updated",
+    metadata: {
+      channel: data.channel,
+      guestId: data.guest_id,
+      status: data.status,
+      totalAmount: Number(data.total_amount ?? 0),
+    },
+    propertyId: data.property_id,
+    reservationId: data.id,
+    userId,
+  });
 
   return data;
 }
@@ -454,6 +538,20 @@ export async function createTask(
     taskId: data.id,
   });
 
+  await recordOperationalEvent(supabase, {
+    entityId: data.id,
+    entityType: "task",
+    eventName: "task.created",
+    metadata: {
+      priority: data.priority,
+      status: data.status,
+    },
+    propertyId: data.property_id,
+    reservationId: data.reservation_id,
+    taskId: data.id,
+    userId,
+  });
+
   return data;
 }
 
@@ -461,6 +559,7 @@ export async function updateTask(
   supabase: SupabaseServerClient,
   taskId: string,
   input: TaskInput,
+  userId: string,
 ) {
   const completedAt = input.status === "done" ? new Date().toISOString() : null;
   const { data, error } = await supabase
@@ -497,6 +596,20 @@ export async function updateTask(
     taskId: data.id,
   });
 
+  await recordOperationalEvent(supabase, {
+    entityId: data.id,
+    entityType: "task",
+    eventName: "task.updated",
+    metadata: {
+      priority: data.priority,
+      status: data.status,
+    },
+    propertyId: data.property_id,
+    reservationId: data.reservation_id,
+    taskId: data.id,
+    userId,
+  });
+
   return data;
 }
 
@@ -504,6 +617,7 @@ export async function updateTaskStatus(
   supabase: SupabaseServerClient,
   taskId: string,
   status: string,
+  userId: string,
 ) {
   const completedAt = status === "done" ? new Date().toISOString() : null;
   const { data, error } = await supabase
@@ -530,6 +644,21 @@ export async function updateTaskStatus(
     taskId: data.id,
   });
 
+  await recordOperationalEvent(supabase, {
+    entityId: data.id,
+    entityType: "task",
+    eventName: "task.status_updated",
+    metadata: {
+      outcome: taskOutcome(data.status, data.due_at, data.completed_at),
+      priority: data.priority,
+      status: data.status,
+    },
+    propertyId: data.property_id,
+    reservationId: data.reservation_id,
+    taskId: data.id,
+    userId,
+  });
+
   return data;
 }
 
@@ -550,7 +679,7 @@ export async function createIncident(
       status: input.status,
       title: input.title,
     })
-    .select("id,status")
+    .select("id,status,property_id,reservation_id,severity,estimated_cost")
     .single();
 
   if (error || !data) {
@@ -560,6 +689,21 @@ export async function createIncident(
     );
   }
 
+  await recordOperationalEvent(supabase, {
+    entityId: data.id,
+    entityType: "incident",
+    eventName: "incident.created",
+    incidentId: data.id,
+    metadata: {
+      estimatedCost: Number(data.estimated_cost ?? 0),
+      severity: data.severity,
+      status: data.status,
+    },
+    propertyId: data.property_id,
+    reservationId: data.reservation_id,
+    userId,
+  });
+
   return data;
 }
 
@@ -567,6 +711,7 @@ export async function updateIncident(
   supabase: SupabaseServerClient,
   incidentId: string,
   input: IncidentInput,
+  userId: string,
 ) {
   const resolvedAt = ["resolved", "charged", "cancelled"].includes(input.status)
     ? new Date().toISOString()
@@ -584,7 +729,7 @@ export async function updateIncident(
       title: input.title,
     })
     .eq("id", incidentId)
-    .select("id,status")
+    .select("id,status,property_id,reservation_id,severity,estimated_cost")
     .single();
 
   if (error || !data) {
@@ -593,6 +738,21 @@ export async function updateIncident(
       "No se ha podido actualizar la incidencia.",
     );
   }
+
+  await recordOperationalEvent(supabase, {
+    entityId: data.id,
+    entityType: "incident",
+    eventName: "incident.updated",
+    incidentId: data.id,
+    metadata: {
+      estimatedCost: Number(data.estimated_cost ?? 0),
+      severity: data.severity,
+      status: data.status,
+    },
+    propertyId: data.property_id,
+    reservationId: data.reservation_id,
+    userId,
+  });
 
   return data;
 }
@@ -601,6 +761,7 @@ export async function updateIncidentStatus(
   supabase: SupabaseServerClient,
   incidentId: string,
   status: string,
+  userId: string,
 ) {
   const resolvedAt = ["resolved", "charged", "cancelled"].includes(status)
     ? new Date().toISOString()
@@ -609,7 +770,7 @@ export async function updateIncidentStatus(
     .from("incidents")
     .update({ resolved_at: resolvedAt, status })
     .eq("id", incidentId)
-    .select("id,status")
+    .select("id,status,property_id,reservation_id,severity,estimated_cost")
     .single();
 
   if (error || !data) {
@@ -618,6 +779,21 @@ export async function updateIncidentStatus(
       "No se ha podido actualizar la incidencia.",
     );
   }
+
+  await recordOperationalEvent(supabase, {
+    entityId: data.id,
+    entityType: "incident",
+    eventName: "incident.status_updated",
+    incidentId: data.id,
+    metadata: {
+      estimatedCost: Number(data.estimated_cost ?? 0),
+      severity: data.severity,
+      status: data.status,
+    },
+    propertyId: data.property_id,
+    reservationId: data.reservation_id,
+    userId,
+  });
 
   return data;
 }

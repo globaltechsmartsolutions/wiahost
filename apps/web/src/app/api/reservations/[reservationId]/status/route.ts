@@ -39,7 +39,12 @@ export async function PATCH(request: Request, { params }: RouteContext) {
   }
 
   try {
-    const reservation = await updateReservationStatus(context.supabase, validId.data, parsed.data.status);
+    const reservation = await updateReservationStatus(
+      context.supabase,
+      validId.data,
+      parsed.data.status,
+      context.userId,
+    );
     return NextResponse.json({ data: reservation });
   } catch (error) {
     if (error instanceof OperationMutationError) {

@@ -135,6 +135,8 @@ Cuando operaciones pulsa "Registrar sync precio", se crea un `channel_sync_event
 
 La tabla `operational_events` ya tiene modulo web en `/audit` y API REST en `/api/audit-events`. Permite registrar eventos manuales o de sistema con `event_name`, `entity_type`, entidad vinculada, fuente, actor y `metadata`.
 
+Ademas de los eventos manuales, el MVP registra eventos automaticos no bloqueantes para reservas, leads directos, tareas, incidencias, respuestas de inbox, cambios de estado de inbox, etiquetas humanas y ejecuciones de automatizaciones. Si falla la escritura de auditoria, la operacion principal no se bloquea.
+
 Esta capa sirve para soporte, investigacion de incidencias, debugging funcional y datasets futuros de automatizacion/IA sin guardar informacion innecesaria.
 
 ## Liquidaciones de propietario

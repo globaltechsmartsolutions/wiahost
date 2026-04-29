@@ -37,7 +37,11 @@ export async function POST(request: Request) {
   }
 
   try {
-    const reservation = await createManualReservation(context.supabase, parsed.data);
+    const reservation = await createManualReservation(
+      context.supabase,
+      parsed.data,
+      context.userId,
+    );
     return NextResponse.json({ data: reservation }, { status: 201 });
   } catch (error) {
     if (error instanceof OperationMutationError) {

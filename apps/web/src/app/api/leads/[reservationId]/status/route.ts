@@ -52,6 +52,7 @@ export async function PATCH(request: Request, { params }: RouteContext) {
       context.supabase,
       validReservationId.data,
       parsed.data.status,
+      context.userId,
     );
     return NextResponse.json({ data: lead });
   } catch (error) {

@@ -36,6 +36,7 @@ export async function POST(_request: Request, { params }: RouteContext) {
     const payment = await prepareDirectLeadPayment(
       context.supabase,
       validReservationId.data,
+      context.userId,
     );
     return NextResponse.json({ data: payment }, { status: 201 });
   } catch (error) {

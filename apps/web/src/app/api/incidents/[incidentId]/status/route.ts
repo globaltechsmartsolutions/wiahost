@@ -39,7 +39,12 @@ export async function PATCH(request: Request, { params }: RouteContext) {
   }
 
   try {
-    const incident = await updateIncidentStatus(context.supabase, validId.data, parsed.data.status);
+    const incident = await updateIncidentStatus(
+      context.supabase,
+      validId.data,
+      parsed.data.status,
+      context.userId,
+    );
     return NextResponse.json({ data: incident });
   } catch (error) {
     if (error instanceof OperationMutationError) {

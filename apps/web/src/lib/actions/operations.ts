@@ -115,11 +115,15 @@ export async function createManualReservationAction(formData: FormData) {
     );
   }
 
-  const { supabase } = await getMutationContext(path);
+  const { supabase, userId } = await getMutationContext(path);
   let reservationId: string;
 
   try {
-    const reservation = await createManualReservation(supabase, parsed.data);
+    const reservation = await createManualReservation(
+      supabase,
+      parsed.data,
+      userId,
+    );
     reservationId = reservation.id;
   } catch (error) {
     redirectWithError(
@@ -146,13 +150,14 @@ export async function updateReservationStatusAction(formData: FormData) {
     redirectWithError(path, "Estado de reserva invalido.");
   }
 
-  const { supabase } = await getMutationContext(path);
+  const { supabase, userId } = await getMutationContext(path);
 
   try {
     await updateReservationStatus(
       supabase,
       reservationId.data,
       parsed.data.status,
+      userId,
     );
   } catch (error) {
     redirectWithError(
@@ -202,10 +207,15 @@ export async function updateManualReservationAction(formData: FormData) {
     );
   }
 
-  const { supabase } = await getMutationContext(path);
+  const { supabase, userId } = await getMutationContext(path);
 
   try {
-    await updateManualReservation(supabase, reservationId.data, parsed.data);
+    await updateManualReservation(
+      supabase,
+      reservationId.data,
+      parsed.data,
+      userId,
+    );
   } catch (error) {
     redirectWithError(
       path,
@@ -270,10 +280,10 @@ export async function updateTaskStatusAction(formData: FormData) {
     redirectWithError(path, "Estado de tarea invalido.");
   }
 
-  const { supabase } = await getMutationContext(path);
+  const { supabase, userId } = await getMutationContext(path);
 
   try {
-    await updateTaskStatus(supabase, taskId.data, parsed.data.status);
+    await updateTaskStatus(supabase, taskId.data, parsed.data.status, userId);
   } catch (error) {
     redirectWithError(
       path,
@@ -314,10 +324,10 @@ export async function updateTaskAction(formData: FormData) {
     );
   }
 
-  const { supabase } = await getMutationContext(path);
+  const { supabase, userId } = await getMutationContext(path);
 
   try {
-    await updateTask(supabase, taskId.data, parsed.data);
+    await updateTask(supabase, taskId.data, parsed.data, userId);
   } catch (error) {
     redirectWithError(
       path,
@@ -381,10 +391,15 @@ export async function updateIncidentStatusAction(formData: FormData) {
     redirectWithError(path, "Estado de incidencia invalido.");
   }
 
-  const { supabase } = await getMutationContext(path);
+  const { supabase, userId } = await getMutationContext(path);
 
   try {
-    await updateIncidentStatus(supabase, incidentId.data, parsed.data.status);
+    await updateIncidentStatus(
+      supabase,
+      incidentId.data,
+      parsed.data.status,
+      userId,
+    );
   } catch (error) {
     redirectWithError(
       path,
@@ -424,10 +439,10 @@ export async function updateIncidentAction(formData: FormData) {
     );
   }
 
-  const { supabase } = await getMutationContext(path);
+  const { supabase, userId } = await getMutationContext(path);
 
   try {
-    await updateIncident(supabase, incidentId.data, parsed.data);
+    await updateIncident(supabase, incidentId.data, parsed.data, userId);
   } catch (error) {
     redirectWithError(
       path,
