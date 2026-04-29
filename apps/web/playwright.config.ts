@@ -2,6 +2,11 @@ import { defineConfig, devices } from "@playwright/test";
 
 const port = process.env.PORT ?? "3002";
 const baseURL = process.env.E2E_BASE_URL ?? `http://127.0.0.1:${port}`;
+const reportName = (
+  process.env.PLAYWRIGHT_REPORT_NAME ??
+  process.env.npm_lifecycle_event ??
+  "playwright"
+).replace(/[^a-z0-9_-]/gi, "-");
 
 export default defineConfig({
   testDir: "./e2e",
@@ -11,9 +16,14 @@ export default defineConfig({
   // Supabase local and the Next dev server are shared stateful resources.
   // One worker keeps data flows deterministic and avoids blank-page flakes.
   workers: 1,
-  reporter: process.env.CI
-    ? [["list"], ["html", { open: "never" }]]
-    : [["list"], ["html", { open: "never" }]],
+  reporter: [
+    ["list"],
+    ["html", { open: "never" }],
+    [
+      "json",
+      { outputFile: `../../quality/reports/playwright/${reportName}.json` },
+    ],
+  ],
   expect: {
     timeout: 10_000,
   },

@@ -25,6 +25,7 @@ const visualSnapshotPath = resolve(
   root,
   "apps/web/e2e/visual.spec.ts-snapshots",
 );
+const playwrightReportDir = resolve(root, "quality/reports/playwright");
 const lighthouseConfigPath = resolve(root, ".lighthouserc.cjs");
 const packageJsonPath = resolve(root, "package.json");
 const reportPath = resolve(root, "quality/reports/quality-summary.json");
@@ -84,6 +85,29 @@ function listFiles(path) {
     .sort();
 }
 
+function readPlaywrightReports() {
+  return listFiles(playwrightReportDir)
+    .filter((fileName) => fileName.endsWith(".json"))
+    .map((fileName) => {
+      const report = readJson(resolve(playwrightReportDir, fileName));
+      const stats = report.stats ?? {};
+      const unexpected = Number(stats.unexpected ?? 0);
+      const flaky = Number(stats.flaky ?? 0);
+      const skipped = Number(stats.skipped ?? 0);
+      const expected = Number(stats.expected ?? 0);
+
+      return {
+        durationMs: Number(stats.duration ?? 0),
+        expected,
+        fileName,
+        flaky,
+        skipped,
+        status: unexpected > 0 ? "failed" : "passed",
+        unexpected,
+      };
+    });
+}
+
 function getChangedFiles() {
   try {
     return execFileSync("git", ["diff", "--name-only", "HEAD"], {
@@ -104,6 +128,7 @@ const accessibilityPaths = extractRouteLiterals(
 );
 const visualPaths = extractRouteLiterals(readText(visualSpecPath));
 const visualSnapshots = listFiles(visualSnapshotPath);
+const playwrightReports = readPlaywrightReports();
 const rootPackage = readJson(packageJsonPath);
 const lighthouseConfig = require(lighthouseConfigPath);
 const lighthouseUrls = lighthouseConfig.ci?.collect?.url ?? [];
@@ -211,6 +236,13 @@ const report = {
     urls: lighthouseUrls,
   },
   memoryFiles,
+  playwright: {
+    note:
+      playwrightReports.length > 0
+        ? "Playwright JSON reports detected from recent local or CI runs."
+        : "No Playwright JSON reports detected yet. Run test:e2e, test:a11y or test:visual to generate them.",
+    reports: playwrightReports,
+  },
   qualityScripts: {
     build: rootPackage.scripts?.["build:web"],
     e2e: rootPackage.scripts?.["test:e2e"],
