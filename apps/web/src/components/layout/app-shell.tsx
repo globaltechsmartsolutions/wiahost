@@ -25,15 +25,9 @@ import {
 
 import { signOutAction } from "@/lib/auth/actions";
 import { getNotificationSummary } from "@/lib/data/notifications";
+import { MobileNavSheet } from "@/components/layout/mobile-nav-sheet";
+import { NotificationMenu } from "@/components/layout/notification-menu";
 import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 
 const navSections = [
@@ -61,18 +55,44 @@ const navSections = [
     items: [
       { label: "Propietarios", href: "/owners", icon: Landmark },
       { label: "Liquidaciones", href: "/statements", icon: CreditCard },
-      { label: "Distribucion", href: "/distribution", icon: RadioTower },
+      { label: "Distribución", href: "/distribution", icon: RadioTower },
       { label: "Notificaciones", href: "/notifications", icon: Bell },
       { label: "Precios", href: "/pricing", icon: TrendingUp },
       { label: "Automatizaciones", href: "/automations", icon: Bot },
       { label: "Check-in/out", href: "/workflows", icon: Send },
-      { label: "Auditoria", href: "/audit", icon: ScrollText },
+      { label: "Auditoría", href: "/audit", icon: ScrollText },
       { label: "Documentos", href: "/documents", icon: FileText },
       { label: "Pagos", href: "/payments", icon: CreditCard },
       { label: "Ajustes", href: "/settings", icon: Settings },
     ],
   },
 ];
+
+function NavigationSections() {
+  return (
+    <nav className="min-h-0 flex-1 space-y-3.5 overflow-y-auto p-3 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+      {navSections.map((section) => (
+        <div key={section.title}>
+          <p className="px-2.5 text-[0.62rem] font-semibold uppercase tracking-[0.22em] text-white/65">
+            {section.title}
+          </p>
+          <div className="mt-2 grid gap-1">
+            {section.items.map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                className="group flex items-center gap-2.5 rounded-xl px-2.5 py-1.5 text-[0.8rem] font-medium text-white/68 transition hover:bg-white/10 hover:text-white"
+              >
+                <item.icon className="size-3.5 text-white/40 transition group-hover:text-[#d8ff74]" />
+                {item.label}
+              </Link>
+            ))}
+          </div>
+        </div>
+      ))}
+    </nav>
+  );
+}
 
 export async function AppShell({ children }: { children: React.ReactNode }) {
   const notificationSummary = await getNotificationSummary();
@@ -96,27 +116,7 @@ export async function AppShell({ children }: { children: React.ReactNode }) {
           </Link>
         </div>
 
-        <nav className="min-h-0 flex-1 space-y-3.5 overflow-y-auto p-3 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-          {navSections.map((section) => (
-            <div key={section.title}>
-              <p className="px-2.5 text-[0.62rem] font-semibold uppercase tracking-[0.22em] text-white/65">
-                {section.title}
-              </p>
-              <div className="mt-2 grid gap-1">
-                {section.items.map((item) => (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    className="group flex items-center gap-2.5 rounded-xl px-2.5 py-1.5 text-[0.8rem] font-medium text-white/68 transition hover:bg-white/10 hover:text-white"
-                  >
-                    <item.icon className="size-3.5 text-white/40 transition group-hover:text-[#d8ff74]" />
-                    {item.label}
-                  </Link>
-                ))}
-              </div>
-            </div>
-          ))}
-        </nav>
+        <NavigationSections />
 
         <div className="p-2.5">
           <div className="rounded-[1.2rem] border border-[#d8ff74]/25 bg-[#d8ff74]/10 p-2.5">
@@ -136,6 +136,7 @@ export async function AppShell({ children }: { children: React.ReactNode }) {
       <div className="xl:pl-[15rem] 2xl:pl-[15.5rem]">
         <header className="sticky top-0 z-10 border-b border-[#dfd2bf] bg-[#f6efe4]/86 px-4 py-2 backdrop-blur-xl lg:px-5">
           <div className="mx-auto flex max-w-[1500px] items-center gap-3">
+            <MobileNavSheet />
             <Link
               href="/"
               className="flex items-center gap-2 font-semibold xl:hidden"
@@ -165,70 +166,7 @@ export async function AppShell({ children }: { children: React.ReactNode }) {
             >
               Portfolio Madrid + Costa
             </Button>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="outline"
-                  size="icon"
-                  className="relative ml-auto rounded-full border-[#dfd2bf] bg-white/70"
-                >
-                  <Bell className="size-4" />
-                  {notificationSummary.unreadCount > 0 ? (
-                    <span className="absolute -right-1 -top-1 flex size-5 items-center justify-center rounded-full bg-[#d8ff74] text-[0.65rem] font-bold text-[#160f09]">
-                      {notificationSummary.unreadCount}
-                    </span>
-                  ) : null}
-                  <span className="sr-only">Abrir notificaciones</span>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent
-                align="end"
-                className="w-80 rounded-2xl border-[#dfd2bf] bg-[#fffaf2] p-2"
-              >
-                <DropdownMenuLabel className="px-3 py-2 text-xs uppercase tracking-[0.2em] text-[#75695b]">
-                  Notificaciones
-                </DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                {notificationSummary.latest.length ? (
-                  notificationSummary.latest.map((notification) => (
-                    <DropdownMenuItem
-                      key={notification.id}
-                      asChild
-                      className="cursor-pointer rounded-xl p-0"
-                    >
-                      <Link
-                        href="/notifications"
-                        className="block w-full px-3 py-2"
-                      >
-                        <span className="flex items-center justify-between gap-3">
-                          <span className="text-sm font-semibold">
-                            {notification.title}
-                          </span>
-                          {notification.isUnread ? (
-                            <span className="rounded-full bg-[#d8ff74] px-2 py-0.5 text-[0.65rem] font-bold text-[#160f09]">
-                              Nuevo
-                            </span>
-                          ) : null}
-                        </span>
-                        <span className="mt-1 line-clamp-2 block text-xs leading-5 text-[#75695b]">
-                          {notification.body}
-                        </span>
-                      </Link>
-                    </DropdownMenuItem>
-                  ))
-                ) : (
-                  <div className="px-3 py-4 text-sm text-[#75695b]">
-                    No hay notificaciones pendientes.
-                  </div>
-                )}
-                <DropdownMenuSeparator />
-                <DropdownMenuItem asChild className="cursor-pointer rounded-xl">
-                  <Link href="/notifications">
-                    Ver centro de notificaciones
-                  </Link>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <NotificationMenu summary={notificationSummary} />
             <div className="hidden text-right sm:block">
               <p className="text-sm font-semibold leading-4">
                 Laura Operaciones

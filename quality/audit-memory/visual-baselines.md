@@ -15,6 +15,7 @@ Current baseline strategy:
 - Operation list/detail/edit routes for reservations, tasks and incidents are covered by artifact-only visual checks for laptop overflow and responsive density.
 - Commercial lead route `/leads` is covered by artifact-only visual checks for laptop overflow and responsive density.
 - Audit, automations, workflows, documents, distribution, notifications, owners, payments, pricing, settings and statements are covered by artifact-only visual checks for laptop overflow and responsive density.
+- Protected mobile shell navigation is covered with a dashboard mobile menu artifact to keep tablet/mobile routes reachable when the desktop sidebar is hidden.
 - Calendar plus guest list/detail/edit are covered by artifact-only visual checks for laptop overflow and responsive density.
 - Lighthouse CI writes public-route reports to `quality/reports/lighthouse` and runs in CI as a non-blocking early warning until we have enough history to make it a hard gate.
 

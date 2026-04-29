@@ -8,7 +8,6 @@ async function prepareVisualPage(page: Page) {
       *, *::before, *::after {
         animation-delay: 0s !important;
         animation-duration: 0s !important;
-        caret-color: transparent !important;
         scroll-behavior: auto !important;
         transition-delay: 0s !important;
         transition-duration: 0s !important;
@@ -256,6 +255,25 @@ test.describe("visual regression baseline @visual", () => {
         await expectDashboardLaptopScale(page);
       }
     }
+  });
+
+  test("protected mobile shell exposes navigation without horizontal overflow", async ({
+    page,
+  }, testInfo) => {
+    await page.setViewportSize({ height: 844, width: 390 });
+    await signInAsDemoOperator(page);
+    await page.goto("/dashboard");
+    await prepareVisualPage(page);
+    await expectNoHorizontalOverflow(page);
+
+    await page.getByRole("button", { name: /abrir navegación/i }).click();
+    await expect(page.getByRole("link", { name: /reservas/i })).toBeVisible();
+    await expect(page.getByRole("link", { name: /pagos/i })).toBeVisible();
+    await expectNoHorizontalOverflow(page);
+    await page.screenshot({
+      fullPage: false,
+      path: testInfo.outputPath("dashboard-mobile-nav.png"),
+    });
   });
 
   test("operations routes keep responsive density without desktop overflow", async ({

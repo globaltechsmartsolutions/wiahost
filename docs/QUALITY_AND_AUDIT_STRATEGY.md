@@ -23,6 +23,7 @@ Ya existe:
 - Tests E2E versionados para smoke publico/auth, login demo, iCal publico/import, mensajes entrantes de canal, pricing con sync outbound, notificaciones, creacion/edicion de reserva UI/API, leads directos con preparacion de pago, owners/settings, guest list/detail/edit, calendar blocks y mutaciones API completas de tareas, incidencias e inbox.
 - Auditoria de accesibilidad con `@axe-core/playwright` sobre rutas publicas, reserva directa, protegidas, leads, notifications, audit, workflows, distribution, pricing, calendario, guests, documentos, detalle, edicion de operaciones, owners, statements y settings.
 - Baseline visual inicial para landing/auth y check de overflow/alineacion de reserva directa, leads, notifications, dashboard, operaciones, editores, audit, workflows, distribution, pricing, calendar/guests, documentos, owners, statements y settings.
+- Check visual de navegacion responsive en el shell protegido para asegurar que mobile/tablet tienen acceso a rutas sin overflow horizontal.
 - Memoria versionada en `quality/audit-memory`.
 - Auditor estatico `pnpm quality:routes` que cruza `route-inventory.json` con las suites de accesibilidad y visual para evitar rutas nuevas sin cobertura.
 - Reporte consolidado `pnpm quality:summary` que resume cobertura de rutas, memoria de auditoria, baselines visuales, Lighthouse y scripts de calidad en `quality/reports/quality-summary.json`.
