@@ -27,6 +27,12 @@ export default function IncidentsScreen() {
         <SectionTitle helper="Acciones que conviene cerrar antes de que escalen.">
           Tareas criticas
         </SectionTitle>
+        <PrimaryButton
+          onPress={() => router.push("/tasks/new")}
+          variant="secondary"
+        >
+          Nueva tarea
+        </PrimaryButton>
         {queue.length ? (
           queue.map((item) => (
             <ListItem
