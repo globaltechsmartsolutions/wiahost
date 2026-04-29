@@ -55,6 +55,7 @@
 - Implementado: escala compacta de dashboard para portatil, con cuatro metricas por fila y hero menos sobredimensionado.
 - Implementado: primera vista del dashboard mas densa, con sidebar/topbar/hero/cards compactos y calendario visible antes.
 - Implementado: memoria versionada en `quality/audit-memory` con reglas visuales, riesgos, rutas y hallazgos previos.
+- Implementado: auditor estatico `pnpm quality:routes` para verificar que el inventario de rutas mantiene cobertura visual/accesibilidad.
 - Implementado: CI inicial con typecheck, lint, unit tests, build web y Lighthouse CI no bloqueante con reportes como artefacto.
 - Pendiente inmediato: snapshots visuales estables por modulo y endurecer Lighthouse cuando haya baseline historico.
 

@@ -35,6 +35,9 @@ jobs:
       - name: Unit tests
         run: pnpm test
 
+      - name: Route coverage audit
+        run: pnpm quality:routes
+
       - name: Build web
         run: pnpm build:web
 

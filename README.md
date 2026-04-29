@@ -85,6 +85,7 @@ pnpm test
 pnpm test:e2e
 pnpm test:a11y
 pnpm test:visual
+pnpm quality:routes
 pnpm audit:web
 pnpm audit:lighthouse
 pnpm supabase:start
@@ -112,4 +113,4 @@ El dashboard no debe tener huecos muertos entre modulos. Si dos cards comparten 
 
 ## Siguiente paso recomendado
 
-Seguir con feedback visual de guardado mas fino, edicion completa de reservas/tareas/incidencias y snapshots visuales estables por modulo.
+Seguir con checkout online real, conectores oficiales de canales y endurecimiento progresivo de Lighthouse cuando tengamos historico estable.

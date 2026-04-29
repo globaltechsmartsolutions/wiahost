@@ -24,6 +24,7 @@ Ya existe:
 - Auditoria de accesibilidad con `@axe-core/playwright` sobre rutas publicas, reserva directa, protegidas, leads, audit, workflows, distribution, pricing, calendario, guests, documentos, detalle, edicion de operaciones, owners, statements y settings.
 - Baseline visual inicial para landing/auth y check de overflow/alineacion de reserva directa, leads, dashboard, operaciones, editores, audit, workflows, distribution, pricing, calendar/guests, documentos, owners, statements y settings.
 - Memoria versionada en `quality/audit-memory`.
+- Auditor estatico `pnpm quality:routes` que cruza `route-inventory.json` con las suites de accesibilidad y visual para evitar rutas nuevas sin cobertura.
 - Lighthouse CI configurado para landing/login/register con budgets iniciales, reportes en filesystem y wrapper local para estabilizar Chrome en Windows.
 - CI inicial con typecheck, lint, unit tests y build web.
 
@@ -276,6 +277,7 @@ pnpm install
 pnpm typecheck
 pnpm lint
 pnpm test
+pnpm quality:routes
 pnpm build:web
 pnpm test:e2e -- --grep @smoke
 pnpm test:e2e -- --grep @a11y
@@ -381,7 +383,8 @@ Un cambio no deberia entrar si:
 
 - Hecho: crear `quality/audit-memory`.
 - Hecho: crear script `pnpm audit:web`.
-- Pendiente: generar reporte JSON consolidado con rutas, screenshots y resultados.
+- Hecho: crear `pnpm quality:routes` con reporte JSON de cobertura de rutas frente a a11y/visual.
+- Pendiente: generar reporte JSON consolidado con rutas, screenshots, Lighthouse y resultados E2E.
 
 ### Paso 6
 
