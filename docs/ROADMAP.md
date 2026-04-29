@@ -74,6 +74,7 @@
 - Implementado: auditor `pnpm quality:prod` para readiness de entorno, secretos server-only, placeholders y configuracion Stripe/webhook sin imprimir valores sensibles.
 - Implementado: `/api/health` con snapshot JSON de app, Supabase, base de datos y Stripe para monitorizacion futura.
 - Implementado: CI inicial con typecheck, lint, unit tests, `pnpm quality:ci`, build web, Lighthouse CI no bloqueante y artefactos de reportes JSON/Lighthouse.
+- Implementado: CI valida tambien `build:mobile` y export Expo web para detectar errores de bundling movil antes de publicar.
 - Implementado: snapshots visuales estrictos de primer viewport para dashboard, reservas, calendario, distribucion y pagos en portatil 1366x768.
 - Pendiente inmediato: ampliar snapshots estrictos al resto de modulos cuando sus campos dinamicos esten congelados y endurecer Lighthouse cuando haya baseline historico.
 

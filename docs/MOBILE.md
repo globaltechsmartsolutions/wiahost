@@ -81,7 +81,10 @@ pnpm --filter mobile android
 pnpm --filter mobile ios
 pnpm --filter mobile web
 pnpm --filter mobile typecheck
+pnpm --filter mobile exec expo export --platform web
 ```
+
+CI ejecuta `pnpm build:mobile` y `expo export --platform web` como guardarrail ligero hasta que se configure EAS Build.
 
 ## Funciones prioritarias siguientes
 

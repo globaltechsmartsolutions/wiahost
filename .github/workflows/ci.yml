@@ -41,6 +41,12 @@ jobs:
       - name: Build web
         run: pnpm build:web
 
+      - name: Build mobile typecheck
+        run: pnpm build:mobile
+
+      - name: Export mobile web bundle
+        run: pnpm --filter mobile exec expo export --platform web
+
       - name: Lighthouse CI
         continue-on-error: true
         run: pnpm lighthouse
