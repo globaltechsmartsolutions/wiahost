@@ -14,6 +14,7 @@
     "test:e2e": "pnpm --filter web test:e2e",
     "test:a11y": "pnpm --filter web test:a11y",
     "test:visual": "pnpm --filter web test:visual",
+    "test:visual:update": "pnpm --filter web test:visual:update",
     "quality:routes": "node scripts/audit-route-coverage.mjs",
     "quality:summary": "node scripts/audit-quality-summary.mjs",
     "audit:web": "pnpm --filter web audit:web && pnpm test:visual",

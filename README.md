@@ -85,6 +85,7 @@ pnpm test
 pnpm test:e2e
 pnpm test:a11y
 pnpm test:visual
+pnpm test:visual:update
 pnpm quality:routes
 pnpm quality:summary
 pnpm audit:web

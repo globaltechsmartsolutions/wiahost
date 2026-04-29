@@ -12,6 +12,7 @@
     "test:e2e": "playwright test --grep-invert \"@a11y|@visual\"",
     "test:a11y": "playwright test --grep @a11y",
     "test:visual": "playwright test --grep @visual",
+    "test:visual:update": "playwright test --grep @visual --update-snapshots",
     "audit:web": "pnpm test:e2e && pnpm test:a11y"
   },
   "dependencies": {

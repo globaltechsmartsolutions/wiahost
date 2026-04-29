@@ -4,9 +4,10 @@ Current baseline strategy:
 
 - Functional E2E remains deterministic and fast.
 - Visual regression is opt-in through `pnpm test:visual`.
-- Committed snapshots cover stable public/auth screens first.
+- Committed snapshots cover stable public/auth screens plus the first viewport of protected core modules.
+- Strict protected snapshots currently cover dashboard, reservations, calendar, distribution and payments at 1366x768 to guard the laptop viewport where spacing issues were most visible.
 - Public direct booking pages are artifact-checked on mobile and laptop widths to prevent booking form overflow before strict snapshots are frozen.
-- Dynamic dashboards are captured as run artifacts and checked for horizontal overflow, but not yet snapshotted because dates, SLA times and seed-relative values change.
+- Dynamic secondary routes are captured as run artifacts and checked for horizontal overflow until their variable content is fully frozen.
 - Dashboard grid gutters are tested directly: horizontal and vertical gaps must match the shared grid rhythm even when rows have different card counts.
 - Dashboard responsive desktop sizes are tested at 1366, 1440, 1536 and 1920 pixels to prevent zoom-like cramped layouts and internal calendar scrollbars.
 - Laptop scale is tested directly: hero title size is capped and the four metric cards must remain in one row on standard desktop laptop widths.

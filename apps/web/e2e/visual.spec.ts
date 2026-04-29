@@ -1,4 +1,4 @@
-import { expect, test, type Page } from "@playwright/test";
+import { expect, test, type Page, type TestInfo } from "@playwright/test";
 
 import { seedIds, signInAsDemoOperator } from "./helpers";
 
@@ -31,6 +31,19 @@ async function expectNoElementHorizontalOverflow(page: Page, testId: string) {
   });
 
   expect(hasOverflow).toBe(false);
+}
+
+async function captureVisualArtifact(
+  page: Page,
+  testInfo: TestInfo,
+  name: string,
+  fullPage = false,
+) {
+  await page.screenshot({
+    caret: "initial",
+    fullPage,
+    path: testInfo.outputPath(name),
+  });
 }
 
 async function expectBottomAligned(
@@ -140,6 +153,34 @@ async function expectDashboardLaptopScale(page: Page) {
   expect(scale.metricsInFirstRow).toBe(4);
 }
 
+const protectedModuleSnapshots = [
+  {
+    heading: /prioridades, reservas y canales/i,
+    name: "dashboard-module-laptop.png",
+    route: "/dashboard",
+  },
+  {
+    heading: /pipeline desde consulta/i,
+    name: "reservations-module-laptop.png",
+    route: "/reservations",
+  },
+  {
+    heading: /disponibilidad, reservas y tareas/i,
+    name: "calendar-module-laptop.png",
+    route: "/calendar",
+  },
+  {
+    heading: /publicaciones, canales y sincronizacion/i,
+    name: "distribution-module-laptop.png",
+    route: "/distribution",
+  },
+  {
+    heading: /control financiero inicial/i,
+    name: "payments-module-laptop.png",
+    route: "/payments",
+  },
+] as const;
+
 test.describe("visual regression baseline @visual", () => {
   test("landing desktop stays visually stable", async ({ page }) => {
     await page.setViewportSize({ height: 900, width: 1440 });
@@ -148,6 +189,7 @@ test.describe("visual regression baseline @visual", () => {
     await expectNoHorizontalOverflow(page);
     await expect(page).toHaveScreenshot("landing-desktop.png", {
       animations: "disabled",
+      caret: "initial",
       fullPage: true,
       maxDiffPixelRatio: 0.01,
     });
@@ -160,6 +202,7 @@ test.describe("visual regression baseline @visual", () => {
     await expectNoHorizontalOverflow(page);
     await expect(page).toHaveScreenshot("landing-mobile.png", {
       animations: "disabled",
+      caret: "initial",
       fullPage: true,
       maxDiffPixelRatio: 0.01,
     });
@@ -173,6 +216,7 @@ test.describe("visual regression baseline @visual", () => {
     await expectNoHorizontalOverflow(page);
     await expect(page).toHaveScreenshot("login.png", {
       animations: "disabled",
+      caret: "initial",
       fullPage: true,
       maxDiffPixelRatio: 0.01,
     });
@@ -182,6 +226,7 @@ test.describe("visual regression baseline @visual", () => {
     await expectNoHorizontalOverflow(page);
     await expect(page).toHaveScreenshot("register.png", {
       animations: "disabled",
+      caret: "initial",
       fullPage: true,
       maxDiffPixelRatio: 0.01,
     });
@@ -201,12 +246,11 @@ test.describe("visual regression baseline @visual", () => {
       await expect(
         page.getByRole("heading", { name: /loft malaga centro/i }),
       ).toBeVisible();
-      await page.screenshot({
-        fullPage: false,
-        path: testInfo.outputPath(
-          `direct-booking-${viewport.width}-density.png`,
-        ),
-      });
+      await captureVisualArtifact(
+        page,
+        testInfo,
+        `direct-booking-${viewport.width}-density.png`,
+      );
     }
   });
 
@@ -225,10 +269,7 @@ test.describe("visual regression baseline @visual", () => {
       "dashboard-priority-card",
     );
     await expectDashboardGridGaps(page);
-    await page.screenshot({
-      fullPage: true,
-      path: testInfo.outputPath("dashboard-current.png"),
-    });
+    await captureVisualArtifact(page, testInfo, "dashboard-current.png", true);
   });
 
   test("dashboard standard desktop sizes avoid cramped calendar scrollbars", async ({
@@ -257,6 +298,28 @@ test.describe("visual regression baseline @visual", () => {
     }
   });
 
+  test("protected core modules keep strict first viewport snapshots", async ({
+    page,
+  }) => {
+    await page.setViewportSize({ height: 768, width: 1366 });
+    await signInAsDemoOperator(page);
+
+    for (const moduleSnapshot of protectedModuleSnapshots) {
+      await page.goto(moduleSnapshot.route);
+      await prepareVisualPage(page);
+      await expectNoHorizontalOverflow(page);
+      await expect(
+        page.getByRole("heading", { name: moduleSnapshot.heading }).first(),
+      ).toBeVisible();
+      await expect(page).toHaveScreenshot(moduleSnapshot.name, {
+        animations: "disabled",
+        caret: "initial",
+        fullPage: false,
+        maxDiffPixelRatio: 0.01,
+      });
+    }
+  });
+
   test("protected mobile shell exposes navigation without horizontal overflow", async ({
     page,
   }, testInfo) => {
@@ -270,10 +333,7 @@ test.describe("visual regression baseline @visual", () => {
     await expect(page.getByRole("link", { name: /reservas/i })).toBeVisible();
     await expect(page.getByRole("link", { name: /pagos/i })).toBeVisible();
     await expectNoHorizontalOverflow(page);
-    await page.screenshot({
-      fullPage: false,
-      path: testInfo.outputPath("dashboard-mobile-nav.png"),
-    });
+    await captureVisualArtifact(page, testInfo, "dashboard-mobile-nav.png");
   });
 
   test("operations routes keep responsive density without desktop overflow", async ({
@@ -289,10 +349,11 @@ test.describe("visual regression baseline @visual", () => {
       await expect(
         page.getByRole("button", { name: /filtrar/i }),
       ).toBeVisible();
-      await page.screenshot({
-        fullPage: false,
-        path: testInfo.outputPath(`${route.replace("/", "")}-density.png`),
-      });
+      await captureVisualArtifact(
+        page,
+        testInfo,
+        `${route.replace("/", "")}-density.png`,
+      );
     }
   });
 
@@ -307,10 +368,7 @@ test.describe("visual regression baseline @visual", () => {
     await expect(
       page.getByRole("heading", { name: /solicitudes web/i }),
     ).toBeVisible();
-    await page.screenshot({
-      fullPage: false,
-      path: testInfo.outputPath("leads-density.png"),
-    });
+    await captureVisualArtifact(page, testInfo, "leads-density.png");
   });
 
   test("operation detail and edit routes keep responsive density without desktop overflow", async ({
@@ -330,12 +388,11 @@ test.describe("visual regression baseline @visual", () => {
       await page.goto(route);
       await prepareVisualPage(page);
       await expectNoHorizontalOverflow(page);
-      await page.screenshot({
-        fullPage: false,
-        path: testInfo.outputPath(
-          `${route.replaceAll("/", "-").replace(":", "")}-density.png`,
-        ),
-      });
+      await captureVisualArtifact(
+        page,
+        testInfo,
+        `${route.replaceAll("/", "-").replace(":", "")}-density.png`,
+      );
     }
   });
 
@@ -353,12 +410,11 @@ test.describe("visual regression baseline @visual", () => {
       await page.goto(route);
       await prepareVisualPage(page);
       await expectNoHorizontalOverflow(page);
-      await page.screenshot({
-        fullPage: false,
-        path: testInfo.outputPath(
-          `${route.replaceAll("/", "-").replace(":", "")}-density.png`,
-        ),
-      });
+      await captureVisualArtifact(
+        page,
+        testInfo,
+        `${route.replaceAll("/", "-").replace(":", "")}-density.png`,
+      );
     }
   });
 
@@ -384,10 +440,11 @@ test.describe("visual regression baseline @visual", () => {
       await page.goto(route);
       await prepareVisualPage(page);
       await expectNoHorizontalOverflow(page);
-      await page.screenshot({
-        fullPage: false,
-        path: testInfo.outputPath(`${route.replace("/", "")}-density.png`),
-      });
+      await captureVisualArtifact(
+        page,
+        testInfo,
+        `${route.replace("/", "")}-density.png`,
+      );
     }
   });
 
@@ -406,10 +463,11 @@ test.describe("visual regression baseline @visual", () => {
       await page.goto(route);
       await prepareVisualPage(page);
       await expectNoHorizontalOverflow(page);
-      await page.screenshot({
-        fullPage: false,
-        path: testInfo.outputPath(`${route.replace("/", "")}-density.png`),
-      });
+      await captureVisualArtifact(
+        page,
+        testInfo,
+        `${route.replace("/", "")}-density.png`,
+      );
     }
   });
 });
