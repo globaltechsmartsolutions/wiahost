@@ -26,6 +26,7 @@ import {
   registerSchema,
   reservationSchema,
   taskSchema,
+  updateConversationStatusSchema,
 } from "./validators";
 
 const uuid = "11111111-1111-4111-8111-111111111111";
@@ -383,6 +384,16 @@ describe("notification validators", () => {
     });
 
     expect(parsed.success).toBe(false);
+  });
+});
+
+describe("message validators", () => {
+  it("accepts supported conversation status updates", () => {
+    const parsed = updateConversationStatusSchema.safeParse({
+      status: "resolved",
+    });
+
+    expect(parsed.success).toBe(true);
   });
 });
 

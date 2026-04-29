@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { messageChannels } from "../constants";
+import { conversationStatuses, messageChannels } from "../constants";
 
 const emptyToUndefined = (value: unknown) => {
   if (typeof value !== "string") {
@@ -45,7 +45,14 @@ export const channelInboundMessageSchema = z.object({
   sentAt: optionalText,
 });
 
+export const updateConversationStatusSchema = z.object({
+  status: z.enum(conversationStatuses),
+});
+
 export type ChannelInboundMessageInput = z.infer<
   typeof channelInboundMessageSchema
 >;
 export type MessageInput = z.infer<typeof messageSchema>;
+export type UpdateConversationStatusInput = z.infer<
+  typeof updateConversationStatusSchema
+>;

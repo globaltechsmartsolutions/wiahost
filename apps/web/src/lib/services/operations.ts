@@ -505,6 +505,28 @@ export async function sendConversationReply(
   return data;
 }
 
+export async function updateConversationStatus(
+  supabase: SupabaseServerClient,
+  conversationId: string,
+  status: string,
+) {
+  const { data, error } = await supabase
+    .from("conversations")
+    .update({ status })
+    .eq("id", conversationId)
+    .select("id,status")
+    .single();
+
+  if (error || !data) {
+    mutationError(
+      "conversation_update_failed",
+      "No se ha podido actualizar la conversacion.",
+    );
+  }
+
+  return data;
+}
+
 function channelSyncChannel(channel: string) {
   return ["airbnb", "booking", "vrbo"].includes(channel) ? channel : "manual";
 }

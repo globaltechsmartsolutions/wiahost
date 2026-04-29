@@ -36,4 +36,15 @@ describe("inbox priority classifier", () => {
     expect(result.label).toBe("Baja");
     expect(result.reasons).toEqual(["Sin senales criticas detectadas."]);
   });
+
+  it("does not re-escalate resolved conversations", () => {
+    const result = classifyInboxPriority({
+      conversationStatus: "resolved",
+      lastMessageBody: "No puedo entrar, el codigo no funciona.",
+      waitingMinutes: 120,
+    });
+
+    expect(result.label).toBe("Baja");
+    expect(result.reasons).toEqual(["Conversacion cerrada o archivada."]);
+  });
 });

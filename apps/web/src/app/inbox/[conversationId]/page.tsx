@@ -7,21 +7,24 @@ import { StatusBadge } from "@/components/status-badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
-import { sendConversationReplyAction } from "@/lib/actions/operations";
+import {
+  sendConversationReplyAction,
+  updateConversationStatusAction,
+} from "@/lib/actions/operations";
 import { getConversationDetail } from "@/lib/data/operations";
 
 export const dynamic = "force-dynamic";
 
 type ConversationDetailPageProps = {
   params: Promise<{ conversationId: string }>;
-  searchParams: Promise<{ sent?: string }>;
+  searchParams: Promise<{ sent?: string; updated?: string }>;
 };
 
 export default async function ConversationDetailPage({
   params,
   searchParams,
 }: ConversationDetailPageProps) {
-  const [{ conversationId }, { sent }] = await Promise.all([
+  const [{ conversationId }, { sent, updated }] = await Promise.all([
     params,
     searchParams,
   ]);
@@ -47,6 +50,11 @@ export default async function ConversationDetailPage({
       {sent ? (
         <div className="mb-5 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
           Respuesta enviada y conversacion actualizada.
+        </div>
+      ) : null}
+      {updated ? (
+        <div className="mb-5 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
+          Estado de conversacion actualizado.
         </div>
       ) : null}
 
@@ -88,6 +96,33 @@ export default async function ConversationDetailPage({
               </div>
               <p>{conversation.priorityReason}</p>
             </div>
+            <form
+              action={updateConversationStatusAction}
+              className="grid gap-3"
+            >
+              <input
+                type="hidden"
+                name="conversationId"
+                value={conversation.id}
+              />
+              <label className="grid gap-2 text-sm font-medium">
+                Estado
+                <select
+                  name="status"
+                  defaultValue="resolved"
+                  className="h-10 rounded-xl border border-input bg-background px-3 text-sm"
+                >
+                  <option value="open">Abierta</option>
+                  <option value="pending_team">Pendiente equipo</option>
+                  <option value="pending_guest">Pendiente huesped</option>
+                  <option value="resolved">Resuelta</option>
+                  <option value="archived">Archivada</option>
+                </select>
+              </label>
+              <Button type="submit" variant="outline" className="rounded-full">
+                Actualizar estado
+              </Button>
+            </form>
             <form action={sendConversationReplyAction} className="grid gap-3">
               <input
                 type="hidden"

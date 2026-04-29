@@ -20,6 +20,14 @@ export const messageChannels = [
   "vrbo",
 ] as const;
 
+export const conversationStatuses = [
+  "open",
+  "pending_guest",
+  "pending_team",
+  "resolved",
+  "archived",
+] as const;
+
 export const automationTriggers = [
   "reservation_confirmed",
   "checkin_24h",

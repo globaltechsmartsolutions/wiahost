@@ -84,6 +84,10 @@ export function classifyInboxPriority(
   const waitingMinutes = Math.max(0, input.waitingMinutes ?? 0);
   const checkInHours = hoursUntil(input.checkInDate);
 
+  if (["archived", "resolved"].includes(status)) {
+    return resultFor(10, ["Conversacion cerrada o archivada."]);
+  }
+
   if (["open", "pending_team"].includes(status)) {
     score += 25;
     reasons.push("Pendiente de respuesta del equipo.");

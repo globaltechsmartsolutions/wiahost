@@ -8,6 +8,7 @@ import {
   messageSchema,
   taskSchema,
   updateIncidentStatusSchema,
+  updateConversationStatusSchema,
   updateReservationStatusSchema,
   updateTaskStatusSchema,
 } from "@wiahost/shared";
@@ -21,6 +22,7 @@ import {
   sendConversationReply,
   updateIncident,
   updateIncidentStatus,
+  updateConversationStatus,
   updateManualReservation,
   updateTask,
   updateReservationStatus,
@@ -461,4 +463,37 @@ export async function sendConversationReplyAction(formData: FormData) {
   revalidatePath("/inbox");
   revalidatePath("/dashboard");
   redirect(`/inbox/${parsed.data.conversationId}?sent=1`);
+}
+
+export async function updateConversationStatusAction(formData: FormData) {
+  const conversationId = idSchema.safeParse(
+    requiredString(formData, "conversationId"),
+  );
+  const parsed = updateConversationStatusSchema.safeParse({
+    status: requiredString(formData, "status"),
+  });
+
+  if (!conversationId.success || !parsed.success) {
+    redirectWithError("/inbox", "Estado de conversacion invalido.");
+  }
+
+  const { supabase } = await getMutationContext("/inbox");
+
+  try {
+    await updateConversationStatus(
+      supabase,
+      conversationId.data,
+      parsed.data.status,
+    );
+  } catch (error) {
+    redirectWithError(
+      "/inbox",
+      mutationMessage(error, "No se ha podido actualizar la conversacion."),
+    );
+  }
+
+  revalidatePath("/inbox");
+  revalidatePath(`/inbox/${conversationId.data}`);
+  revalidatePath("/dashboard");
+  redirect(`/inbox/${conversationId.data}?updated=1`);
 }

@@ -205,9 +205,25 @@ test.describe("operations flows with Supabase @critical @data", () => {
     await page.goto(`/inbox/${seedIds.conversationId}`);
     await expect(page.getByText(replyBody)).toBeVisible();
 
+    const conversationStatusResponse = await page.request.patch(
+      `/api/inbox/${seedIds.conversationId}`,
+      { data: { status: "resolved" } },
+    );
+    expect(conversationStatusResponse.status()).toBe(200);
+
+    await page.goto(`/inbox/${seedIds.conversationId}`);
+    await expect(page.locator('select[name="status"]')).toBeVisible();
+    await expect(
+      page.getByText("Conversacion cerrada o archivada."),
+    ).toBeVisible();
+
     await page.goto(`/inbox?q=${encodeURIComponent(replyBody)}`);
     await expect(page.getByText(`Mostrando 1 de`)).toBeVisible();
     await expect(page.getByText(replyBody)).toBeVisible();
+
+    await page.request.patch(`/api/inbox/${seedIds.conversationId}`, {
+      data: { status: "pending_team" },
+    });
   });
 
   test("normalizes inbound channel messages into the unified inbox", async ({

@@ -10,7 +10,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { ingestChannelMessageAction } from "@/lib/actions/channel-messages";
-import { sendConversationReplyAction } from "@/lib/actions/operations";
+import {
+  sendConversationReplyAction,
+  updateConversationStatusAction,
+} from "@/lib/actions/operations";
 import {
   getInboxThreads,
   getOperationFormOptions,
@@ -283,6 +286,22 @@ export default async function InboxPage({ searchParams }: InboxPageProps) {
                     {thread.waiting}
                   </span>
                   <StatusBadge value={thread.status} />
+                  <form action={updateConversationStatusAction}>
+                    <input
+                      type="hidden"
+                      name="conversationId"
+                      value={thread.id}
+                    />
+                    <input type="hidden" name="status" value="resolved" />
+                    <Button
+                      type="submit"
+                      size="sm"
+                      variant="outline"
+                      className="rounded-full"
+                    >
+                      Resolver
+                    </Button>
+                  </form>
                   <Button
                     asChild
                     size="sm"
