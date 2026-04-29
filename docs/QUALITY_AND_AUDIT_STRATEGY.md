@@ -25,6 +25,7 @@ Ya existe:
 - Baseline visual inicial para landing/auth y check de overflow/alineacion de reserva directa, leads, notifications, dashboard, operaciones, editores, audit, workflows, distribution, pricing, calendar/guests, documentos, owners, statements y settings.
 - Memoria versionada en `quality/audit-memory`.
 - Auditor estatico `pnpm quality:routes` que cruza `route-inventory.json` con las suites de accesibilidad y visual para evitar rutas nuevas sin cobertura.
+- Reporte consolidado `pnpm quality:summary` que resume cobertura de rutas, memoria de auditoria, baselines visuales, Lighthouse y scripts de calidad en `quality/reports/quality-summary.json`.
 - Lighthouse CI configurado para landing/login/register con budgets iniciales, reportes en filesystem y wrapper local para estabilizar Chrome en Windows.
 - CI inicial con typecheck, lint, unit tests y build web.
 
@@ -385,7 +386,8 @@ Un cambio no deberia entrar si:
 - Hecho: crear `quality/audit-memory`.
 - Hecho: crear script `pnpm audit:web`.
 - Hecho: crear `pnpm quality:routes` con reporte JSON de cobertura de rutas frente a a11y/visual.
-- Pendiente: generar reporte JSON consolidado con rutas, screenshots, Lighthouse y resultados E2E.
+- Hecho: generar reporte JSON consolidado con rutas, memoria visual, Lighthouse y scripts de calidad mediante `pnpm quality:summary`.
+- Pendiente: anadir resultados E2E/a11y/visual del ultimo run dentro del resumen consolidado cuando Playwright exporte JSON en CI.
 
 ### Paso 6
 

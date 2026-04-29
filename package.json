@@ -15,6 +15,7 @@
     "test:a11y": "pnpm --filter web test:a11y",
     "test:visual": "pnpm --filter web test:visual",
     "quality:routes": "node scripts/audit-route-coverage.mjs",
+    "quality:summary": "node scripts/audit-quality-summary.mjs",
     "audit:web": "pnpm --filter web audit:web && pnpm test:visual",
     "audit:visual": "pnpm test:visual",
     "audit:lighthouse": "pnpm build:web && pnpm lighthouse",

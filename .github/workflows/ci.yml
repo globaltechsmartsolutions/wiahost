@@ -38,6 +38,9 @@ jobs:
       - name: Route coverage audit
         run: pnpm quality:routes
 
+      - name: Quality memory summary
+        run: pnpm quality:summary
+
       - name: Build web
         run: pnpm build:web
 
