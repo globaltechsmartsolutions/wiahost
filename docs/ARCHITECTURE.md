@@ -76,7 +76,7 @@ La UI combina datos demo con primeras integraciones reales:
 - Guests lee huespedes, reservas y conversaciones desde Supabase; permite alta, ficha, edicion mediante Server Actions y API GET/POST/GET detail/PATCH.
 - Calendar reutiliza la matriz operativa real del dashboard, filtra propiedades archivadas y permite crear, editar y eliminar bloqueos manuales mediante Server Actions/API.
 - Automations gestiona reglas PMS con trigger, canal, plantilla, delay y estado mediante Server Actions y API REST preparada para mobile.
-- Workflows de check-in/check-out es una capa de producto sobre `automation_rules`: filtra los triggers de ciclo de vida del huesped, expone plantillas reutilizables y mantiene API REST preparada para mobile sin duplicar modelo de datos.
+- Workflows de check-in/check-out es una capa de producto sobre `automation_rules`: filtra los triggers de ciclo de vida del huesped, expone plantillas reutilizables y mantiene API REST preparada para mobile sin duplicar modelo de datos. Las plantillas usan el renderer compartido de `@wiahost/shared` para preview con datos demo y deteccion de variables pendientes.
 - Audit registra y muestra eventos operativos sobre propiedades, reservas, tareas e incidencias usando la tabla `operational_events` preparada para trazabilidad e IA futura.
 - Documents gestiona evidencias y referencias de storage vinculadas a propiedades, reservas e incidencias mediante Server Actions y API REST preparada para mobile.
 - Statements gestiona liquidaciones de propietario con ingresos, costes, fees, periodo, estado y API REST preparada para mobile.

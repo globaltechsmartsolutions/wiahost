@@ -1,4 +1,7 @@
-import { guestWorkflowTriggers } from "@wiahost/shared";
+import {
+  guestWorkflowTriggers,
+  supportedTemplateVariables,
+} from "@wiahost/shared";
 
 import {
   getAutomationRuleDetail,
@@ -54,15 +57,9 @@ export const workflowTriggerOptions = workflowStages.map((stage) => ({
   value: stage.trigger,
 }));
 
-export const workflowTemplateVariables = [
-  "{{guest_name}}",
-  "{{property_name}}",
-  "{{checkin_date}}",
-  "{{checkout_date}}",
-  "{{access_code}}",
-  "{{house_rules}}",
-  "{{support_phone}}",
-];
+export const workflowTemplateVariables = supportedTemplateVariables.map(
+  (variable) => `{{${variable}}}`,
+);
 
 export type GuestWorkflow = AutomationRuleDetail & {
   phase: string;
@@ -81,14 +78,6 @@ function stageForTrigger(trigger: string) {
   );
 }
 
-function variableHints(template: string) {
-  const variables = workflowTemplateVariables.filter((variable) =>
-    template.includes(variable),
-  );
-
-  return variables.length ? variables : ["Sin variables dinamicas"];
-}
-
 function enrichWorkflow(rule: AutomationRuleDetail): GuestWorkflow {
   const stage = stageForTrigger(rule.raw.trigger);
 
@@ -96,7 +85,9 @@ function enrichWorkflow(rule: AutomationRuleDetail): GuestWorkflow {
     ...rule,
     phase: stage.label,
     recommendation: stage.description,
-    variables: variableHints(rule.template),
+    variables: rule.variables.length
+      ? rule.variables
+      : ["Sin variables dinamicas"],
   };
 }
 

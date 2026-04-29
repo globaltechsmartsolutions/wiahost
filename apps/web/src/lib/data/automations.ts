@@ -1,3 +1,9 @@
+import {
+  extractTemplateVariables,
+  renderMessageTemplate,
+  templatePreviewContext,
+} from "@wiahost/shared";
+
 import { automationRules as demoAutomationRules } from "@/lib/demo-data";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
@@ -17,6 +23,7 @@ type AutomationRuleRow = {
 export type AutomationRuleDetail = AutomationRuleItem & {
   channel: string;
   id: string;
+  missingVariables: string[];
   raw: {
     channel: string;
     delayMinutes: number;
@@ -26,6 +33,8 @@ export type AutomationRuleDetail = AutomationRuleItem & {
     trigger: string;
   };
   template: string;
+  templatePreview: string;
+  variables: string[];
 };
 
 export const triggerOptions = [
@@ -50,26 +59,43 @@ export const channelOptions = [
   { label: "Vrbo", value: "vrbo" },
 ];
 
+function getTemplateMetadata(template: string) {
+  const preview = renderMessageTemplate(template, templatePreviewContext);
+
+  return {
+    missingVariables: preview.missingVariables,
+    templatePreview: preview.rendered,
+    variables: extractTemplateVariables(template).map(
+      (variable) => `{{${variable}}}`,
+    ),
+  };
+}
+
 const fallbackAutomationRules: AutomationRuleDetail[] = demoAutomationRules.map(
-  (rule, index) => ({
-    ...rule,
-    channel: index === 1 ? "Inbox" : "Email",
-    id: `demo-automation-${index + 1}`,
-    raw: {
-      channel: index === 1 ? "inbox" : "email",
-      delayMinutes: index === 2 ? 30 : 0,
-      enabled: rule.status === "Activa",
-      name: rule.name,
-      template: `Plantilla demo para ${rule.name}.`,
-      trigger:
-        index === 0
-          ? "checkin_24h"
-          : index === 1
-            ? "checkin_1h"
-            : "checkout_time",
-    },
-    template: `Plantilla demo para ${rule.name}.`,
-  }),
+  (rule, index) => {
+    const template = `Hola {{guest_name}}, plantilla demo para ${rule.name} en {{property_name}}.`;
+
+    return {
+      ...rule,
+      ...getTemplateMetadata(template),
+      channel: index === 1 ? "Inbox" : "Email",
+      id: `demo-automation-${index + 1}`,
+      raw: {
+        channel: index === 1 ? "inbox" : "email",
+        delayMinutes: index === 2 ? 30 : 0,
+        enabled: rule.status === "Activa",
+        name: rule.name,
+        template,
+        trigger:
+          index === 0
+            ? "checkin_24h"
+            : index === 1
+              ? "checkin_1h"
+              : "checkout_time",
+      },
+      template,
+    };
+  },
 );
 
 function labelFromOptions(
@@ -93,7 +119,10 @@ function delayLabel(delayMinutes: number) {
 }
 
 function mapAutomationRule(row: AutomationRuleRow): AutomationRuleDetail {
+  const templateMetadata = getTemplateMetadata(row.template);
+
   return {
+    ...templateMetadata,
     channel: labelFromOptions(channelOptions, row.channel),
     id: row.id,
     impact: delayLabel(row.delay_minutes),

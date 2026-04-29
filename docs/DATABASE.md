@@ -54,7 +54,7 @@ La estrategia IA canonica esta en `AI.md`.
 
 Los workflows de check-in/check-out del MVP viven sobre `automation_rules` para evitar duplicar modelos. La pantalla `/workflows` filtra los triggers `reservation_confirmed`, `checkin_24h`, `checkin_1h` y `checkout_time`, y usa `template`, `channel`, `delay_minutes` y `enabled` como fuente de verdad.
 
-Las variables visibles en UI (`{{guest_name}}`, `{{property_name}}`, `{{checkin_date}}`, `{{checkout_date}}`, `{{access_code}}`, `{{house_rules}}`, `{{support_phone}}`) son placeholders de plantilla. La resolucion real por reserva se implementara cuando conectemos el motor de envio.
+Las variables visibles en UI (`{{guest_name}}`, `{{property_name}}`, `{{checkin_date}}`, `{{checkout_date}}`, `{{access_code}}`, `{{house_rules}}`, `{{support_phone}}`) son placeholders de plantilla. La resolucion base ya vive en `@wiahost/shared` para preview y validacion visual; el envio real reutilizara ese motor cuando conectemos proveedores de email/WhatsApp/canales.
 
 ## Distribucion y canales
 

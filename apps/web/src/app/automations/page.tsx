@@ -116,6 +116,11 @@ export default async function AutomationsPage({
                   </div>
                 </CardHeader>
                 <CardContent className="grid gap-4">
+                  <TemplatePreview
+                    missingVariables={rule.missingVariables}
+                    preview={rule.templatePreview}
+                    variables={rule.variables}
+                  />
                   <form
                     action={updateAutomationRuleAction}
                     className="grid gap-4"
@@ -152,6 +157,42 @@ export default async function AutomationsPage({
         </section>
       </section>
     </AppShell>
+  );
+}
+
+function TemplatePreview({
+  missingVariables,
+  preview,
+  variables,
+}: {
+  missingVariables: string[];
+  preview: string;
+  variables: string[];
+}) {
+  return (
+    <div className="rounded-2xl border border-[#dfd2bf] bg-white/55 p-4">
+      <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+        Preview con datos demo
+      </p>
+      <p className="mt-3 text-sm leading-6 text-foreground">{preview}</p>
+      <div className="mt-4 flex flex-wrap gap-2">
+        {(variables.length ? variables : ["Sin variables dinamicas"]).map(
+          (variable) => (
+            <span
+              key={variable}
+              className="rounded-full border border-[#dfd2bf] bg-white/70 px-2.5 py-1 font-mono text-xs"
+            >
+              {variable}
+            </span>
+          ),
+        )}
+      </div>
+      {missingVariables.length ? (
+        <p className="mt-3 text-xs text-amber-700">
+          Variables pendientes: {missingVariables.join(", ")}
+        </p>
+      ) : null}
+    </div>
   );
 }
 

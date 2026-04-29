@@ -206,6 +206,19 @@ function WorkflowCard({ workflow }: { workflow: GuestWorkflow }) {
           <p className="text-sm leading-6 text-muted-foreground">
             {workflow.recommendation}
           </p>
+          <div className="mt-4 rounded-2xl bg-white/70 p-4">
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+              Preview con datos demo
+            </p>
+            <p className="mt-3 text-sm leading-6 text-foreground">
+              {workflow.templatePreview}
+            </p>
+            {workflow.missingVariables.length ? (
+              <p className="mt-3 text-xs text-amber-700">
+                Variables pendientes: {workflow.missingVariables.join(", ")}
+              </p>
+            ) : null}
+          </div>
           <div className="mt-4 flex flex-wrap gap-2">
             {workflow.variables.map((variable) => (
               <Badge
