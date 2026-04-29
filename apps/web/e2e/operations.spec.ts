@@ -919,6 +919,20 @@ test.describe("operations flows with Supabase @critical @data", () => {
       page.locator("span").filter({ hasText: "Reservado" }).first(),
     ).toBeVisible();
 
+    const pricingSyncResponse = await page.request.post(
+      `/api/pricing/observations/${pricingBody.data.id}/sync`,
+    );
+    expect(pricingSyncResponse.status()).toBe(201);
+
+    const pricingSyncBody = (await pricingSyncResponse.json()) as {
+      data: { id: string; status: string };
+    };
+    expect(pricingSyncBody.data.id).toBeTruthy();
+    expect(pricingSyncBody.data.status).toBe("pending");
+
+    await page.goto("/distribution");
+    await expect(page.getByText("price_update").first()).toBeVisible();
+
     const pricingDeleteResponse = await page.request.delete(
       `/api/pricing/observations/${pricingBody.data.id}`,
     );

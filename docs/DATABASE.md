@@ -114,6 +114,8 @@ El modulo `/pricing` activa la tabla `pricing_observations`. Cada registro guard
 
 Esta capa no cambia automaticamente tarifas publicadas. Es un control humano y auditable para comparar recomendaciones contra resultado real antes de integrar PriceLabs, motores de pricing o automatizaciones.
 
+Cuando operaciones pulsa "Registrar sync precio", se crea un `channel_sync_events` outbound con `payload.action = price_update`, importe, moneda, fecha y referencia a la observacion. Si `source` coincide con un canal soportado se usa ese canal; si no, queda como `manual`.
+
 ## Auditoria operativa
 
 La tabla `operational_events` ya tiene modulo web en `/audit` y API REST en `/api/audit-events`. Permite registrar eventos manuales o de sistema con `event_name`, `entity_type`, entidad vinculada, fuente, actor y `metadata`.

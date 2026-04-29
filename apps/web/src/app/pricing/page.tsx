@@ -1,6 +1,7 @@
 import {
   createPricingObservationAction,
   deletePricingObservationAction,
+  syncPricingObservationAction,
   updatePricingObservationAction,
 } from "@/lib/actions/pricing";
 import { getOperationFormOptions } from "@/lib/data/operations";
@@ -30,6 +31,7 @@ type PricingPageProps = {
     created?: string;
     deleted?: string;
     error?: string;
+    synced?: string;
     updated?: string;
   }>;
 };
@@ -80,6 +82,12 @@ export default async function PricingPage({ searchParams }: PricingPageProps) {
       {params?.deleted ? (
         <div className="rounded-3xl border border-emerald-200 bg-emerald-50 px-5 py-4 text-sm text-emerald-800">
           Observacion de precio eliminada correctamente.
+        </div>
+      ) : null}
+      {params?.synced ? (
+        <div className="rounded-3xl border border-emerald-200 bg-emerald-50 px-5 py-4 text-sm text-emerald-800">
+          Sincronizacion de precio registrada. Lista para conectar con APIs de
+          canal.
         </div>
       ) : null}
 
@@ -190,16 +198,24 @@ function PricingCard({
           </div>
         </form>
 
-        <form action={deletePricingObservationAction}>
-          <input type="hidden" name="observationId" value={observation.id} />
-          <Button
-            type="submit"
-            variant="outline"
-            className="rounded-full border-red-200 text-red-700 hover:bg-red-50 hover:text-red-800"
-          >
-            Eliminar observacion
-          </Button>
-        </form>
+        <div className="flex flex-wrap gap-2">
+          <form action={syncPricingObservationAction}>
+            <input type="hidden" name="observationId" value={observation.id} />
+            <Button type="submit" variant="outline" className="rounded-full">
+              Registrar sync precio
+            </Button>
+          </form>
+          <form action={deletePricingObservationAction}>
+            <input type="hidden" name="observationId" value={observation.id} />
+            <Button
+              type="submit"
+              variant="outline"
+              className="rounded-full border-red-200 text-red-700 hover:bg-red-50 hover:text-red-800"
+            >
+              Eliminar observacion
+            </Button>
+          </form>
+        </div>
       </CardContent>
     </Card>
   );

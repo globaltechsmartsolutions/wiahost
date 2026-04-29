@@ -1,4 +1,4 @@
-import type { PricingObservationInput } from "@wiahost/shared";
+import { bookingChannels, type PricingObservationInput } from "@wiahost/shared";
 import type { createSupabaseServerClient } from "@/lib/supabase/server";
 
 type SupabaseServerClient = Awaited<
@@ -43,6 +43,16 @@ function toPricingPayload(input: PricingObservationInput) {
   };
 }
 
+function channelFromSource(source: string) {
+  const normalized = source.trim().toLowerCase();
+
+  return bookingChannels.includes(
+    normalized as (typeof bookingChannels)[number],
+  )
+    ? normalized
+    : "manual";
+}
+
 export async function createPricingObservation(
   supabase: SupabaseServerClient,
   input: PricingObservationInput,
@@ -61,6 +71,89 @@ export async function createPricingObservation(
   }
 
   return data;
+}
+
+export async function syncPricingObservation(
+  supabase: SupabaseServerClient,
+  observationId: string,
+) {
+  const { data: observation, error: observationError } = await supabase
+    .from("pricing_observations")
+    .select(
+      "id,property_id,reservation_id,observed_for,source,current_price,suggested_price,approved_price,final_price,currency,metadata",
+    )
+    .eq("id", observationId)
+    .single();
+
+  if (observationError || !observation) {
+    mutationError(
+      "pricing_observation_not_found",
+      "No se ha encontrado la observacion de precio.",
+    );
+  }
+
+  const selectedPrice =
+    observation.approved_price ??
+    observation.final_price ??
+    observation.suggested_price ??
+    observation.current_price;
+
+  if (selectedPrice === null || selectedPrice === undefined) {
+    mutationError(
+      "pricing_sync_price_missing",
+      "Define un precio aprobado, final, sugerido o actual antes de sincronizar.",
+    );
+  }
+
+  const channel = channelFromSource(observation.source);
+  const amount = Number(selectedPrice);
+  const metadata =
+    observation.metadata &&
+    typeof observation.metadata === "object" &&
+    !Array.isArray(observation.metadata)
+      ? observation.metadata
+      : {};
+
+  const { data: syncEvent, error: syncError } = await supabase
+    .from("channel_sync_events")
+    .insert({
+      channel,
+      direction: "outbound",
+      payload: {
+        action: "price_update",
+        amount,
+        currency: observation.currency,
+        observationId,
+        observedFor: observation.observed_for,
+        reservationId: observation.reservation_id,
+        source: observation.source,
+      },
+      property_id: observation.property_id,
+      status: "pending",
+    })
+    .select("id,status,channel")
+    .single();
+
+  if (syncError || !syncEvent) {
+    mutationError(
+      "pricing_sync_event_failed",
+      "No se ha podido registrar la sincronizacion de precio.",
+    );
+  }
+
+  await supabase
+    .from("pricing_observations")
+    .update({
+      metadata: {
+        ...metadata,
+        lastSyncEventId: syncEvent.id,
+        lastSyncRequestedAt: new Date().toISOString(),
+        lastSyncStatus: syncEvent.status,
+      },
+    })
+    .eq("id", observationId);
+
+  return syncEvent;
 }
 
 export async function updatePricingObservation(

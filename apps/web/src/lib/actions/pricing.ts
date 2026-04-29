@@ -9,6 +9,7 @@ import {
   createPricingObservation,
   deletePricingObservation,
   PricingMutationError,
+  syncPricingObservation,
   updatePricingObservation,
 } from "@/lib/services/pricing";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
@@ -145,4 +146,30 @@ export async function deletePricingObservationAction(formData: FormData) {
   revalidatePath("/pricing");
   revalidatePath("/dashboard");
   redirect("/pricing?deleted=1");
+}
+
+export async function syncPricingObservationAction(formData: FormData) {
+  const observationId = String(formData.get("observationId") ?? "");
+  const validObservationId = idSchema.safeParse(observationId);
+
+  if (!validObservationId.success) {
+    redirectWithError("El identificador de precio no es valido.");
+  }
+
+  const supabase = await requirePricingClient();
+
+  try {
+    await syncPricingObservation(supabase, validObservationId.data);
+  } catch (error) {
+    if (error instanceof PricingMutationError) {
+      redirectWithError(error.message);
+    }
+
+    redirectWithError("No se ha podido registrar la sincronizacion de precio.");
+  }
+
+  revalidatePath("/pricing");
+  revalidatePath("/distribution");
+  revalidatePath("/dashboard");
+  redirect("/pricing?synced=1");
 }
