@@ -114,6 +114,14 @@ values
   ('20000000-0000-0000-0000-000000000002', 'direct', 'direct-demo-2', 'loft-malaga-centro', 'Loft Malaga Centro', 'published', 'http://localhost:3000/book/loft-malaga-centro', false)
 on conflict do nothing;
 
+insert into public.channel_accounts (channel, account_label, external_account_id, auth_mode, status, health_status, scopes, notes, connected_at, last_checked_at)
+values
+  ('airbnb', 'Airbnb WIA Demo', 'airbnb-host-demo', 'partner_api', 'connected', 'synced', '["availability","reservations","messages"]', 'Cuenta demo preparada para mapear anuncios, reservas y mensajes inbound.', now() - interval '12 days', now() - interval '30 minutes'),
+  ('booking', 'Booking Madrid Portfolio', 'booking-hotel-demo', 'partner_api', 'needs_attention', 'failed', '["availability","rates","reservations"]', 'Pendiente validar permisos de mensajeria antes de activar sync automatico.', now() - interval '10 days', now() - interval '2 hours'),
+  ('vrbo', 'Vrbo Villas Demo', null, 'ical_only', 'pending_credentials', 'pending', '["calendar"]', 'Preparado para iCal mientras se solicita acceso API oficial.', null, null),
+  ('direct', 'Web directa WIAHost', 'wiahost-direct', 'manual', 'connected', 'synced', '["booking_engine","payments","inbox"]', 'Canal propio sin dependencia externa.', now() - interval '20 days', now() - interval '15 minutes')
+on conflict do nothing;
+
 insert into public.guests (id, full_name, email, phone, preferred_language, tags)
 values
   ('30000000-0000-0000-0000-000000000001', 'Sofia Martin', 'sofia@example.com', '+34600000001', 'es', '["repeat_guest"]'),

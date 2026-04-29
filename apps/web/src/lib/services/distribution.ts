@@ -1,4 +1,5 @@
 import type {
+  ChannelAccountInput,
   ChannelSyncEventInput,
   IcalImportInput,
   ListingInput,
@@ -48,6 +49,19 @@ function toSyncEventPayload(input: ChannelSyncEventInput) {
     listing_id: optionalValue(input.listingId),
     payload: input.payload,
     property_id: optionalValue(input.propertyId),
+    status: input.status,
+  };
+}
+
+function toChannelAccountPayload(input: ChannelAccountInput) {
+  return {
+    account_label: input.accountLabel.trim(),
+    auth_mode: input.authMode,
+    channel: input.channel,
+    external_account_id: optionalValue(input.externalAccountId),
+    health_status: input.healthStatus,
+    notes: optionalValue(input.notes),
+    scopes: input.scopes,
     status: input.status,
   };
 }
@@ -215,6 +229,69 @@ export async function createSyncEvent(
     mutationError(
       "sync_event_create_failed",
       "No se ha podido registrar el evento de sincronizacion.",
+    );
+  }
+
+  return data;
+}
+
+export async function createChannelAccount(
+  supabase: SupabaseServerClient,
+  input: ChannelAccountInput,
+) {
+  const { data, error } = await supabase
+    .from("channel_accounts")
+    .insert(toChannelAccountPayload(input))
+    .select("id,account_label,status")
+    .single();
+
+  if (error || !data) {
+    mutationError(
+      "channel_account_create_failed",
+      "No se ha podido crear el conector de canal.",
+    );
+  }
+
+  return data;
+}
+
+export async function updateChannelAccount(
+  supabase: SupabaseServerClient,
+  accountId: string,
+  input: ChannelAccountInput,
+) {
+  const { data, error } = await supabase
+    .from("channel_accounts")
+    .update(toChannelAccountPayload(input))
+    .eq("id", accountId)
+    .select("id,account_label,status")
+    .single();
+
+  if (error || !data) {
+    mutationError(
+      "channel_account_update_failed",
+      "No se ha podido actualizar el conector de canal.",
+    );
+  }
+
+  return data;
+}
+
+export async function deleteChannelAccount(
+  supabase: SupabaseServerClient,
+  accountId: string,
+) {
+  const { data, error } = await supabase
+    .from("channel_accounts")
+    .delete()
+    .eq("id", accountId)
+    .select("id")
+    .single();
+
+  if (error || !data) {
+    mutationError(
+      "channel_account_delete_failed",
+      "No se ha podido eliminar el conector de canal.",
     );
   }
 

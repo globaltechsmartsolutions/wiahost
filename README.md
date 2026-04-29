@@ -11,6 +11,7 @@ El objetivo es centralizar propiedades, reservas, calendario multi-canal, mensaj
 - UI profesional tipo hospitality command center.
 - Dashboard navegable con datos Supabase y fallback demo.
 - Rutas web actuales: landing, dashboard, properties, reservations, calendar, guests, inbox, leads, notifications, tasks, incidents, owners, statements, payments, pricing, distribution, documents, audit, workflows, automations, settings, login y register.
+- Distribucion ya prepara publicaciones, iCal, mensajes inbound, precios y cuentas externas por canal sin guardar secretos.
 - Supabase preparado con migraciones SQL, RLS, storage, seed demo y base de datos preparada para IA futura.
 - Supabase Auth implementado y verificado con usuarios demo locales.
 - Propiedades tienen lectura, detalle, creacion, edicion, API y archivo controlado contra Supabase local.

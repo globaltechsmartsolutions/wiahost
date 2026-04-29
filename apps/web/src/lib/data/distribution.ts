@@ -40,6 +40,20 @@ type SyncEventRow = {
   status: string;
 };
 
+type ChannelAccountRow = {
+  account_label: string;
+  auth_mode: string;
+  channel: string;
+  connected_at: string | null;
+  external_account_id: string | null;
+  health_status: string;
+  id: string;
+  last_checked_at: string | null;
+  notes: string | null;
+  scopes: unknown;
+  status: string;
+};
+
 type PropertyOptionRow = {
   city: string | null;
   id: string;
@@ -92,6 +106,30 @@ export type SyncEventListItem = {
   status: string;
 };
 
+export type ChannelAccountListItem = {
+  accountLabel: string;
+  authMode: string;
+  channel: string;
+  connectedAt: string;
+  externalAccountId: string;
+  healthStatus: string;
+  id: string;
+  lastCheckedAt: string;
+  notes: string;
+  raw: {
+    accountLabel: string;
+    authMode: string;
+    channel: string;
+    externalAccountId?: string;
+    healthStatus: string;
+    notes?: string;
+    scopes: string[];
+    status: string;
+  };
+  scopes: string;
+  status: string;
+};
+
 export type DistributionFormOptions = {
   listings: Array<{ helper?: string; id: string; label: string }>;
   properties: Array<{ helper?: string; id: string; label: string }>;
@@ -124,6 +162,22 @@ export const syncStatusOptions = [
 export const syncDirectionOptions = [
   { label: "Saliente", value: "outbound" },
   { label: "Entrante", value: "inbound" },
+];
+
+export const channelAccountStatusOptions = [
+  { label: "Planificado", value: "planned" },
+  { label: "Pendiente credenciales", value: "pending_credentials" },
+  { label: "Conectado", value: "connected" },
+  { label: "Requiere atencion", value: "needs_attention" },
+  { label: "Desactivado", value: "disabled" },
+];
+
+export const channelAuthModeOptions = [
+  { label: "Manual", value: "manual" },
+  { label: "OAuth", value: "oauth" },
+  { label: "API key", value: "api_key" },
+  { label: "Partner API", value: "partner_api" },
+  { label: "Solo iCal", value: "ical_only" },
 ];
 
 const fallbackListings: ListingListItem[] = demoChannelHealth.map(
@@ -184,6 +238,59 @@ const fallbackSyncEvents: SyncEventListItem[] = [
   },
 ];
 
+const fallbackChannelAccounts: ChannelAccountListItem[] = [
+  {
+    accountLabel: "Airbnb WIA Demo",
+    authMode: "Partner API",
+    channel: "Airbnb",
+    connectedAt: "Demo",
+    externalAccountId: "airbnb-host-demo",
+    healthStatus: "Sincronizado",
+    id: "demo-channel-account-1",
+    lastCheckedAt: "Demo",
+    notes:
+      "Cuenta demo preparada para mapear anuncios, reservas y mensajes inbound.",
+    raw: {
+      accountLabel: "Airbnb WIA Demo",
+      authMode: "partner_api",
+      channel: "airbnb",
+      externalAccountId: "airbnb-host-demo",
+      healthStatus: "synced",
+      notes:
+        "Cuenta demo preparada para mapear anuncios, reservas y mensajes inbound.",
+      scopes: ["availability", "reservations", "messages"],
+      status: "connected",
+    },
+    scopes: "availability, reservations, messages",
+    status: "Conectado",
+  },
+  {
+    accountLabel: "Booking Madrid Portfolio",
+    authMode: "Partner API",
+    channel: "Booking.com",
+    connectedAt: "Demo",
+    externalAccountId: "booking-hotel-demo",
+    healthStatus: "Fallido",
+    id: "demo-channel-account-2",
+    lastCheckedAt: "Demo",
+    notes:
+      "Pendiente validar permisos de mensajeria antes de activar sync automatico.",
+    raw: {
+      accountLabel: "Booking Madrid Portfolio",
+      authMode: "partner_api",
+      channel: "booking",
+      externalAccountId: "booking-hotel-demo",
+      healthStatus: "failed",
+      notes:
+        "Pendiente validar permisos de mensajeria antes de activar sync automatico.",
+      scopes: ["availability", "rates", "reservations"],
+      status: "needs_attention",
+    },
+    scopes: "availability, rates, reservations",
+    status: "Requiere atencion",
+  },
+];
+
 function one<T>(relation: Relation<T>): T | null {
   if (Array.isArray(relation)) {
     return relation[0] ?? null;
@@ -223,6 +330,12 @@ function payloadSummary(payload: unknown) {
   return typeof action === "string"
     ? action
     : `${Object.keys(record).length} campos`;
+}
+
+function scopesFromUnknown(value: unknown) {
+  return Array.isArray(value)
+    ? value.filter((scope): scope is string => typeof scope === "string")
+    : [];
 }
 
 function mapListing(row: ListingRow): ListingListItem {
@@ -284,14 +397,98 @@ function mapSyncEvent(row: SyncEventRow): SyncEventListItem {
   };
 }
 
+function mapChannelAccount(row: ChannelAccountRow): ChannelAccountListItem {
+  const scopes = scopesFromUnknown(row.scopes);
+
+  return {
+    accountLabel: row.account_label,
+    authMode: labelFromOptions(channelAuthModeOptions, row.auth_mode),
+    channel: labelFromOptions(channelOptions, row.channel),
+    connectedAt: shortDate(row.connected_at),
+    externalAccountId: row.external_account_id ?? "Sin ID externo",
+    healthStatus: labelFromOptions(syncStatusOptions, row.health_status),
+    id: row.id,
+    lastCheckedAt: shortDate(row.last_checked_at),
+    notes: row.notes ?? "Sin notas de integracion",
+    raw: {
+      accountLabel: row.account_label,
+      authMode: row.auth_mode,
+      channel: row.channel,
+      externalAccountId: row.external_account_id ?? undefined,
+      healthStatus: row.health_status,
+      notes: row.notes ?? undefined,
+      scopes,
+      status: row.status,
+    },
+    scopes: scopes.length ? scopes.join(", ") : "Sin scopes",
+    status: labelFromOptions(channelAccountStatusOptions, row.status),
+  };
+}
+
 export async function getDistributionData() {
-  const [listings, syncEvents, options] = await Promise.all([
+  const [channelAccounts, listings, syncEvents, options] = await Promise.all([
+    getChannelAccounts(),
     getListings(),
     getSyncEvents(),
     getDistributionFormOptions(),
   ]);
 
-  return { listings, options, syncEvents };
+  return { channelAccounts, listings, options, syncEvents };
+}
+
+export async function getChannelAccounts(): Promise<ChannelAccountListItem[]> {
+  if (!isSupabaseConfigured()) {
+    return fallbackChannelAccounts;
+  }
+
+  try {
+    const supabase = await createSupabaseServerClient();
+    const { data, error } = await supabase
+      .from("channel_accounts")
+      .select(
+        "id,channel,account_label,external_account_id,auth_mode,status,health_status,scopes,notes,connected_at,last_checked_at",
+      )
+      .order("updated_at", { ascending: false })
+      .limit(50);
+
+    if (error || !data) {
+      return fallbackChannelAccounts;
+    }
+
+    return (data as ChannelAccountRow[]).map(mapChannelAccount);
+  } catch {
+    return fallbackChannelAccounts;
+  }
+}
+
+export async function getChannelAccountDetail(
+  accountId: string,
+): Promise<ChannelAccountListItem | null> {
+  if (!isSupabaseConfigured()) {
+    return (
+      fallbackChannelAccounts.find((account) => account.id === accountId) ??
+      null
+    );
+  }
+
+  try {
+    const supabase = await createSupabaseServerClient();
+    const { data, error } = await supabase
+      .from("channel_accounts")
+      .select(
+        "id,channel,account_label,external_account_id,auth_mode,status,health_status,scopes,notes,connected_at,last_checked_at",
+      )
+      .eq("id", accountId)
+      .single();
+
+    if (error || !data) {
+      return null;
+    }
+
+    return mapChannelAccount(data as ChannelAccountRow);
+  } catch {
+    return null;
+  }
 }
 
 export async function getListings(): Promise<ListingListItem[]> {

@@ -4,6 +4,7 @@ import {
   aiAuditLogSchema,
   automationRuleSchema,
   calendarBlockSchema,
+  channelAccountSchema,
   channelSyncEventSchema,
   checkoutConfirmationSchema,
   directBookingInquirySchema,
@@ -265,6 +266,28 @@ describe("distribution validators", () => {
     });
 
     expect(parsed.success).toBe(false);
+  });
+
+  it("accepts channel account readiness inputs and parses scopes", () => {
+    const parsed = channelAccountSchema.safeParse({
+      accountLabel: "Airbnb WIA Demo",
+      authMode: "partner_api",
+      channel: "airbnb",
+      externalAccountId: "airbnb-host-demo",
+      healthStatus: "synced",
+      notes: "Cuenta preparada para disponibilidad, reservas y mensajes.",
+      scopes: "availability,reservations,messages",
+      status: "connected",
+    });
+
+    expect(parsed.success).toBe(true);
+    if (parsed.success) {
+      expect(parsed.data.scopes).toEqual([
+        "availability",
+        "reservations",
+        "messages",
+      ]);
+    }
   });
 });
 

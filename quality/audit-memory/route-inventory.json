@@ -69,7 +69,7 @@
     {
       "path": "/distribution",
       "auth": "protected",
-      "primaryCheck": "Distribution listings can be created, edited, synced and deleted through API/UI context",
+      "primaryCheck": "Distribution listings and channel accounts can be created, edited, synced and deleted through API/UI context",
       "tests": ["critical", "data", "a11y", "visual"]
     },
     {

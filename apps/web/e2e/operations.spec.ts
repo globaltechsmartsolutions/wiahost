@@ -671,6 +671,78 @@ test.describe("operations flows with Supabase @critical @data", () => {
     await expect(page.getByText(updatedListingTitle)).not.toBeVisible();
   });
 
+  test("creates, updates and deletes channel accounts through API routes", async ({
+    page,
+  }) => {
+    const existingAccountsResponse = await page.request.get(
+      "/api/distribution/accounts",
+    );
+    if (existingAccountsResponse.ok()) {
+      const existingAccounts = (await existingAccountsResponse.json()) as {
+        data: Array<{ accountLabel: string; id: string }>;
+      };
+
+      for (const account of existingAccounts.data.filter((item) =>
+        item.accountLabel.startsWith("E2E Channel"),
+      )) {
+        await page.request.delete(`/api/distribution/accounts/${account.id}`);
+      }
+    }
+
+    const accountLabel = uniqueName("E2E Channel");
+    const accountResponse = await page.request.post(
+      "/api/distribution/accounts",
+      {
+        data: {
+          accountLabel,
+          authMode: "partner_api",
+          channel: "airbnb",
+          externalAccountId: `e2e-account-${Date.now()}`,
+          healthStatus: "pending",
+          notes: "Cuenta creada por Playwright sin guardar secretos.",
+          scopes: "availability,reservations,messages",
+          status: "pending_credentials",
+        },
+      },
+    );
+    expect(accountResponse.status()).toBe(201);
+
+    const accountBody = (await accountResponse.json()) as {
+      data: { id: string };
+    };
+    const updatedAccountLabel = `${accountLabel} editada`;
+    const accountPatchResponse = await page.request.patch(
+      `/api/distribution/accounts/${accountBody.data.id}`,
+      {
+        data: {
+          accountLabel: updatedAccountLabel,
+          authMode: "oauth",
+          channel: "booking",
+          externalAccountId: `booking-${accountBody.data.id.slice(0, 8)}`,
+          healthStatus: "synced",
+          notes: "OAuth validado en entorno de test.",
+          scopes: ["availability", "rates"],
+          status: "connected",
+        },
+      },
+    );
+    expect(accountPatchResponse.status()).toBe(200);
+
+    await page.goto("/distribution");
+    await expect(page.getByText(updatedAccountLabel)).toBeVisible();
+    await expect(
+      page.locator("span").filter({ hasText: "Conectado" }).first(),
+    ).toBeVisible();
+
+    const accountDeleteResponse = await page.request.delete(
+      `/api/distribution/accounts/${accountBody.data.id}`,
+    );
+    expect(accountDeleteResponse.status()).toBe(200);
+
+    await page.goto("/distribution");
+    await expect(page.getByText(updatedAccountLabel)).not.toBeVisible();
+  });
+
   test("imports iCal availability blocks through API routes", async ({
     page,
   }) => {

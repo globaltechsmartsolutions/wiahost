@@ -1,16 +1,22 @@
 import {
+  createChannelAccountAction,
   createListingAction,
   createSyncEventAction,
+  deleteChannelAccountAction,
   deleteListingAction,
   importIcalAction,
+  updateChannelAccountAction,
   updateListingAction,
 } from "@/lib/actions/distribution";
 import {
+  channelAccountStatusOptions,
+  channelAuthModeOptions,
   channelOptions,
   getDistributionData,
   listingStatusOptions,
   syncDirectionOptions,
   syncStatusOptions,
+  type ChannelAccountListItem,
   type DistributionFormOptions,
   type ListingListItem,
 } from "@/lib/data/distribution";
@@ -40,25 +46,26 @@ type DistributionPageProps = {
     imported?: string;
     synced?: string;
     updated?: string;
+    accountCreated?: string;
+    accountDeleted?: string;
+    accountUpdated?: string;
   }>;
 };
 
 export default async function DistributionPage({
   searchParams,
 }: DistributionPageProps) {
-  const [{ listings, options, syncEvents }, params] = await Promise.all([
-    getDistributionData(),
-    searchParams,
-  ]);
+  const [{ channelAccounts, listings, options, syncEvents }, params] =
+    await Promise.all([getDistributionData(), searchParams]);
 
   const publishedListings = listings.filter(
     (listing) => listing.raw.status === "published",
   ).length;
-  const syncedListings = listings.filter(
-    (listing) => listing.syncEnabled,
-  ).length;
   const listingsWithErrors = listings.filter(
     (listing) => listing.raw.status === "sync_error",
+  ).length;
+  const connectedAccounts = channelAccounts.filter(
+    (account) => account.raw.status === "connected",
   ).length;
 
   return (
@@ -99,11 +106,26 @@ export default async function DistributionPage({
           Calendario iCal importado correctamente.
         </div>
       ) : null}
+      {params?.accountCreated ? (
+        <div className="rounded-3xl border border-emerald-200 bg-emerald-50 px-5 py-4 text-sm text-emerald-800">
+          Conector de canal creado correctamente.
+        </div>
+      ) : null}
+      {params?.accountUpdated ? (
+        <div className="rounded-3xl border border-emerald-200 bg-emerald-50 px-5 py-4 text-sm text-emerald-800">
+          Conector de canal actualizado correctamente.
+        </div>
+      ) : null}
+      {params?.accountDeleted ? (
+        <div className="rounded-3xl border border-emerald-200 bg-emerald-50 px-5 py-4 text-sm text-emerald-800">
+          Conector de canal eliminado correctamente.
+        </div>
+      ) : null}
 
       <section className="grid gap-4 md:grid-cols-4">
         <MetricCard label="Publicaciones" value={String(listings.length)} />
         <MetricCard label="Publicadas" value={String(publishedListings)} />
-        <MetricCard label="Sync activo" value={String(syncedListings)} />
+        <MetricCard label="Conectores" value={String(connectedAccounts)} />
         <MetricCard label="Errores" value={String(listingsWithErrors)} />
       </section>
 
@@ -122,6 +144,24 @@ export default async function DistributionPage({
                 <ListingFields options={options} />
                 <Button type="submit" className="rounded-full">
                   Crear publicacion
+                </Button>
+              </form>
+            </CardContent>
+          </Card>
+
+          <Card className="rounded-[2rem] border-border/80 bg-card/80">
+            <CardHeader>
+              <CardTitle>Nuevo conector</CardTitle>
+              <CardDescription>
+                Registra la cuenta externa sin guardar secretos. Las claves y
+                OAuth se configuraran en entorno seguro cuando se active la API.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <form action={createChannelAccountAction} className="grid gap-4">
+                <ChannelAccountFields />
+                <Button type="submit" className="rounded-full">
+                  Crear conector
                 </Button>
               </form>
             </CardContent>
@@ -165,6 +205,28 @@ export default async function DistributionPage({
         </div>
 
         <section className="grid gap-4">
+          <Card className="rounded-[2rem] border-border/80 bg-card/80">
+            <CardHeader>
+              <CardTitle>Conectores de canal</CardTitle>
+              <CardDescription>
+                Estado operativo de las cuentas externas antes de publicar,
+                importar reservas o recibir mensajes por API.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="grid gap-4">
+              {channelAccounts.length ? (
+                channelAccounts.map((account) => (
+                  <ChannelAccountCard key={account.id} account={account} />
+                ))
+              ) : (
+                <EmptyState
+                  title="Sin conectores"
+                  description="Registra la primera cuenta de canal para preparar permisos, scopes y salud de integracion."
+                />
+              )}
+            </CardContent>
+          </Card>
+
           {listings.length ? (
             listings.map((listing) => (
               <ListingCard
@@ -228,6 +290,51 @@ export default async function DistributionPage({
   );
 }
 
+function ChannelAccountCard({ account }: { account: ChannelAccountListItem }) {
+  return (
+    <div className="grid gap-4 rounded-3xl border border-[#dfd2bf] bg-white/55 p-4">
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <p className="font-semibold">{account.accountLabel}</p>
+          <p className="mt-1 text-sm text-muted-foreground">
+            {account.channel} - {account.authMode} - Salud:{" "}
+            {account.healthStatus}
+          </p>
+        </div>
+        <StatusBadge value={account.status} />
+      </div>
+
+      <div className="grid gap-3 rounded-2xl border border-[#dfd2bf] bg-background/70 p-4 md:grid-cols-3">
+        <MiniFact label="ID externo" value={account.externalAccountId} />
+        <MiniFact label="Scopes" value={account.scopes} />
+        <MiniFact label="Ultima revision" value={account.lastCheckedAt} />
+      </div>
+      <p className="text-sm text-muted-foreground">{account.notes}</p>
+
+      <form action={updateChannelAccountAction} className="grid gap-4">
+        <input type="hidden" name="accountId" value={account.id} />
+        <ChannelAccountFields account={account.raw} fieldPrefix={account.id} />
+        <div className="flex justify-end">
+          <Button type="submit" className="rounded-full">
+            Guardar conector
+          </Button>
+        </div>
+      </form>
+
+      <form action={deleteChannelAccountAction}>
+        <input type="hidden" name="accountId" value={account.id} />
+        <Button
+          type="submit"
+          variant="outline"
+          className="rounded-full border-red-200 text-red-700 hover:bg-red-50 hover:text-red-800"
+        >
+          Eliminar conector
+        </Button>
+      </form>
+    </div>
+  );
+}
+
 function ListingCard({
   listing,
   options,
@@ -284,6 +391,91 @@ function ListingCard({
         </form>
       </CardContent>
     </Card>
+  );
+}
+
+function ChannelAccountFields({
+  account,
+  fieldPrefix,
+}: {
+  account?: ChannelAccountListItem["raw"];
+  fieldPrefix?: string;
+}) {
+  const prefix = fieldPrefix ? `${fieldPrefix}-` : "";
+
+  return (
+    <div className="grid gap-4 md:grid-cols-2">
+      <Field label="Canal" id={`${prefix}accountChannel`}>
+        <OptionSelect
+          id={`${prefix}accountChannel`}
+          name="channel"
+          options={channelOptions}
+          value={account?.channel ?? "airbnb"}
+        />
+      </Field>
+      <Field label="Modo auth" id={`${prefix}authMode`}>
+        <OptionSelect
+          id={`${prefix}authMode`}
+          name="authMode"
+          options={channelAuthModeOptions}
+          value={account?.authMode ?? "manual"}
+        />
+      </Field>
+      <Field label="Cuenta" id={`${prefix}accountLabel`}>
+        <Input
+          id={`${prefix}accountLabel`}
+          name="accountLabel"
+          required
+          defaultValue={account?.accountLabel ?? ""}
+          placeholder="Airbnb WIA Demo"
+        />
+      </Field>
+      <Field label="Estado" id={`${prefix}accountStatus`}>
+        <OptionSelect
+          id={`${prefix}accountStatus`}
+          name="status"
+          options={channelAccountStatusOptions}
+          value={account?.status ?? "planned"}
+        />
+      </Field>
+      <Field label="ID cuenta externa" id={`${prefix}externalAccountId`}>
+        <Input
+          id={`${prefix}externalAccountId`}
+          name="externalAccountId"
+          defaultValue={account?.externalAccountId ?? ""}
+          placeholder="airbnb-host-123"
+        />
+      </Field>
+      <Field label="Health" id={`${prefix}healthStatus`}>
+        <OptionSelect
+          id={`${prefix}healthStatus`}
+          name="healthStatus"
+          options={syncStatusOptions}
+          value={account?.healthStatus ?? "pending"}
+        />
+      </Field>
+      <div className="md:col-span-2">
+        <Field label="Scopes" id={`${prefix}scopes`}>
+          <Input
+            id={`${prefix}scopes`}
+            name="scopes"
+            defaultValue={account?.scopes.join(", ") ?? ""}
+            placeholder="availability, reservations, messages"
+          />
+        </Field>
+      </div>
+      <div className="md:col-span-2">
+        <Field label="Notas" id={`${prefix}accountNotes`}>
+          <Textarea
+            id={`${prefix}accountNotes`}
+            name="notes"
+            rows={3}
+            defaultValue={account?.notes ?? ""}
+            placeholder="Pendiente validar permisos de mensajeria, OAuth o partner API."
+          />
+        </Field>
+      </div>
+    </div>
   );
 }
 

@@ -263,6 +263,54 @@ export type Database = {
           },
         ]
       }
+      channel_accounts: {
+        Row: {
+          account_label: string
+          auth_mode: string
+          channel: Database["public"]["Enums"]["channel_type"]
+          connected_at: string | null
+          created_at: string
+          external_account_id: string | null
+          health_status: Database["public"]["Enums"]["sync_status"]
+          id: string
+          last_checked_at: string | null
+          notes: string | null
+          scopes: Json
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          account_label: string
+          auth_mode?: string
+          channel: Database["public"]["Enums"]["channel_type"]
+          connected_at?: string | null
+          created_at?: string
+          external_account_id?: string | null
+          health_status?: Database["public"]["Enums"]["sync_status"]
+          id?: string
+          last_checked_at?: string | null
+          notes?: string | null
+          scopes?: Json
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          account_label?: string
+          auth_mode?: string
+          channel?: Database["public"]["Enums"]["channel_type"]
+          connected_at?: string | null
+          created_at?: string
+          external_account_id?: string | null
+          health_status?: Database["public"]["Enums"]["sync_status"]
+          id?: string
+          last_checked_at?: string | null
+          notes?: string | null
+          scopes?: Json
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       channel_sync_events: {
         Row: {
           channel: Database["public"]["Enums"]["channel_type"]

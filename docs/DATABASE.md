@@ -8,6 +8,7 @@ supabase/migrations/
   0002_rls_policies.sql
   0003_storage.sql
   0004_ai_foundation.sql
+  0005_channel_accounts.sql
 ```
 
 ## Tablas principales
@@ -16,6 +17,7 @@ supabase/migrations/
 - `owner_accounts`: propietarios y entidades de pago.
 - `properties`: activos/alojamientos.
 - `property_listings`: publicacion por canal.
+- `channel_accounts`: preparacion de cuentas externas por canal sin secretos.
 - `guests`: CRM de huespedes.
 - `reservations`: reservas por canal.
 - `calendar_blocks`: bloqueos de calendario.
@@ -59,6 +61,7 @@ Las variables visibles en UI (`{{guest_name}}`, `{{property_name}}`, `{{checkin_
 El modulo `/distribution` conecta dos tablas ya existentes:
 
 - `property_listings`: publicacion de una propiedad en un canal, con estado, URL publica, ID externo, slug para web directa y bandera `sync_enabled`.
+- `channel_accounts`: estado de preparacion de una cuenta externa, modo de integracion (`manual`, `oauth`, `api_key`, `partner_api`, `ical_only`), health, scopes y notas. No guarda tokens ni claves API.
 - `channel_sync_events`: registro de cada intercambio con canales, con direccion `inbound/outbound`, estado de sync, payload JSON y error si existe.
 
 Esto no publica todavia en Airbnb/Booking/Vrbo de forma automatica. Deja preparado el modelo operativo para API oficiales, iCal, web directa y normalizacion de mensajes entrantes.

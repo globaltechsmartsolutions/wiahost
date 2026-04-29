@@ -19,6 +19,19 @@ const optionalUrl = z.preprocess(
   emptyToUndefined,
   z.string().trim().url("La URL del canal no es valida.").optional(),
 );
+const scopesSchema = z.preprocess(
+  (value) => {
+    if (typeof value !== "string") {
+      return value ?? [];
+    }
+
+    return value
+      .split(",")
+      .map((scope) => scope.trim())
+      .filter(Boolean);
+  },
+  z.array(z.string().trim().min(1).max(80)).max(20),
+);
 
 const payloadSchema = z.preprocess(
   (value) => {
@@ -88,6 +101,32 @@ export const icalImportSchema = z.object({
     .max(80, "El origen es demasiado largo."),
 });
 
+export const channelAccountSchema = z.object({
+  accountLabel: z
+    .string()
+    .trim()
+    .min(2, "El nombre de la cuenta debe tener al menos 2 caracteres.")
+    .max(120, "El nombre de la cuenta es demasiado largo."),
+  authMode: z
+    .enum(["manual", "oauth", "api_key", "partner_api", "ical_only"])
+    .default("manual"),
+  channel: z.enum(bookingChannels),
+  externalAccountId: optionalText,
+  healthStatus: z.enum(syncStatuses).default("pending"),
+  notes: optionalText,
+  scopes: scopesSchema.default([]),
+  status: z
+    .enum([
+      "planned",
+      "pending_credentials",
+      "connected",
+      "needs_attention",
+      "disabled",
+    ])
+    .default("planned"),
+});
+
+export type ChannelAccountInput = z.infer<typeof channelAccountSchema>;
 export type ChannelSyncEventInput = z.infer<typeof channelSyncEventSchema>;
 export type IcalImportInput = z.infer<typeof icalImportSchema>;
 export type ListingInput = z.infer<typeof listingSchema>;

@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import {
+  channelAccountSchema,
   channelSyncEventSchema,
   icalImportSchema,
   listingSchema,
@@ -10,11 +11,14 @@ import {
 import { z } from "zod";
 
 import {
+  createChannelAccount,
   createListing,
   createSyncEvent,
+  deleteChannelAccount,
   deleteListing,
   DistributionMutationError,
   importIcalBlocks,
+  updateChannelAccount,
   updateListing,
 } from "@/lib/services/distribution";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
@@ -75,6 +79,19 @@ function icalImportInputFromForm(formData: FormData) {
     icalText: formData.get("icalText"),
     propertyId: formData.get("propertyId"),
     sourceName: formData.get("sourceName"),
+  };
+}
+
+function channelAccountInputFromForm(formData: FormData) {
+  return {
+    accountLabel: formData.get("accountLabel"),
+    authMode: formData.get("authMode"),
+    channel: formData.get("channel"),
+    externalAccountId: formData.get("externalAccountId"),
+    healthStatus: formData.get("healthStatus"),
+    notes: formData.get("notes"),
+    scopes: formData.get("scopes"),
+    status: formData.get("status"),
   };
 }
 
@@ -157,6 +174,91 @@ export async function deleteListingAction(formData: FormData) {
 
   revalidatePath("/distribution");
   redirect("/distribution?deleted=1");
+}
+
+export async function createChannelAccountAction(formData: FormData) {
+  const parsed = channelAccountSchema.safeParse(
+    channelAccountInputFromForm(formData),
+  );
+
+  if (!parsed.success) {
+    redirectWithError(
+      parsed.error.issues[0]?.message ?? "Conector de canal no valido.",
+    );
+  }
+
+  const { supabase } = await requireDistributionContext();
+
+  try {
+    await createChannelAccount(supabase, parsed.data);
+  } catch (error) {
+    if (error instanceof DistributionMutationError) {
+      redirectWithError(error.message);
+    }
+
+    redirectWithError("No se ha podido crear el conector de canal.");
+  }
+
+  revalidatePath("/distribution");
+  redirect("/distribution?accountCreated=1");
+}
+
+export async function updateChannelAccountAction(formData: FormData) {
+  const accountId = String(formData.get("accountId") ?? "");
+  const validAccountId = idSchema.safeParse(accountId);
+
+  if (!validAccountId.success) {
+    redirectWithError("El identificador de conector no es valido.");
+  }
+
+  const parsed = channelAccountSchema.safeParse(
+    channelAccountInputFromForm(formData),
+  );
+
+  if (!parsed.success) {
+    redirectWithError(
+      parsed.error.issues[0]?.message ?? "Conector de canal no valido.",
+    );
+  }
+
+  const { supabase } = await requireDistributionContext();
+
+  try {
+    await updateChannelAccount(supabase, validAccountId.data, parsed.data);
+  } catch (error) {
+    if (error instanceof DistributionMutationError) {
+      redirectWithError(error.message);
+    }
+
+    redirectWithError("No se ha podido actualizar el conector de canal.");
+  }
+
+  revalidatePath("/distribution");
+  redirect("/distribution?accountUpdated=1");
+}
+
+export async function deleteChannelAccountAction(formData: FormData) {
+  const accountId = String(formData.get("accountId") ?? "");
+  const validAccountId = idSchema.safeParse(accountId);
+
+  if (!validAccountId.success) {
+    redirectWithError("El identificador de conector no es valido.");
+  }
+
+  const { supabase } = await requireDistributionContext();
+
+  try {
+    await deleteChannelAccount(supabase, validAccountId.data);
+  } catch (error) {
+    if (error instanceof DistributionMutationError) {
+      redirectWithError(error.message);
+    }
+
+    redirectWithError("No se ha podido eliminar el conector de canal.");
+  }
+
+  revalidatePath("/distribution");
+  redirect("/distribution?accountDeleted=1");
 }
 
 export async function createSyncEventAction(formData: FormData) {
