@@ -640,6 +640,41 @@ test.describe("operations flows with Supabase @critical @data", () => {
     await expect(page.getByText(updatedListingTitle)).not.toBeVisible();
   });
 
+  test("imports iCal availability blocks through API routes", async ({
+    page,
+  }) => {
+    const sourceName = uniqueName("E2E iCal");
+    const startDate = isoDateFromToday(120).replaceAll("-", "");
+    const endDate = isoDateFromToday(123).replaceAll("-", "");
+    const icalResponse = await page.request.post("/api/ical/import", {
+      data: {
+        channel: "airbnb",
+        icalText: [
+          "BEGIN:VCALENDAR",
+          "VERSION:2.0",
+          "BEGIN:VEVENT",
+          `DTSTART;VALUE=DATE:${startDate}`,
+          `DTEND;VALUE=DATE:${endDate}`,
+          "SUMMARY:Busy from Airbnb",
+          "END:VEVENT",
+          "END:VCALENDAR",
+        ].join("\r\n"),
+        propertyId: seedIds.propertyId,
+        sourceName,
+      },
+    });
+    expect(icalResponse.status()).toBe(201);
+
+    const icalBody = (await icalResponse.json()) as {
+      data: { imported: number; parsed: number };
+    };
+    expect(icalBody.data.parsed).toBe(1);
+    expect(icalBody.data.imported).toBeGreaterThanOrEqual(1);
+
+    await page.goto("/distribution");
+    await expect(page.getByText("ical_import").first()).toBeVisible();
+  });
+
   test("converts direct booking leads through the commercial pipeline", async ({
     page,
   }) => {

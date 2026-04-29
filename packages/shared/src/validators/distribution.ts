@@ -73,5 +73,21 @@ export const channelSyncEventSchema = z
     path: ["listingId"],
   });
 
+export const icalImportSchema = z.object({
+  channel: z.enum(bookingChannels).default("manual"),
+  icalText: z
+    .string()
+    .trim()
+    .min(20, "El calendario iCal esta vacio o no es valido.")
+    .max(200_000, "El calendario iCal es demasiado grande para este import."),
+  propertyId: z.guid("La propiedad no es valida."),
+  sourceName: z
+    .string()
+    .trim()
+    .min(2, "El origen debe tener al menos 2 caracteres.")
+    .max(80, "El origen es demasiado largo."),
+});
+
 export type ChannelSyncEventInput = z.infer<typeof channelSyncEventSchema>;
+export type IcalImportInput = z.infer<typeof icalImportSchema>;
 export type ListingInput = z.infer<typeof listingSchema>;

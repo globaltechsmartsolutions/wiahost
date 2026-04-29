@@ -65,6 +65,8 @@ Esto no publica todavia en Airbnb/Booking/Vrbo de forma automatica. Deja prepara
 
 El export iCal publico vive en `/api/ical/[slug]` y usa `property_listings.public_slug` para localizar el anuncio publicado. El feed combina `reservations` confirmadas/en curso/pendientes y `calendar_blocks`, pero solo emite estados genericos como `Reservado` o `Bloqueado`; no incluye nombre, email, telefono ni notas privadas del huesped.
 
+El import iCal basico vive en `/api/ical/import` y crea `calendar_blocks` a partir de eventos `VEVENT`. Antes de insertar compara propiedad, canal, fechas y razon para evitar duplicados simples. Cada import registra un `channel_sync_events` inbound con accion `ical_import`.
+
 ## Motor de reserva directa
 
 La ruta publica `/book/[slug]` usa `property_listings.public_slug` como identificador del anuncio. Si el listing esta publicado, muestra los datos base de la propiedad y permite enviar una solicitud.

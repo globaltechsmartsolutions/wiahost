@@ -2,6 +2,7 @@ import {
   createListingAction,
   createSyncEventAction,
   deleteListingAction,
+  importIcalAction,
   updateListingAction,
 } from "@/lib/actions/distribution";
 import {
@@ -36,6 +37,7 @@ type DistributionPageProps = {
     created?: string;
     deleted?: string;
     error?: string;
+    imported?: string;
     synced?: string;
     updated?: string;
   }>;
@@ -92,6 +94,11 @@ export default async function DistributionPage({
           Evento de sincronizacion registrado correctamente.
         </div>
       ) : null}
+      {params?.imported ? (
+        <div className="rounded-3xl border border-emerald-200 bg-emerald-50 px-5 py-4 text-sm text-emerald-800">
+          Calendario iCal importado correctamente.
+        </div>
+      ) : null}
 
       <section className="grid gap-4 md:grid-cols-4">
         <MetricCard label="Publicaciones" value={String(listings.length)} />
@@ -133,6 +140,24 @@ export default async function DistributionPage({
                 <SyncEventFields options={options} />
                 <Button type="submit" className="rounded-full">
                   Registrar evento
+                </Button>
+              </form>
+            </CardContent>
+          </Card>
+
+          <Card className="rounded-[2rem] border-border/80 bg-card/80">
+            <CardHeader>
+              <CardTitle>Importar iCal</CardTitle>
+              <CardDescription>
+                Pega un feed iCal externo para bloquear disponibilidad mientras
+                conectamos APIs oficiales por canal.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <form action={importIcalAction} className="grid gap-4">
+                <IcalImportFields options={options} />
+                <Button type="submit" className="rounded-full">
+                  Importar bloqueos
                 </Button>
               </form>
             </CardContent>
@@ -417,6 +442,56 @@ function SyncEventFields({ options }: { options: DistributionFormOptions }) {
           />
         </Field>
       </div>
+    </div>
+  );
+}
+
+function IcalImportFields({ options }: { options: DistributionFormOptions }) {
+  return (
+    <div className="grid gap-4">
+      <Field label="Propiedad" id="icalPropertyId">
+        <SelectField
+          id="icalPropertyId"
+          name="propertyId"
+          options={options.properties}
+          placeholder="Selecciona propiedad"
+        />
+      </Field>
+      <div className="grid gap-4 md:grid-cols-2">
+        <Field label="Canal origen" id="icalChannel">
+          <OptionSelect
+            id="icalChannel"
+            name="channel"
+            options={channelOptions}
+            value="airbnb"
+          />
+        </Field>
+        <Field label="Nombre origen" id="sourceName">
+          <Input
+            id="sourceName"
+            name="sourceName"
+            placeholder="Airbnb calendario principal"
+            required
+          />
+        </Field>
+      </div>
+      <Field label="Contenido iCal" id="icalText">
+        <Textarea
+          id="icalText"
+          name="icalText"
+          rows={7}
+          placeholder={[
+            "BEGIN:VCALENDAR",
+            "BEGIN:VEVENT",
+            "DTSTART;VALUE=DATE:20260501",
+            "DTEND;VALUE=DATE:20260504",
+            "SUMMARY:Busy",
+            "END:VEVENT",
+            "END:VCALENDAR",
+          ].join("\n")}
+          required
+        />
+      </Field>
     </div>
   );
 }

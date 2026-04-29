@@ -2,7 +2,11 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { channelSyncEventSchema, listingSchema } from "@wiahost/shared";
+import {
+  channelSyncEventSchema,
+  icalImportSchema,
+  listingSchema,
+} from "@wiahost/shared";
 import { z } from "zod";
 
 import {
@@ -10,6 +14,7 @@ import {
   createSyncEvent,
   deleteListing,
   DistributionMutationError,
+  importIcalBlocks,
   updateListing,
 } from "@/lib/services/distribution";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
@@ -61,6 +66,15 @@ function syncEventInputFromForm(formData: FormData) {
     payload: formData.get("payload"),
     propertyId: formData.get("propertyId"),
     status: formData.get("status"),
+  };
+}
+
+function icalImportInputFromForm(formData: FormData) {
+  return {
+    channel: formData.get("channel"),
+    icalText: formData.get("icalText"),
+    propertyId: formData.get("propertyId"),
+    sourceName: formData.get("sourceName"),
   };
 }
 
@@ -170,4 +184,28 @@ export async function createSyncEventAction(formData: FormData) {
 
   revalidatePath("/distribution");
   redirect("/distribution?synced=1");
+}
+
+export async function importIcalAction(formData: FormData) {
+  const parsed = icalImportSchema.safeParse(icalImportInputFromForm(formData));
+
+  if (!parsed.success) {
+    redirectWithError(parsed.error.issues[0]?.message ?? "iCal no valido.");
+  }
+
+  const { supabase } = await requireDistributionContext();
+
+  try {
+    await importIcalBlocks(supabase, parsed.data);
+  } catch (error) {
+    if (error instanceof DistributionMutationError) {
+      redirectWithError(error.message);
+    }
+
+    redirectWithError("No se ha podido importar el calendario iCal.");
+  }
+
+  revalidatePath("/distribution");
+  revalidatePath("/calendar");
+  redirect("/distribution?imported=1");
 }
