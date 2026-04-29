@@ -1,6 +1,6 @@
 import {
-  incidentStatuses,
-  type IncidentStatus,
+  taskStatuses,
+  type TaskStatus,
 } from "@wiahost/shared";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useLocalSearchParams } from "expo-router";
@@ -13,89 +13,81 @@ import {
   StatusActionGroup,
   type StatusOption,
 } from "@/src/components/status-actions";
-import { useMobileDashboard } from "@/src/hooks/use-mobile-dashboard";
+import { useTaskDetail } from "@/src/hooks/use-task-detail";
 import { isSupabaseConfigured, supabase } from "@/src/lib/supabase";
 import { colors } from "@/src/lib/theme";
 import { isGuid } from "@/src/lib/utils";
 
-const statusLabels: Record<IncidentStatus, string> = {
+const statusLabels: Record<TaskStatus, string> = {
+  blocked: "Bloqueada",
   cancelled: "Cancelada",
-  charged: "Cobrada",
-  investigating: "Investigando",
+  done: "Cerrada",
+  in_progress: "En curso",
   open: "Abierta",
-  resolved: "Resuelta",
+  scheduled: "Programada",
 };
 
-const statusOptions: StatusOption<IncidentStatus>[] = incidentStatuses.map(
-  (status) => ({
-    label: statusLabels[status],
-    value: status,
-  }),
-);
+const statusOptions: StatusOption<TaskStatus>[] = taskStatuses.map((status) => ({
+  label: statusLabels[status],
+  value: status,
+}));
 
-async function updateIncidentStatus({
-  incidentId,
+async function updateTaskStatus({
   status,
+  taskId,
 }: {
-  incidentId: string;
-  status: IncidentStatus;
+  status: TaskStatus;
+  taskId: string;
 }) {
   if (!isSupabaseConfigured()) {
-    throw new Error("Configura Supabase para actualizar incidencias desde mobile.");
+    throw new Error("Configura Supabase para actualizar tareas desde mobile.");
   }
 
-  if (!isGuid(incidentId)) {
-    throw new Error("Esta incidencia demo es solo lectura. Con datos reales sera editable.");
+  if (!isGuid(taskId)) {
+    throw new Error("Esta tarea demo es solo lectura. Con datos reales sera editable.");
   }
 
-  const { error } = await supabase
-    .from("incidents")
-    .update({ status })
-    .eq("id", incidentId);
+  const { error } = await supabase.from("tasks").update({ status }).eq("id", taskId);
 
   if (error) {
     throw error;
   }
 }
 
-function normalizeStatus(value: string): IncidentStatus {
-  return incidentStatuses.includes(value as IncidentStatus)
-    ? (value as IncidentStatus)
-    : "open";
+function normalizeStatus(value: string): TaskStatus {
+  return taskStatuses.includes(value as TaskStatus) ? (value as TaskStatus) : "open";
 }
 
-export default function IncidentDetailScreen() {
-  const { incidentId } = useLocalSearchParams<{ incidentId: string }>();
-  const { data, isLoading, refetch, isRefetching } = useMobileDashboard();
+export default function TaskDetailScreen() {
+  const { taskId } = useLocalSearchParams<{ taskId: string }>();
+  const { data: task, isLoading, refetch, isRefetching } = useTaskDetail(taskId);
   const queryClient = useQueryClient();
   const [statusError, setStatusError] = useState<string | null>(null);
-  const incident = data?.incidents.find((item) => item.id === incidentId);
   const mutation = useMutation({
-    mutationFn: updateIncidentStatus,
+    mutationFn: updateTaskStatus,
     onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["task-detail", taskId] });
       await queryClient.invalidateQueries({ queryKey: ["mobile-dashboard"] });
       await refetch();
     },
   });
-  const currentStatus = incident
-    ? normalizeStatus(incident.statusValue)
-    : "open";
-  const canMutateIncident =
-    Boolean(incident) && isSupabaseConfigured() && isGuid(incident?.id ?? "");
+  const currentStatus = task ? normalizeStatus(task.statusValue) : "open";
+  const canMutateTask =
+    Boolean(task) && isSupabaseConfigured() && isGuid(task?.id ?? "");
 
-  const changeStatus = async (status: IncidentStatus) => {
+  const changeStatus = async (status: TaskStatus) => {
     setStatusError(null);
 
     try {
       await mutation.mutateAsync({
-        incidentId: incidentId ?? "",
         status,
+        taskId: taskId ?? "",
       });
     } catch (error) {
       setStatusError(
         error instanceof Error
           ? error.message
-          : "No hemos podido actualizar la incidencia.",
+          : "No hemos podido actualizar la tarea.",
       );
     }
   };
@@ -105,50 +97,53 @@ export default function IncidentDetailScreen() {
       isLoading={isLoading}
       onRefresh={() => void refetch()}
       refreshing={isRefetching}
-      subtitle="Seguimiento rapido para decidir si escalar, cobrar o cerrar."
-      title={incident?.title ?? "Incidencia"}
+      subtitle="Accion operativa con prioridad, fecha y estado accionable."
+      title={task?.title ?? "Tarea"}
     >
-      {incident ? (
+      {task ? (
         <>
           <Card>
             <View style={styles.headerRow}>
               <View style={styles.headerCopy}>
-                <Text style={styles.title}>{incident.title}</Text>
-                <Text style={styles.meta}>{incident.property}</Text>
+                <Text style={styles.title}>{task.title}</Text>
+                <Text style={styles.meta}>{task.property}</Text>
               </View>
-              <StatusBadge label={incident.severity} />
+              <StatusBadge label={task.priority} />
             </View>
           </Card>
+
           <Card>
-            <SectionTitle helper="Estado de seguimiento operativo.">
+            <SectionTitle helper="Contexto para resolverla sin abrir el panel web.">
               Detalle
             </SectionTitle>
-            <DetailRow label="Estado" value={incident.status} />
-            <DetailRow label="Severidad" value={incident.severity} />
-            <DetailRow label="Coste" value={incident.cost} />
+            <DetailRow label="Tipo" value={task.type} />
+            <DetailRow label="Vencimiento" value={task.due} />
+            <DetailRow label="Estado" value={task.status} />
+            <DetailRow label="Descripcion" value={task.description} />
           </Card>
+
           <Card>
             <StatusActionGroup
               currentValue={currentStatus}
-              disabled={!canMutateIncident}
+              disabled={!canMutateTask}
               helper={
-                canMutateIncident
-                  ? "Mantiene riesgo, tareas y panel web sincronizados."
-                  : "Solo lectura en modo demo. Conecta Supabase y abre una incidencia real para guardar cambios."
+                canMutateTask
+                  ? "Cambia el estado y actualiza la cola operativa."
+                  : "Solo lectura en modo demo. Conecta Supabase y abre una tarea real para guardar cambios."
               }
               onChange={changeStatus}
               options={statusOptions}
               pendingValue={
                 mutation.isPending ? (mutation.variables?.status ?? null) : null
               }
-              title="Estado de la incidencia"
+              title="Estado de la tarea"
             />
             {statusError ? <Text style={styles.error}>{statusError}</Text> : null}
           </Card>
         </>
       ) : (
-        <EmptyState title="Incidencia no encontrada">
-          No hemos encontrado esta incidencia en la cache movil.
+        <EmptyState title="Tarea no encontrada">
+          No hemos encontrado esta tarea en la cache movil.
         </EmptyState>
       )}
     </Screen>
@@ -182,14 +177,14 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: "900",
   },
-  headerCopy: {
-    flex: 1,
-    gap: 4,
-  },
   error: {
     color: colors.danger,
     fontSize: 13,
     fontWeight: "800",
+  },
+  headerCopy: {
+    flex: 1,
+    gap: 4,
   },
   headerRow: {
     alignItems: "center",

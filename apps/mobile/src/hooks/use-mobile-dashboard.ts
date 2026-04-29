@@ -15,7 +15,13 @@ export type MobileProperty = (typeof demoProperties)[number];
 export type MobileReservation = (typeof demoReservations)[number];
 export type MobileIncident = (typeof demoIncidents)[number];
 export type MobileInboxThread = (typeof demoInbox)[number];
-export type MobileQueueItem = (typeof demoQueue)[number];
+export type MobileQueueItem = {
+  entityType: "inbox" | "incident" | "task";
+  id: string;
+  label: string;
+  meta: string;
+  priority: string;
+};
 
 export type MobileDashboardData = {
   inbox: MobileInboxThread[];
@@ -39,7 +45,11 @@ const statusLabels: Record<string, string> = {
   open: "Abierta",
   paused: "Pausado",
   pending: "Pendiente",
+  pending_guest: "Pendiente huesped",
+  pending_team: "Pendiente equipo",
   resolved: "Resuelta",
+  scheduled: "Programada",
+  done: "Cerrada",
 };
 
 const channelLabels: Record<string, string> = {
@@ -83,7 +93,7 @@ function fallbackData(): MobileDashboardData {
     incidents: demoIncidents,
     metrics: demoMetrics,
     properties: demoProperties,
-    queue: demoQueue,
+    queue: demoQueue as MobileQueueItem[],
     reservations: demoReservations,
   };
 }
@@ -162,6 +172,7 @@ async function loadMobileDashboard(): Promise<MobileDashboardData> {
         id: reservation.id,
         property: property?.name ?? "Propiedad sin asignar",
         status: label(reservation.status),
+        statusValue: reservation.status ?? "pending",
       };
     });
 
@@ -183,6 +194,7 @@ async function loadMobileDashboard(): Promise<MobileDashboardData> {
         property: property?.name ?? "Propiedad sin asignar",
         severity: label(incident.severity),
         status: label(incident.status),
+        statusValue: incident.status ?? "open",
         title: incident.title,
       };
     });
@@ -218,6 +230,8 @@ async function loadMobileDashboard(): Promise<MobileDashboardData> {
 
     const mappedQueue: MobileQueueItem[] = [
       ...mappedInbox.slice(0, 1).map((thread) => ({
+        entityType: "inbox" as const,
+        id: thread.id,
         label: `Responder a ${thread.guest}`,
         meta: `${thread.property} - ${thread.channel}`,
         priority: thread.status,
@@ -236,6 +250,8 @@ async function loadMobileDashboard(): Promise<MobileDashboardData> {
             : task.properties;
 
           return {
+            entityType: "task" as const,
+            id: task.id,
             label: task.title,
             meta: `${property?.name ?? "Propiedad"} - ${shortDate(task.due_at)}`,
             priority: label(task.priority),
@@ -277,7 +293,7 @@ async function loadMobileDashboard(): Promise<MobileDashboardData> {
         },
       ],
       properties: mappedProperties.length ? mappedProperties : demoProperties,
-      queue: mappedQueue.length ? mappedQueue : demoQueue,
+      queue: mappedQueue.length ? mappedQueue : (demoQueue as MobileQueueItem[]),
       reservations: mappedReservations.length ? mappedReservations : demoReservations,
     };
   } catch {

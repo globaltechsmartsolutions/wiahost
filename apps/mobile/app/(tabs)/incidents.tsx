@@ -3,7 +3,33 @@ import { router } from "expo-router";
 import { Card, EmptyState, ListItem, SectionTitle } from "@/src/components/cards";
 import { PrimaryButton } from "@/src/components/form";
 import { Screen } from "@/src/components/screen";
-import { useMobileDashboard } from "@/src/hooks/use-mobile-dashboard";
+import {
+  type MobileQueueItem,
+  useMobileDashboard,
+} from "@/src/hooks/use-mobile-dashboard";
+
+function openQueueItem(item: MobileQueueItem) {
+  if (item.entityType === "inbox") {
+    router.push({
+      pathname: "/inbox/[conversationId]",
+      params: { conversationId: item.id },
+    });
+    return;
+  }
+
+  if (item.entityType === "task") {
+    router.push({
+      pathname: "/tasks/[taskId]",
+      params: { taskId: item.id },
+    });
+    return;
+  }
+
+  router.push({
+    pathname: "/incidents/[incidentId]",
+    params: { incidentId: item.id },
+  });
+}
 
 export default function IncidentsScreen() {
   const { data, isLoading, refetch, isRefetching } = useMobileDashboard();
@@ -37,8 +63,10 @@ export default function IncidentsScreen() {
           queue.map((item) => (
             <ListItem
               badge={item.priority}
-              key={`${item.label}-${item.meta}`}
+              helper={item.entityType === "task" ? "Tarea operativa" : "Inbox"}
+              key={`${item.entityType}-${item.id}`}
               meta={item.meta}
+              onPress={() => openQueueItem(item)}
               title={item.label}
             />
           ))

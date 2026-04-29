@@ -57,6 +57,7 @@ export const demoReservations = [
     id: "res-1028",
     property: "Atico Gran Via Sky",
     status: "Confirmada",
+    statusValue: "confirmed",
   },
   {
     amount: "420 EUR",
@@ -66,6 +67,7 @@ export const demoReservations = [
     id: "res-1029",
     property: "Loft Malaga Centro",
     status: "En estancia",
+    statusValue: "checked_in",
   },
   {
     amount: "522 EUR",
@@ -75,21 +77,28 @@ export const demoReservations = [
     id: "res-1030",
     property: "Atico Gran Via Sky",
     status: "Confirmada",
+    statusValue: "confirmed",
   },
 ];
 
 export const demoQueue = [
   {
+    entityType: "inbox",
+    id: "inbox-1",
     label: "Responder a Sofia Martin",
     meta: "Atico Gran Via Sky - Inbox",
     priority: "Alta",
   },
   {
+    entityType: "task",
+    id: "demo-task-1",
     label: "Preparar Atico Gran Via",
     meta: "Limpieza - 28 abr, 13:00",
     priority: "Alta",
   },
   {
+    entityType: "task",
+    id: "demo-task-2",
     label: "Revisar aire acondicionado",
     meta: "Loft Malaga Centro - hoy",
     priority: "Media",
@@ -103,6 +112,7 @@ export const demoIncidents = [
     property: "Loft Malaga Centro",
     severity: "Media",
     status: "Abierta",
+    statusValue: "open",
     title: "Ruido en aire acondicionado",
   },
   {
@@ -111,6 +121,7 @@ export const demoIncidents = [
     property: "Atico Gran Via Sky",
     severity: "Alta",
     status: "Investigando",
+    statusValue: "investigating",
     title: "Reposicion de cerradura inteligente",
   },
 ];

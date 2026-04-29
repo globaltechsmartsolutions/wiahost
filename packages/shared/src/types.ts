@@ -5,6 +5,7 @@ import type {
   aiModelTasks,
   aiPredictionStatuses,
   bookingChannels,
+  conversationStatuses,
   incidentStatuses,
   qualityAuditAreas,
   qualityAuditStatuses,
@@ -15,6 +16,7 @@ import type {
 import type { UserRole } from "./roles";
 
 export type BookingChannel = (typeof bookingChannels)[number];
+export type ConversationStatus = (typeof conversationStatuses)[number];
 export type ReservationStatus = (typeof reservationStatuses)[number];
 export type TaskStatus = (typeof taskStatuses)[number];
 export type IncidentStatus = (typeof incidentStatuses)[number];

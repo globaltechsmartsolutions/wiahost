@@ -8,12 +8,14 @@ WIAHost tiene app movil real con Expo React Native en `apps/mobile`. No es una W
 
 - App Expo creada en `apps/mobile`.
 - Expo Router con tabs moviles: Dashboard, Activos, Reservas, Inbox, Riesgo y Ajustes.
-- Fichas moviles para activo, reserva, conversacion e incidencia.
+- Fichas moviles para activo, reserva, conversacion, tarea e incidencia.
 - Alta nativa de activos desde `/properties/new`.
 - Alta nativa de incidencias desde `/incidents/new`.
 - Alta nativa de reservas manuales/directas desde `/reservations/new`.
 - Alta nativa de tareas desde `/tasks/new`.
 - Respuesta outbound desde ficha de inbox movil.
+- Historial completo de conversaciones desde `/inbox/[conversationId]`.
+- Cambio de estado desde mobile para conversaciones, reservas, tareas e incidencias.
 - Login y registro con Supabase Auth.
 - Persistencia de sesion con `@react-native-async-storage/async-storage`.
 - TanStack Query para cache y refresco de datos operativos.
@@ -41,6 +43,7 @@ apps/mobile/
     inbox/[conversationId].tsx
     incidents/[incidentId].tsx
     incidents/new.tsx
+    tasks/[taskId].tsx
     tasks/new.tsx
     login.tsx
     register.tsx
@@ -91,11 +94,10 @@ CI ejecuta `pnpm build:mobile` y `expo export --platform web` como guardarrail l
 ## Funciones prioritarias siguientes
 
 - Edicion nativa de propiedades existentes.
-- Edicion/cambio de estado de tareas desde mobile.
-- Hilo completo de conversacion con historial real y estados.
 - Subida de fotos/evidencias desde camara o galeria.
 - Push notifications para check-in, SLA de inbox e incidencias.
 - Offline read-only basico para tareas del dia.
+- Tests e2e mobile con Maestro o Detox cuando el flujo nativo se estabilice.
 
 ## Play Store
 
@@ -113,7 +115,11 @@ Para publicar en Google Play necesitaremos:
 Comandos previstos:
 
 ```bash
-pnpm --filter mobile start
-eas build --platform android
-eas submit --platform android
+cd apps/mobile
+pnpm start
+eas build --profile preview --platform android
+eas build --profile production --platform android
+eas submit --profile production --platform android
 ```
+
+El proyecto ya incluye `apps/mobile/eas.json` con perfiles `development`, `preview` y `production`. El perfil `production` genera `.aab`, que es el formato esperado por Play Store.

@@ -1,5 +1,10 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { messageSchema, type MessageInput } from "@wiahost/shared";
+import {
+  conversationStatuses,
+  messageSchema,
+  type ConversationStatus,
+  type MessageInput,
+} from "@wiahost/shared";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useLocalSearchParams } from "expo-router";
 import { useState } from "react";
@@ -9,13 +14,36 @@ import { StyleSheet, Text, View } from "react-native";
 import { Card, EmptyState, SectionTitle, StatusBadge } from "@/src/components/cards";
 import { Field, PrimaryButton } from "@/src/components/form";
 import { Screen } from "@/src/components/screen";
-import { useMobileDashboard } from "@/src/hooks/use-mobile-dashboard";
+import {
+  StatusActionGroup,
+  type StatusOption,
+} from "@/src/components/status-actions";
+import { useConversationDetail } from "@/src/hooks/use-conversation-detail";
 import { isSupabaseConfigured, supabase } from "@/src/lib/supabase";
 import { colors } from "@/src/lib/theme";
+import { isGuid } from "@/src/lib/utils";
+
+const statusLabels: Record<ConversationStatus, string> = {
+  archived: "Archivada",
+  open: "Abierta",
+  pending_guest: "Pendiente huesped",
+  pending_team: "Pendiente equipo",
+  resolved: "Resuelta",
+};
+
+const statusOptions: StatusOption<ConversationStatus>[] =
+  conversationStatuses.map((status) => ({
+    label: statusLabels[status],
+    value: status,
+  }));
 
 async function sendMessage(input: MessageInput) {
   if (!isSupabaseConfigured()) {
     throw new Error("Configura Supabase en apps/mobile/.env para responder.");
+  }
+
+  if (!isGuid(input.conversationId)) {
+    throw new Error("Este hilo demo es solo lectura. Con Supabase conectado sera editable.");
   }
 
   const {
@@ -36,21 +64,57 @@ async function sendMessage(input: MessageInput) {
     throw error;
   }
 
-  await supabase
+  const { error: conversationError } = await supabase
     .from("conversations")
     .update({
       last_message_at: sentAt,
       status: "pending_guest",
     })
     .eq("id", input.conversationId);
+
+  if (conversationError) {
+    throw conversationError;
+  }
+}
+
+async function updateConversationStatus({
+  conversationId,
+  status,
+}: {
+  conversationId: string;
+  status: ConversationStatus;
+}) {
+  if (!isSupabaseConfigured()) {
+    throw new Error("Configura Supabase para actualizar estados desde mobile.");
+  }
+
+  if (!isGuid(conversationId)) {
+    throw new Error("Este hilo demo es solo lectura. Con datos reales podras cambiarlo.");
+  }
+
+  const { error } = await supabase
+    .from("conversations")
+    .update({ status })
+    .eq("id", conversationId);
+
+  if (error) {
+    throw error;
+  }
+}
+
+function normalizeStatus(value: string): ConversationStatus {
+  return conversationStatuses.includes(value as ConversationStatus)
+    ? (value as ConversationStatus)
+    : "open";
 }
 
 export default function InboxDetailScreen() {
   const { conversationId } = useLocalSearchParams<{ conversationId: string }>();
-  const { data, isLoading, refetch, isRefetching } = useMobileDashboard();
+  const { data: conversation, isLoading, refetch, isRefetching } =
+    useConversationDetail(conversationId);
   const queryClient = useQueryClient();
   const [formError, setFormError] = useState<string | null>(null);
-  const thread = data?.inbox.find((item) => item.id === conversationId);
+  const [statusError, setStatusError] = useState<string | null>(null);
   const {
     control,
     formState: { errors },
@@ -85,6 +149,11 @@ export default function InboxDetailScreen() {
         ...values,
         conversationId: conversationId ?? values.conversationId,
       });
+      await queryClient.invalidateQueries({
+        queryKey: ["conversation-detail", conversationId],
+      });
+      await queryClient.invalidateQueries({ queryKey: ["mobile-dashboard"] });
+      await refetch();
     } catch (error) {
       setFormError(
         error instanceof Error
@@ -93,6 +162,38 @@ export default function InboxDetailScreen() {
       );
     }
   });
+  const statusMutation = useMutation({
+    mutationFn: updateConversationStatus,
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: ["conversation-detail", conversationId],
+      });
+      await queryClient.invalidateQueries({ queryKey: ["mobile-dashboard"] });
+      await refetch();
+    },
+  });
+  const currentStatus = conversation
+    ? normalizeStatus(conversation.statusValue)
+    : "open";
+  const canMutateConversation =
+    Boolean(conversation) && isSupabaseConfigured() && isGuid(conversation?.id ?? "");
+
+  const changeStatus = async (status: ConversationStatus) => {
+    setStatusError(null);
+
+    try {
+      await statusMutation.mutateAsync({
+        conversationId: conversationId ?? "",
+        status,
+      });
+    } catch (error) {
+      setStatusError(
+        error instanceof Error
+          ? error.message
+          : "No hemos podido actualizar el estado.",
+      );
+    }
+  };
 
   return (
     <Screen
@@ -100,34 +201,78 @@ export default function InboxDetailScreen() {
       onRefresh={() => void refetch()}
       refreshing={isRefetching}
       subtitle="Mensaje priorizado para responder sin perder contexto."
-      title={thread?.guest ?? "Conversacion"}
+      title={conversation?.guest ?? "Conversacion"}
     >
-      {thread ? (
+      {conversation ? (
         <>
           <Card>
             <View style={styles.headerRow}>
               <View style={styles.headerCopy}>
-                <Text style={styles.title}>{thread.guest}</Text>
+                <Text style={styles.title}>{conversation.guest}</Text>
                 <Text style={styles.meta}>
-                  {thread.property} - {thread.channel}
+                  {conversation.property} - {conversation.channel}
                 </Text>
               </View>
-              <StatusBadge label={thread.status} />
+              <StatusBadge label={conversation.status} />
             </View>
           </Card>
           <Card>
-            <SectionTitle helper={`Tiempo visible: ${thread.waiting}`}>
-              Ultimo mensaje
+            <SectionTitle helper={`Ultima actividad visible: ${conversation.waiting}`}>
+              Historial
             </SectionTitle>
-            <Text style={styles.message}>{thread.message}</Text>
+            {conversation.messages.length ? (
+              conversation.messages.map((message) => {
+                const outbound = message.direction === "Equipo";
+
+                return (
+                  <View
+                    key={message.id}
+                    style={[
+                      styles.messageBubble,
+                      outbound && styles.outboundBubble,
+                    ]}
+                  >
+                    <View style={styles.messageMetaRow}>
+                      <Text style={styles.messageDirection}>
+                        {message.direction}
+                      </Text>
+                      <Text style={styles.messageTime}>{message.sentAt}</Text>
+                    </View>
+                    <Text style={styles.message}>{message.body}</Text>
+                  </View>
+                );
+              })
+            ) : (
+              <Text style={styles.meta}>Todavia no hay mensajes en este hilo.</Text>
+            )}
+          </Card>
+          <Card>
+            <StatusActionGroup
+              currentValue={currentStatus}
+              disabled={!canMutateConversation}
+              helper={
+                canMutateConversation
+                  ? "Actualiza la bandeja sin salir del movil."
+                  : "Solo lectura en modo demo. Conecta Supabase y abre un hilo real para guardar cambios."
+              }
+              onChange={changeStatus}
+              options={statusOptions}
+              pendingValue={
+                statusMutation.isPending
+                  ? (statusMutation.variables?.status ?? null)
+                  : null
+              }
+              title="Estado del hilo"
+            />
+            {statusError ? <Text style={styles.error}>{statusError}</Text> : null}
           </Card>
           <Card>
             <SectionTitle helper="La respuesta se guarda como mensaje outbound.">
               Responder
             </SectionTitle>
-            {!isSupabaseConfigured() ? (
+            {!canMutateConversation ? (
               <Text style={styles.meta}>
-                Conecta Supabase para enviar respuestas reales desde mobile.
+                Solo lectura en modo demo. Conecta Supabase para enviar respuestas reales desde mobile.
               </Text>
             ) : (
               <>
@@ -177,9 +322,41 @@ const styles = StyleSheet.create({
   },
   message: {
     color: colors.ink,
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: "700",
-    lineHeight: 23,
+    lineHeight: 20,
+  },
+  messageBubble: {
+    alignSelf: "flex-start",
+    backgroundColor: "#fffaf2",
+    borderColor: colors.border,
+    borderRadius: 18,
+    borderWidth: 1,
+    gap: 8,
+    maxWidth: "92%",
+    padding: 13,
+  },
+  messageDirection: {
+    color: colors.ink,
+    fontSize: 11,
+    fontWeight: "900",
+    textTransform: "uppercase",
+  },
+  messageMetaRow: {
+    alignItems: "center",
+    flexDirection: "row",
+    gap: 10,
+    justifyContent: "space-between",
+  },
+  messageTime: {
+    color: colors.muted,
+    fontSize: 11,
+    fontWeight: "700",
+  },
+  outboundBubble: {
+    alignSelf: "flex-end",
+    backgroundColor: "#efffe9",
+    borderColor: "#bde984",
   },
   error: {
     color: colors.danger,

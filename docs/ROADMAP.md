@@ -147,10 +147,15 @@
 - Implementado: envio de respuesta desde ficha de inbox mobile con validacion compartida `messageSchema`, insercion en `conversation_messages` y actualizacion de estado de conversacion.
 - Implementado: alta nativa de reservas desde mobile con validacion compartida `manualReservationSchema`, creacion de huesped y reserva con calculo de noches/importes.
 - Implementado: alta nativa de tareas desde mobile con validacion compartida `taskSchema`, seleccion de activo, tipo, prioridad y vencimiento.
+- Implementado: cola prioritaria mobile navegable hacia inbox, tareas e incidencias.
+- Implementado: ficha mobile de tarea con detalle, prioridad, vencimiento y cambio de estado.
+- Implementado: historial completo de inbox mobile con mensajes ordenados y cambio de estado de conversacion.
+- Implementado: cambio de estado mobile para reservas e incidencias con invalidacion de cache operativa.
+- Implementado: configuracion inicial `apps/mobile/eas.json` para builds `development`, `preview` y `production` de Android.
 - Implementado: TanStack Query para cache/refresco de datos operativos y lectura directa de Supabase con RLS.
 - Implementado: fallback demo para poder revisar la experiencia movil aunque no esten copiadas las variables.
 - Implementado: typecheck movil limpio.
-- Pendiente inmediato: edicion nativa de activos, cambios de estado mobile, historial completo de mensajes, subida de evidencias, push notifications y EAS Build.
+- Pendiente inmediato: edicion nativa de activos, subida de evidencias/fotos desde camara o galeria, push notifications, EAS Build real con cuenta Expo y tests e2e mobile.
 
 ## Fase 5 - IA y automatizacion avanzada
 
