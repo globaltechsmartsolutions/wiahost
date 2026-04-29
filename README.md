@@ -88,6 +88,7 @@ pnpm test:a11y
 pnpm test:visual
 pnpm test:visual:update
 pnpm quality:routes
+pnpm quality:prod
 pnpm quality:summary
 pnpm audit:web
 pnpm audit:lighthouse
@@ -108,6 +109,7 @@ Documentos principales:
 - IA: `docs/AI.md`
 - Roadmap: `docs/ROADMAP.md`
 - Setup local: `docs/SETUP.md`
+- Seguridad/readiness: `docs/SECURITY.md`
 - Calidad: `docs/QUALITY_AND_AUDIT_STRATEGY.md`
 
 ## Regla visual importante

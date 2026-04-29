@@ -26,6 +26,10 @@ const visualSnapshotPath = resolve(
   "apps/web/e2e/visual.spec.ts-snapshots",
 );
 const playwrightReportDir = resolve(root, "quality/reports/playwright");
+const productionReadinessPath = resolve(
+  root,
+  "quality/reports/production-readiness.json",
+);
 const lighthouseConfigPath = resolve(root, ".lighthouserc.cjs");
 const packageJsonPath = resolve(root, "package.json");
 const reportPath = resolve(root, "quality/reports/quality-summary.json");
@@ -173,6 +177,7 @@ const missingScripts = [
   "test:a11y",
   "test:visual",
   "quality:routes",
+  "quality:prod",
   "build:web",
 ].filter((scriptName) => !rootPackage.scripts?.[scriptName]);
 
@@ -243,11 +248,18 @@ const report = {
         : "No Playwright JSON reports detected yet. Run test:e2e, test:a11y or test:visual to generate them.",
     reports: playwrightReports,
   },
+  productionReadiness: existsSync(productionReadinessPath)
+    ? readJson(productionReadinessPath)
+    : {
+        note: "No production readiness report detected yet. Run pnpm quality:prod to generate it.",
+        status: "not_run",
+      },
   qualityScripts: {
     build: rootPackage.scripts?.["build:web"],
     e2e: rootPackage.scripts?.["test:e2e"],
     lint: rootPackage.scripts?.lint,
     routes: rootPackage.scripts?.["quality:routes"],
+    productionReadiness: rootPackage.scripts?.["quality:prod"],
     typecheck: rootPackage.scripts?.typecheck,
     unit: rootPackage.scripts?.test,
     visual: rootPackage.scripts?.["test:visual"],

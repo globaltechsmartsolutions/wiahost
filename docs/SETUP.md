@@ -54,6 +54,7 @@ pnpm test:e2e
 pnpm test:a11y
 pnpm test:visual
 pnpm quality:routes
+pnpm quality:prod
 pnpm audit:web
 pnpm audit:lighthouse
 pnpm build:web
@@ -61,6 +62,7 @@ pnpm build:web
 
 `pnpm test:e2e` necesita Supabase local arrancado, `apps/web/.env.local` configurado y usuarios demo creados con `pnpm db:reset`.
 `pnpm quality:routes` cruza el inventario versionado de rutas con las suites visuales y de accesibilidad para detectar pantallas nuevas sin cobertura.
+`pnpm quality:prod` genera un informe local de readiness sin imprimir secretos: revisa `.env.example`, `.env.local`, Stripe webhook y referencias server-only.
 `pnpm test:visual -- --update-snapshots` actualiza capturas base cuando un cambio visual ha sido revisado y aceptado.
 `pnpm audit:lighthouse` construye la web, arranca `next start` en el puerto `3010`, usa un perfil Chrome temporal controlado para evitar bloqueos de Windows y guarda reportes locales en `quality/reports/lighthouse`.
 

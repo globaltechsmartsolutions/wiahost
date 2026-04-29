@@ -27,6 +27,7 @@ Ya existe:
 - Memoria versionada en `quality/audit-memory`.
 - Auditor estatico `pnpm quality:routes` que cruza `route-inventory.json` con las suites de accesibilidad y visual para evitar rutas nuevas sin cobertura.
 - Reporte consolidado `pnpm quality:summary` que resume cobertura de rutas, memoria de auditoria, baselines visuales, Lighthouse, scripts de calidad y reportes JSON recientes de Playwright en `quality/reports/quality-summary.json`.
+- Auditor de readiness `pnpm quality:prod` que revisa variables de entorno, placeholders, pares Stripe/webhook y exposicion accidental de claves server-only sin imprimir secretos.
 - Lighthouse CI configurado para landing/login/register con budgets iniciales, reportes en filesystem y wrapper local para estabilizar Chrome en Windows.
 - CI inicial con typecheck, lint, unit tests y build web.
 
@@ -389,6 +390,7 @@ Un cambio no deberia entrar si:
 - Hecho: crear `pnpm quality:routes` con reporte JSON de cobertura de rutas frente a a11y/visual.
 - Hecho: generar reporte JSON consolidado con rutas, memoria visual, Lighthouse y scripts de calidad mediante `pnpm quality:summary`.
 - Hecho: Playwright exporta reportes JSON a `quality/reports/playwright` y `pnpm quality:summary` los resume si existen.
+- Hecho: crear `pnpm quality:prod` y `pnpm quality:prod:production` para auditar readiness de entorno, ejemplos, Stripe webhook y uso server-only de secretos.
 
 ### Paso 6
 

@@ -11,20 +11,22 @@ Este directorio concentra la documentacion viva del producto. La idea es que cua
 5. `DATABASE.md`: modelo Supabase y migraciones.
 6. `AI.md`: estrategia IA canonica.
 7. `QUALITY_AND_AUDIT_STRATEGY.md`: tests, auditoria visual y memoria de calidad.
+8. `SECURITY.md`: secretos, RLS, Stripe y readiness de produccion.
 
 ## Documentos principales
 
-| Documento | Rol |
-| --- | --- |
-| `PRODUCT.md` | Define el producto, usuarios y modulos funcionales. |
-| `ARCHITECTURE.md` | Explica apps, packages, Supabase y estado de integracion. |
-| `DATABASE.md` | Resume migraciones, tablas, storage, seed y pendientes de datos. |
-| `SETUP.md` | Guia corta de instalacion local y comandos. |
-| `ROADMAP.md` | Fases de producto, web, mobile, IA y SaaS. |
-| `MOBILE_AND_PLAYSTORE.md` | Plan para app movil real con Expo y publicacion Play Store. |
-| `UI_RESEARCH.md` | Direccion visual y referencias PMS/CRM. |
+| Documento                       | Rol                                                                            |
+| ------------------------------- | ------------------------------------------------------------------------------ |
+| `PRODUCT.md`                    | Define el producto, usuarios y modulos funcionales.                            |
+| `ARCHITECTURE.md`               | Explica apps, packages, Supabase y estado de integracion.                      |
+| `DATABASE.md`                   | Resume migraciones, tablas, storage, seed y pendientes de datos.               |
+| `SETUP.md`                      | Guia corta de instalacion local y comandos.                                    |
+| `ROADMAP.md`                    | Fases de producto, web, mobile, IA y SaaS.                                     |
+| `MOBILE_AND_PLAYSTORE.md`       | Plan para app movil real con Expo y publicacion Play Store.                    |
+| `UI_RESEARCH.md`                | Direccion visual y referencias PMS/CRM.                                        |
 | `QUALITY_AND_AUDIT_STRATEGY.md` | Estrategia de testing, visual regression, accesibilidad y auditor inteligente. |
-| `AI.md` | Documento maestro de IA: producto, arquitectura, datos, fases y guardrails. |
+| `SECURITY.md`                   | Reglas de secretos, checks de entorno y checklist antes de produccion.         |
+| `AI.md`                         | Documento maestro de IA: producto, arquitectura, datos, fases y guardrails.    |
 
 ## Regla editorial
 
