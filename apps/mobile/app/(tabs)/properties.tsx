@@ -1,6 +1,7 @@
 import { router } from "expo-router";
 
 import { Card, EmptyState, ListItem, SectionTitle } from "@/src/components/cards";
+import { PrimaryButton } from "@/src/components/form";
 import { Screen } from "@/src/components/screen";
 import { useMobileDashboard } from "@/src/hooks/use-mobile-dashboard";
 
@@ -15,6 +16,11 @@ export default function PropertiesScreen() {
       refreshing={isRefetching}
       subtitle="Portfolio sincronizado para revisar estado, ciudad y precio base desde el movil."
       title="Activos"
+      action={
+        <PrimaryButton onPress={() => router.push("/properties/new")}>
+          Nuevo
+        </PrimaryButton>
+      }
     >
       <Card>
         <SectionTitle helper={`${properties.length} propiedades visibles`}>
