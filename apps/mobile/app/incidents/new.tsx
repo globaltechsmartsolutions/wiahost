@@ -17,6 +17,7 @@ import { Screen } from "@/src/components/screen";
 import { useMobileDashboard } from "@/src/hooks/use-mobile-dashboard";
 import { isSupabaseConfigured, supabase } from "@/src/lib/supabase";
 import { colors } from "@/src/lib/theme";
+import { isGuid } from "@/src/lib/utils";
 
 const severityLabels: Record<Severity, string> = {
   critical: "Critica",
@@ -73,6 +74,9 @@ export default function NewIncidentScreen() {
     resolver: zodResolver(incidentSchema) as Resolver<IncidentInput>,
   });
   const selectedPropertyId = watch("propertyId");
+  const propertyOptions = (data?.properties ?? []).filter((property) =>
+    isGuid(property.id),
+  );
   const selectedSeverity = watch("severity");
   const mutation = useMutation({
     mutationFn: createIncident,
@@ -83,14 +87,14 @@ export default function NewIncidentScreen() {
   });
 
   useEffect(() => {
-    const firstProperty = data?.properties[0];
-    if (!selectedPropertyId && firstProperty?.id.includes("-")) {
+    const firstProperty = propertyOptions[0];
+    if (!selectedPropertyId && firstProperty) {
       setValue("propertyId", firstProperty.id, {
         shouldDirty: true,
         shouldValidate: true,
       });
     }
-  }, [data?.properties, selectedPropertyId, setValue]);
+  }, [propertyOptions, selectedPropertyId, setValue]);
 
   const onSubmit = handleSubmit(async (values) => {
     setFormError(null);
@@ -121,8 +125,9 @@ export default function NewIncidentScreen() {
             <SectionTitle helper="Selecciona el activo afectado.">
               Activo
             </SectionTitle>
-            <View style={styles.pillGrid}>
-              {(data?.properties ?? []).map((property) => (
+            {propertyOptions.length ? (
+              <View style={styles.pillGrid}>
+                {propertyOptions.map((property) => (
                 <SelectPill
                   active={selectedPropertyId === property.id}
                   key={property.id}
@@ -135,8 +140,13 @@ export default function NewIncidentScreen() {
                 >
                   {property.name}
                 </SelectPill>
-              ))}
-            </View>
+                ))}
+              </View>
+            ) : (
+              <Text style={styles.meta}>
+                No hay activos reales disponibles para seleccionar. Crea uno desde Activos.
+              </Text>
+            )}
             {errors.propertyId?.message ? (
               <Text style={styles.error}>{errors.propertyId.message}</Text>
             ) : null}
@@ -231,6 +241,11 @@ const styles = StyleSheet.create({
     color: colors.danger,
     fontSize: 13,
     fontWeight: "800",
+  },
+  meta: {
+    color: colors.muted,
+    fontSize: 13,
+    lineHeight: 19,
   },
   pillGrid: {
     flexDirection: "row",
