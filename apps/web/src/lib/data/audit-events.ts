@@ -13,6 +13,7 @@ type Relation<T> = T | T[] | null | undefined;
 
 type OperationalEventRow = {
   actor_type: string;
+  conversation_id: string | null;
   created_at: string;
   entity_id: string | null;
   entity_type: string;
@@ -204,6 +205,7 @@ function mapEvent(row: OperationalEventRow): AuditEventListItem {
     metadataSummary: metadataSummary(row.metadata),
     occurredAt: shortDate(row.occurred_at),
     raw: {
+      conversationId: row.conversation_id ?? undefined,
       entityId: row.entity_id ?? undefined,
       entityType: row.entity_type,
       eventName: row.event_name,

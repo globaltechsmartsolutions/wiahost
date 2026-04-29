@@ -477,13 +477,14 @@ export async function updateConversationStatusAction(formData: FormData) {
     redirectWithError("/inbox", "Estado de conversacion invalido.");
   }
 
-  const { supabase } = await getMutationContext("/inbox");
+  const { supabase, userId } = await getMutationContext("/inbox");
 
   try {
     await updateConversationStatus(
       supabase,
       conversationId.data,
       parsed.data.status,
+      userId,
     );
   } catch (error) {
     redirectWithError(

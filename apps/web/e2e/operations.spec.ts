@@ -217,6 +217,19 @@ test.describe("operations flows with Supabase @critical @data", () => {
       page.getByText("Conversacion cerrada o archivada."),
     ).toBeVisible();
 
+    const auditEventsResponse = await page.request.get("/api/audit-events");
+    expect(auditEventsResponse.status()).toBe(200);
+    const auditEventsBody = (await auditEventsResponse.json()) as {
+      data: Array<{ raw?: { conversationId?: string }; title: string }>;
+    };
+    expect(
+      auditEventsBody.data.some(
+        (event) =>
+          event.title === "conversation.status_updated" &&
+          event.raw?.conversationId === seedIds.conversationId,
+      ),
+    ).toBe(true);
+
     await page.goto(`/inbox?q=${encodeURIComponent(replyBody)}`);
     await expect(page.getByText(`Mostrando 1 de`)).toBeVisible();
     await expect(page.getByText(replyBody)).toBeVisible();

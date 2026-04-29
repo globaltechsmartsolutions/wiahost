@@ -46,6 +46,7 @@
 - Implementado: filtros operativos en reservas, tareas, incidencias e inbox por busqueda y estado/canal/prioridad/severidad segun modulo.
 - Implementado: priorizacion explicable de inbox por SLA, check-in cercano y senales operativas/acceso, con motivo visible para el equipo.
 - Implementado: actualizacion de estado de conversaciones desde inbox y API `PATCH /api/inbox/:conversationId` para resolver, reabrir o archivar hilos.
+- Implementado: eventos automaticos de auditoria para respuestas y cambios de estado de conversaciones.
 - Implementado: Supabase local verificado con Auth, seed demo, tipos generados y escrituras reales desde UI/API.
 - Implementado: proteccion de rutas web con `proxy.ts` de Next.js 16 usando Supabase Auth.
 - Implementado: Playwright E2E inicial para landing/login/register, redireccion anonima, login demo, creacion/edicion de reserva UI/API, owners/settings, guests/calendar y mutaciones completas de tareas, incidencias e inbox.

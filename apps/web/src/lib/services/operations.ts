@@ -25,6 +25,33 @@ function mutationError(code: string, message: string): never {
   throw new OperationMutationError(code, message);
 }
 
+async function recordOperationalEvent(
+  supabase: SupabaseServerClient,
+  input: {
+    conversationId?: string;
+    entityId?: string;
+    entityType: string;
+    eventName: string;
+    metadata?: Record<string, unknown>;
+    userId: string;
+  },
+) {
+  try {
+    await supabase.from("operational_events").insert({
+      actor_profile_id: input.userId,
+      actor_type: "user",
+      conversation_id: input.conversationId ?? null,
+      entity_id: input.entityId ?? input.conversationId ?? null,
+      entity_type: input.entityType,
+      event_name: input.eventName,
+      metadata: input.metadata ?? {},
+      source: "web",
+    });
+  } catch {
+    // Audit events must never block the operation they describe.
+  }
+}
+
 function nightsBetween(checkIn: string, checkOut: string) {
   const milliseconds =
     new Date(checkOut).getTime() - new Date(checkIn).getTime();
@@ -502,6 +529,17 @@ export async function sendConversationReply(
     .update({ last_message_at: sentAt, status: "pending_guest" })
     .eq("id", input.conversationId);
 
+  await recordOperationalEvent(supabase, {
+    conversationId: input.conversationId,
+    entityType: "conversation",
+    eventName: "conversation.reply_sent",
+    metadata: {
+      channel: input.channel,
+      messageId: data.id,
+    },
+    userId,
+  });
+
   return data;
 }
 
@@ -509,6 +547,7 @@ export async function updateConversationStatus(
   supabase: SupabaseServerClient,
   conversationId: string,
   status: string,
+  userId: string,
 ) {
   const { data, error } = await supabase
     .from("conversations")
@@ -523,6 +562,16 @@ export async function updateConversationStatus(
       "No se ha podido actualizar la conversacion.",
     );
   }
+
+  await recordOperationalEvent(supabase, {
+    conversationId,
+    entityType: "conversation",
+    eventName: "conversation.status_updated",
+    metadata: {
+      status,
+    },
+    userId,
+  });
 
   return data;
 }
