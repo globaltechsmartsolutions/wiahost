@@ -13,22 +13,79 @@ export const navigationItems: NavigationItem[] = [
   { label: "Ajustes", href: "/settings" },
 ];
 
-export const channelChips = ["Airbnb", "Booking.com", "Vrbo", "Expedia", "Google", "Directo"];
+export const channelChips = [
+  "Airbnb",
+  "Booking.com",
+  "Vrbo",
+  "Expedia",
+  "Google",
+  "Directo",
+];
 
 export const dashboardMetrics: DashboardMetric[] = [
-  { label: "Ocupacion", value: "94%", helper: "Proximos 30 dias", trend: "+8%" },
-  { label: "Ingresos", value: "42.850 EUR", helper: "Abril confirmado", trend: "+12%" },
-  { label: "ADR", value: "168 EUR", helper: "Tarifa media diaria", trend: "+6%" },
-  { label: "Mensajes", value: "2", helper: "Sin respuesta urgente", trend: "-4" },
-  { label: "Check-ins hoy", value: "7", helper: "3 pendientes de codigo", trend: "Hoy" },
-  { label: "Tareas criticas", value: "5", helper: "Limpieza y mantenimiento", trend: "+2" },
+  {
+    label: "Ocupacion",
+    value: "94%",
+    helper: "Proximos 30 dias",
+    trend: "+8%",
+  },
+  {
+    label: "Ingresos",
+    value: "42.850 EUR",
+    helper: "Abril confirmado",
+    trend: "+12%",
+  },
+  {
+    label: "ADR",
+    value: "168 EUR",
+    helper: "Tarifa media diaria",
+    trend: "+6%",
+  },
+  {
+    label: "Mensajes",
+    value: "2",
+    helper: "Sin respuesta urgente",
+    trend: "-4",
+  },
+  {
+    label: "Check-ins hoy",
+    value: "7",
+    helper: "3 pendientes de codigo",
+    trend: "Hoy",
+  },
+  {
+    label: "Tareas criticas",
+    value: "5",
+    helper: "Limpieza y mantenimiento",
+    trend: "+2",
+  },
 ];
 
 export const executiveMetrics = [
-  { label: "Reservas activas", value: "128", helper: "Abril - 42 propiedades", tone: "neutral" },
-  { label: "RevPAR", value: "154 EUR", helper: "+11% vs mes anterior", tone: "positive" },
-  { label: "SLA inbox", value: "7m", helper: "Respuesta media", tone: "positive" },
-  { label: "Riesgo operativo", value: "5", helper: "Acciones antes de check-in", tone: "warning" },
+  {
+    label: "Reservas activas",
+    value: "128",
+    helper: "Abril - 42 propiedades",
+    tone: "neutral",
+  },
+  {
+    label: "RevPAR",
+    value: "154 EUR",
+    helper: "+11% vs mes anterior",
+    tone: "positive",
+  },
+  {
+    label: "SLA inbox",
+    value: "7m",
+    helper: "Respuesta media",
+    tone: "positive",
+  },
+  {
+    label: "Riesgo operativo",
+    value: "5",
+    helper: "Acciones antes de check-in",
+    tone: "warning",
+  },
 ];
 
 export const properties = [
@@ -68,10 +125,34 @@ export const properties = [
 ];
 
 export const channelHealth = [
-  { channel: "Airbnb", bookings: 54, revenue: "18.420 EUR", sync: "Sincronizado", health: 98 },
-  { channel: "Booking.com", bookings: 38, revenue: "12.760 EUR", sync: "Sincronizado", health: 96 },
-  { channel: "Directo", bookings: 21, revenue: "7.480 EUR", sync: "Motor activo", health: 91 },
-  { channel: "Vrbo", bookings: 15, revenue: "4.190 EUR", sync: "Revisar tarifa", health: 82 },
+  {
+    channel: "Airbnb",
+    bookings: 54,
+    revenue: "18.420 EUR",
+    sync: "Sincronizado",
+    health: 98,
+  },
+  {
+    channel: "Booking.com",
+    bookings: 38,
+    revenue: "12.760 EUR",
+    sync: "Sincronizado",
+    health: 96,
+  },
+  {
+    channel: "Directo",
+    bookings: 21,
+    revenue: "7.480 EUR",
+    sync: "Motor activo",
+    health: 91,
+  },
+  {
+    channel: "Vrbo",
+    bookings: 15,
+    revenue: "4.190 EUR",
+    sync: "Revisar tarifa",
+    health: 82,
+  },
 ];
 
 export const reservations = [
@@ -166,9 +247,24 @@ export const tasks = [
 ];
 
 export const automationRules = [
-  { name: "Instrucciones 24h antes", trigger: "Check-in 24h", status: "Activa", impact: "38 mensajes/mes" },
-  { name: "Codigo smart lock 1h antes", trigger: "Check-in 1h", status: "Activa", impact: "7 hoy" },
-  { name: "Aviso limpieza post check-out", trigger: "Checkout", status: "Activa", impact: "11 tareas" },
+  {
+    name: "Instrucciones 24h antes",
+    trigger: "Check-in 24h",
+    status: "Activa",
+    impact: "38 mensajes/mes",
+  },
+  {
+    name: "Codigo smart lock 1h antes",
+    trigger: "Check-in 1h",
+    status: "Activa",
+    impact: "7 hoy",
+  },
+  {
+    name: "Aviso limpieza post check-out",
+    trigger: "Checkout",
+    status: "Activa",
+    impact: "11 tareas",
+  },
 ];
 
 export const inboxThreads = [
@@ -180,6 +276,8 @@ export const inboxThreads = [
     message: "Llegaremos sobre las 19:30. Podemos hacer check-in autonomo?",
     waiting: "20 min",
     status: "Urgente",
+    priorityReason:
+      "Check-in cercano y mensaje relacionado con llegada/acceso.",
   },
   {
     id: "demo-conversation-2",
@@ -189,6 +287,7 @@ export const inboxThreads = [
     message: "The AC is making an intermittent noise.",
     waiting: "8 min",
     status: "Operativo",
+    priorityReason: "Posible impacto operativo o mantenimiento.",
   },
   {
     id: "demo-conversation-3",
@@ -198,6 +297,7 @@ export const inboxThreads = [
     message: "Se puede anadir una cuna a la reserva?",
     waiting: "2 h",
     status: "Pendiente",
+    priorityReason: "Consulta pendiente con espera superior a una hora.",
   },
 ];
 
@@ -221,7 +321,11 @@ export const incidents = [
 ];
 
 export const calendarDays = [
-  { day: "Lun", date: "27", events: ["Loft Malaga - estancia", "Limpieza Valencia"] },
+  {
+    day: "Lun",
+    date: "27",
+    events: ["Loft Malaga - estancia", "Limpieza Valencia"],
+  },
   { day: "Mar", date: "28", events: ["Check-in Malaga", "Revision AC"] },
   { day: "Mie", date: "29", events: ["Check-in Madrid", "Codigo smart lock"] },
   { day: "Jue", date: "30", events: ["Check-out Malaga", "Limpieza Malaga"] },
@@ -234,21 +338,53 @@ export const calendarMatrix = [
   {
     property: "Atico Gran Via Sky",
     code: "MAD-GV-01",
-    cells: ["Libre", "Libre", "Check-in - Airbnb", "Ocupado", "Ocupado", "Check-out", "Limpieza"],
+    cells: [
+      "Libre",
+      "Libre",
+      "Check-in - Airbnb",
+      "Ocupado",
+      "Ocupado",
+      "Check-out",
+      "Limpieza",
+    ],
   },
   {
     property: "Loft Malaga Centro",
     code: "AGP-CT-02",
-    cells: ["Ocupado", "Check-in - Directo", "Ocupado", "Check-out", "Limpieza", "Libre", "Libre"],
+    cells: [
+      "Ocupado",
+      "Check-in - Directo",
+      "Ocupado",
+      "Check-out",
+      "Limpieza",
+      "Libre",
+      "Libre",
+    ],
   },
   {
     property: "Sea View Valencia",
     code: "VLC-SEA-03",
-    cells: ["Limpieza", "Libre", "Libre", "Libre", "Check-in - Booking", "Ocupado", "Bloqueo"],
+    cells: [
+      "Limpieza",
+      "Libre",
+      "Libre",
+      "Libre",
+      "Check-in - Booking",
+      "Ocupado",
+      "Bloqueo",
+    ],
   },
   {
     property: "Eixample Urban Suite",
     code: "BCN-EIX-04",
-    cells: ["Check-out", "Limpieza", "Libre", "Check-in - Vrbo", "Ocupado", "Ocupado", "Libre"],
+    cells: [
+      "Check-out",
+      "Limpieza",
+      "Libre",
+      "Check-in - Vrbo",
+      "Ocupado",
+      "Ocupado",
+      "Libre",
+    ],
   },
 ];

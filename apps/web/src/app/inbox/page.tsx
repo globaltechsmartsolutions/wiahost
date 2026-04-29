@@ -250,6 +250,9 @@ export default async function InboxPage({ searchParams }: InboxPageProps) {
                 </div>
                 <div>
                   <p className="text-sm leading-6">{thread.message}</p>
+                  <p className="mt-2 rounded-full bg-amber-50 px-3 py-1 text-xs font-medium text-amber-800">
+                    Prioridad: {thread.priorityReason}
+                  </p>
                   <form
                     action={sendConversationReplyAction}
                     className="mt-4 grid gap-2"

@@ -1,3 +1,5 @@
+import { classifyInboxPriority } from "@wiahost/shared";
+
 import {
   automationRules as demoAutomationRules,
   calendarDays as demoCalendarDays,
@@ -308,14 +310,11 @@ function dateRange(checkIn: string, checkOut: string) {
 }
 
 function waitingSince(value: string | null | undefined) {
-  if (!value) {
+  const minutes = waitingMinutes(value);
+
+  if (minutes === null) {
     return "Sin fecha";
   }
-
-  const minutes = Math.max(
-    0,
-    Math.round((Date.now() - new Date(value).getTime()) / 60000),
-  );
 
   if (minutes < 60) {
     return `${minutes} min`;
@@ -323,6 +322,20 @@ function waitingSince(value: string | null | undefined) {
 
   const hours = Math.round(minutes / 60);
   return `${hours} h`;
+}
+
+function waitingMinutes(value: string | null | undefined) {
+  if (!value) {
+    return null;
+  }
+
+  const time = new Date(value).getTime();
+
+  if (Number.isNaN(time)) {
+    return null;
+  }
+
+  return Math.max(0, Math.round((Date.now() - time) / 60000));
 }
 
 function dueLabel(value: string | null | undefined) {
@@ -609,6 +622,14 @@ export async function getInboxThreads(): Promise<InboxThreadItem[]> {
     return (conversations as ConversationRow[]).map((conversation) => {
       const latestMessage = latestMessageByConversation.get(conversation.id);
       const reservation = one(conversation.reservations);
+      const latestMessageAt =
+        latestMessage?.sent_at ?? conversation.last_message_at;
+      const priority = classifyInboxPriority({
+        checkInDate: reservation?.check_in,
+        conversationStatus: conversation.status,
+        lastMessageBody: latestMessage?.body ?? "",
+        waitingMinutes: waitingMinutes(latestMessageAt),
+      });
 
       return {
         channel: label(
@@ -617,14 +638,10 @@ export async function getInboxThreads(): Promise<InboxThreadItem[]> {
         guest: one(conversation.guests)?.full_name ?? "Contacto sin nombre",
         id: conversation.id,
         message: latestMessage?.body ?? "Sin mensajes recientes.",
+        priorityReason: priority.reasons[0],
         property: one(conversation.properties)?.name ?? "Propiedad sin asignar",
-        status:
-          conversation.status === "open"
-            ? "Urgente"
-            : label(conversation.status),
-        waiting: waitingSince(
-          latestMessage?.sent_at ?? conversation.last_message_at,
-        ),
+        status: priority.label,
+        waiting: waitingSince(latestMessageAt),
       };
     });
   } catch {
@@ -1050,6 +1067,13 @@ export async function getConversationDetail(
     const row = conversation as ConversationRow;
     const latestMessage = ((messages ?? []) as MessageRow[]).at(-1);
     const reservation = one(row.reservations);
+    const latestMessageAt = latestMessage?.sent_at ?? row.last_message_at;
+    const priority = classifyInboxPriority({
+      checkInDate: reservation?.check_in,
+      conversationStatus: row.status,
+      lastMessageBody: latestMessage?.body ?? "",
+      waitingMinutes: waitingMinutes(latestMessageAt),
+    });
 
     return {
       channel: label(latestMessage?.channel ?? reservation?.channel ?? "inbox"),
@@ -1063,9 +1087,10 @@ export async function getConversationDetail(
         id: message.id ?? `${message.conversation_id}-${message.sent_at}`,
         sentAt: dueLabel(message.sent_at),
       })),
+      priorityReason: priority.reasons[0],
       property: one(row.properties)?.name ?? "Propiedad sin asignar",
-      status: row.status === "open" ? "Urgente" : label(row.status),
-      waiting: waitingSince(latestMessage?.sent_at ?? row.last_message_at),
+      status: priority.label,
+      waiting: waitingSince(latestMessageAt),
     };
   } catch {
     return null;

@@ -31,6 +31,7 @@ const toneByValue: Record<string, string> = {
   Urgente: "border-red-300 bg-red-50 text-red-800",
   Alta: "border-red-300 bg-red-50 text-red-800",
   Media: "border-amber-300 bg-amber-50 text-amber-800",
+  Operativo: "border-blue-300 bg-blue-50 text-blue-800",
   Abierta: "border-red-300 bg-red-50 text-red-800",
   Investigando: "border-blue-300 bg-blue-50 text-blue-800",
   Programada: "border-blue-300 bg-blue-50 text-blue-800",

@@ -44,6 +44,7 @@
 - Implementado: calendario multi-propiedad conectado a la matriz real de reservas, excluyendo propiedades archivadas, con alta, edicion y eliminacion de bloqueos manuales por UI/API.
 - Implementado: feedback visual basico tras crear reservas/tareas/incidencias, enviar respuestas y actualizar estados.
 - Implementado: filtros operativos en reservas, tareas, incidencias e inbox por busqueda y estado/canal/prioridad/severidad segun modulo.
+- Implementado: priorizacion explicable de inbox por SLA, check-in cercano y senales operativas/acceso, con motivo visible para el equipo.
 - Implementado: Supabase local verificado con Auth, seed demo, tipos generados y escrituras reales desde UI/API.
 - Implementado: proteccion de rutas web con `proxy.ts` de Next.js 16 usando Supabase Auth.
 - Implementado: Playwright E2E inicial para landing/login/register, redireccion anonima, login demo, creacion/edicion de reserva UI/API, owners/settings, guests/calendar y mutaciones completas de tareas, incidencias e inbox.

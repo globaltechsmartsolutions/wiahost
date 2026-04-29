@@ -21,7 +21,10 @@ export default async function ConversationDetailPage({
   params,
   searchParams,
 }: ConversationDetailPageProps) {
-  const [{ conversationId }, { sent }] = await Promise.all([params, searchParams]);
+  const [{ conversationId }, { sent }] = await Promise.all([
+    params,
+    searchParams,
+  ]);
   const conversation = await getConversationDetail(conversationId);
 
   if (!conversation) {
@@ -77,7 +80,14 @@ export default async function ConversationDetailPage({
           <CardHeader>
             <CardTitle>Responder</CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="grid gap-4">
+            <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
+              <div className="mb-2 flex items-center justify-between gap-3">
+                <span className="font-semibold">Prioridad sugerida</span>
+                <StatusBadge value={conversation.status} />
+              </div>
+              <p>{conversation.priorityReason}</p>
+            </div>
             <form action={sendConversationReplyAction} className="grid gap-3">
               <input
                 type="hidden"
