@@ -2,6 +2,9 @@ import { Badge } from "@/components/ui/badge";
 
 const toneByValue: Record<string, string> = {
   Activo: "border-emerald-300 bg-emerald-50 text-emerald-800",
+  OK: "border-emerald-300 bg-emerald-50 text-emerald-800",
+  Aviso: "border-amber-300 bg-amber-50 text-amber-800",
+  Error: "border-red-300 bg-red-50 text-red-800",
   Archivado: "border-zinc-300 bg-zinc-50 text-zinc-700",
   Borrador: "border-amber-300 bg-amber-50 text-amber-800",
   Publicado: "border-emerald-300 bg-emerald-50 text-emerald-800",

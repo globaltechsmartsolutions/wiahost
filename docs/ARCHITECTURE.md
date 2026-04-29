@@ -72,6 +72,7 @@ La UI combina datos demo con primeras integraciones reales:
 - Reservas, tareas, incidencias e inbox tienen filtros GET server-side sobre los datos cargados para proteger deep links y futura app movil.
 - Owners lee owner accounts, propiedades, reservas e incidencias desde Supabase con fallback demo.
 - Settings lee el perfil autenticado desde Supabase y permite actualizar nombre/telefono mediante Server Action.
+- Settings muestra readiness tecnico de URL publica, Supabase, service role, base de datos y Stripe sin exponer secretos. El mismo snapshot alimenta `/api/health`.
 - Guests lee huespedes, reservas y conversaciones desde Supabase; permite alta, ficha, edicion mediante Server Actions y API GET/POST/GET detail/PATCH.
 - Calendar reutiliza la matriz operativa real del dashboard, filtra propiedades archivadas y permite crear, editar y eliminar bloqueos manuales mediante Server Actions/API.
 - Automations gestiona reglas PMS con trigger, canal, plantilla, delay y estado mediante Server Actions y API REST preparada para mobile.
@@ -87,6 +88,7 @@ La UI combina datos demo con primeras integraciones reales:
 - Leads centraliza solicitudes directas en `/leads`, reutilizando `reservations`, `guests`, `properties` y `conversations`. El paso "preparar pago" crea un `payments` pendiente con proveedor `direct_checkout`, genera enlace `/checkout/[paymentId]` con token o Stripe Checkout, cambia consultas a `pending` y registra `channel_sync_events`.
 - Stripe queda aislado en `apps/web/src/lib/stripe/server.ts` con cliente lazy para no romper builds sin secretos. El webhook `POST /api/stripe/webhook` verifica `Stripe-Signature` con `STRIPE_WEBHOOK_SECRET` y solo marca pagos como `paid` cuando Stripe informa `payment_status = paid`, incluyendo pagos diferidos mediante `checkout.session.async_payment_succeeded`.
 - Readiness de produccion se audita con `pnpm quality:prod`: revisa ejemplos de entorno, `.env.local`, exposicion de claves server-only y pares Stripe/webhook sin imprimir valores sensibles.
+- `/api/health` expone un snapshot JSON de readiness para monitores externos: estado global, checks y estado de base de datos. Devuelve 503 solo si una comprobacion critica falla.
 - iCal export expone `/api/ical/[slug]` para anuncios publicados. Genera un calendario `text/calendar` con reservas/bloqueos de la propiedad y oculta datos personales, sirviendo como puente hasta integrar APIs oficiales.
 - iCal import recibe calendarios externos en `/api/ical/import` o desde `/distribution`, parsea `VEVENT`, crea `calendar_blocks` no duplicados y registra `channel_sync_events` inbound para auditoria.
 - Inbound channel messages entran por `/api/channels/messages` o desde `/inbox`: se normalizan en `guests`, `conversations`, `conversation_messages` y `channel_sync_events` para que futuros webhooks de portales acaben en la misma bandeja operativa.

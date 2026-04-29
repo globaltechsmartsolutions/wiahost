@@ -38,7 +38,7 @@
 - Implementado: propiedades con lista, detalle, edicion, PATCH API y archivo controlado mediante Server Action/API.
 - Implementado: edicion completa de reservas, tareas e incidencias mediante pantallas protegidas, Server Actions y PATCH API.
 - Implementado: owners conectado a Supabase con resumen de propietarios, activos, ingresos, payout e incidencias.
-- Implementado: settings conectado a Supabase con lectura y actualizacion del perfil operativo.
+- Implementado: settings conectado a Supabase con lectura, actualizacion del perfil operativo y readiness tecnico compartido con `/api/health`.
 - Implementado: CRM de huespedes conectado a Supabase con listado, filtro, alta y API GET/POST.
 - Implementado: ficha y edicion de huespedes con contexto de reservas, conversaciones, notas internas y API GET/PATCH.
 - Implementado: calendario multi-propiedad conectado a la matriz real de reservas, excluyendo propiedades archivadas, con alta, edicion y eliminacion de bloqueos manuales por UI/API.
@@ -60,6 +60,7 @@
 - Implementado: reporte consolidado `pnpm quality:summary` con cobertura de rutas, memoria de auditoria, baselines visuales, Lighthouse y scripts de calidad.
 - Implementado: reportes JSON de Playwright para E2E, a11y y visual, detectados por `pnpm quality:summary` como memoria de ultima ejecucion.
 - Implementado: auditor `pnpm quality:prod` para readiness de entorno, secretos server-only, placeholders y configuracion Stripe/webhook sin imprimir valores sensibles.
+- Implementado: `/api/health` con snapshot JSON de app, Supabase, base de datos y Stripe para monitorizacion futura.
 - Implementado: CI inicial con typecheck, lint, unit tests, `pnpm quality:ci`, build web, Lighthouse CI no bloqueante y artefactos de reportes JSON/Lighthouse.
 - Implementado: snapshots visuales estrictos de primer viewport para dashboard, reservas, calendario, distribucion y pagos en portatil 1366x768.
 - Pendiente inmediato: ampliar snapshots estrictos al resto de modulos cuando sus campos dinamicos esten congelados y endurecer Lighthouse cuando haya baseline historico.

@@ -1,9 +1,9 @@
-import { isSupabaseConfigured } from "@/lib/supabase/config";
+import { getReadinessSnapshot } from "@/lib/health/readiness";
 
 export async function GET() {
-  return Response.json({
-    status: "ok",
-    app: "wiahost",
-    database: isSupabaseConfigured() ? "configured" : "not_configured",
+  const snapshot = await getReadinessSnapshot();
+
+  return Response.json(snapshot, {
+    status: snapshot.status === "ok" ? 200 : 503,
   });
 }

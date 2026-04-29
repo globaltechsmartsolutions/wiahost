@@ -1,7 +1,14 @@
+import { getReadinessSnapshot } from "@/lib/health/readiness";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 export type SettingsIntegration = {
+  description: string;
+  label: string;
+  status: string;
+};
+
+export type SettingsSystemHealth = {
   description: string;
   label: string;
   status: string;
@@ -17,6 +24,7 @@ export type SettingsProfile = {
 export type SettingsData = {
   integrations: SettingsIntegration[];
   profile: SettingsProfile;
+  systemHealth: SettingsSystemHealth[];
 };
 
 const roleLabels: Record<string, string> = {
@@ -56,7 +64,41 @@ const fallbackData: SettingsData = {
     phone: "",
     role: "Operaciones",
   },
+  systemHealth: [
+    {
+      description: "Configura apps/web/.env.local para conectar Supabase.",
+      label: "Supabase",
+      status: "Aviso",
+    },
+    {
+      description: "Checkout demo activo hasta configurar Stripe real.",
+      label: "Stripe Checkout",
+      status: "Aviso",
+    },
+  ],
 };
+
+function labelReadinessStatus(status: string) {
+  if (status === "ok") {
+    return "OK";
+  }
+
+  if (status === "error") {
+    return "Error";
+  }
+
+  return "Aviso";
+}
+
+async function getSystemHealth(): Promise<SettingsSystemHealth[]> {
+  const snapshot = await getReadinessSnapshot();
+
+  return snapshot.checks.map((check) => ({
+    description: check.message,
+    label: check.label,
+    status: labelReadinessStatus(check.status),
+  }));
+}
 
 function labelRole(role: string | null | undefined) {
   if (!role) {
@@ -84,6 +126,8 @@ export async function getSettingsData(): Promise<SettingsData> {
       .select("full_name,role,phone")
       .eq("id", userData.user.id)
       .single();
+
+    const systemHealth = await getSystemHealth();
 
     return {
       integrations: [
@@ -126,6 +170,7 @@ export async function getSettingsData(): Promise<SettingsData> {
         phone: profile?.phone ?? "",
         role: labelRole(profile?.role),
       },
+      systemHealth,
     };
   } catch {
     return fallbackData;

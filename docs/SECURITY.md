@@ -26,6 +26,18 @@ Genera `quality/reports/production-readiness.json` y revisa:
 - Que variables server-only no aparezcan en componentes cliente.
 - Que `pnpm quality:summary` pueda recoger el resultado como parte de la memoria de calidad.
 
+## Health endpoint
+
+`GET /api/health` devuelve un snapshot JSON de readiness:
+
+- URL publica.
+- Supabase publico.
+- Service role server-only.
+- Consulta server-side a base de datos.
+- Stripe Checkout y webhook.
+
+El endpoint no devuelve valores de secretos. Sirve para monitores externos y para la tarjeta "Readiness tecnico" de Settings.
+
 Para una comprobacion de entorno de produccion:
 
 ```bash

@@ -102,6 +102,28 @@ export default async function SettingsPage({
           </CardContent>
         </Card>
       </section>
+
+      <Card className="rounded-[2rem] border-border/80 bg-card/80">
+        <CardHeader>
+          <CardTitle>Readiness tecnico</CardTitle>
+        </CardHeader>
+        <CardContent className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+          {data.systemHealth.map((check) => (
+            <div
+              key={check.label}
+              className="rounded-3xl border border-border/80 bg-background/60 p-4"
+            >
+              <div className="flex items-start justify-between gap-3">
+                <p className="font-semibold">{check.label}</p>
+                <StatusBadge value={check.status} />
+              </div>
+              <p className="mt-4 text-sm leading-6 text-muted-foreground">
+                {check.description}
+              </p>
+            </div>
+          ))}
+        </CardContent>
+      </Card>
     </AppShell>
   );
 }

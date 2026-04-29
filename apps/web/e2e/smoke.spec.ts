@@ -83,4 +83,15 @@ test.describe("public and auth smoke @smoke", () => {
     expect(body).toContain("SUMMARY:Reservado");
     expect(body.toLowerCase()).not.toContain("sofia");
   });
+
+  test("serves a public readiness health snapshot", async ({ page }) => {
+    const response = await page.request.get("/api/health");
+
+    expect(response.status()).toBe(200);
+
+    const body = await response.json();
+    expect(body.app).toBe("wiahost");
+    expect(body.status).toBe("ok");
+    expect(Array.isArray(body.checks)).toBe(true);
+  });
 });
