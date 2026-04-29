@@ -18,4 +18,13 @@ export const automationRuleSchema = z.object({
   trigger: z.enum(automationTriggers),
 });
 
+export const automationRunSchema = z.object({
+  reservationId: z.preprocess(
+    (value) =>
+      typeof value === "string" && value.trim() === "" ? undefined : value,
+    z.guid().optional(),
+  ),
+});
+
 export type AutomationRuleInput = z.infer<typeof automationRuleSchema>;
+export type AutomationRunInput = z.infer<typeof automationRunSchema>;

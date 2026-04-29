@@ -85,6 +85,7 @@
 ### Estado actual de Fase 2
 
 - Implementado: modulo web de automatizaciones con alta, edicion, pausa/activacion, eliminacion, plantillas, trigger, canal, delay y API GET/POST/GET detail/PATCH/DELETE.
+- Implementado: ejecucion manual segura de automatizaciones con `automation_runs`, preview renderizado, evento de auditoria y API `POST /api/automations/:ruleId/run`.
 - Implementado: modulo web de workflows de check-in/check-out sobre `automation_rules`, con plantillas reutilizables por etapa, variables dinamicas, preview renderizado, alta, edicion, pausa/activacion, eliminacion y API GET/POST/GET detail/PATCH/DELETE.
 - Implementado: motor compartido de plantillas en `@wiahost/shared` para resolver `{{guest_name}}`, `{{property_name}}`, fechas, access code, normas y telefono de soporte sin duplicar logica entre web/mobile/backend.
 - Implementado: modulo web de auditoria operativa con timeline de eventos, alta manual, metadata, vinculacion a entidades y API GET/POST/GET detail/DELETE.

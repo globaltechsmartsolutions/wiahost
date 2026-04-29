@@ -553,6 +553,26 @@ test.describe("operations flows with Supabase @critical @data", () => {
       page.getByText("Pausada", { exact: true }).first(),
     ).toBeVisible();
 
+    const runResponse = await page.request.post(
+      `/api/automations/${ruleBody.data.id}/run`,
+      {
+        data: {
+          reservationId: seedIds.reservationId,
+        },
+      },
+    );
+    expect(runResponse.status()).toBe(201);
+    const runBody = (await runResponse.json()) as {
+      data: { id: string; renderedMessage: string; status: string };
+    };
+    expect(runBody.data.id).toBeTruthy();
+    expect(runBody.data.status).toBe("synced");
+    expect(runBody.data.renderedMessage).toContain("Mensaje interno");
+
+    await page.goto("/automations");
+    await expect(page.getByText("Ultimas ejecuciones")).toBeVisible();
+    await expect(page.getByText(updatedRuleName).first()).toBeVisible();
+
     const ruleDeleteResponse = await page.request.delete(
       `/api/automations/${ruleBody.data.id}`,
     );

@@ -164,6 +164,8 @@ Tablas ya preparadas:
 
 `message_labels` ya se alimenta desde el detalle de inbox y desde `POST /api/inbox/:conversationId/labels`: urgencia, sentimiento, categoria, intencion, idioma y rationale humano. Esto crea dataset revisado por operaciones antes de activar clasificadores o LLMs.
 
+`automation_runs` ya registra pruebas manuales de reglas con preview renderizado y variables pendientes. Sera una fuente clave para medir que automatizaciones se usan, fallan o necesitan aprobacion humana antes de hacerlas autonomas.
+
 Tablas futuras recomendadas:
 
 - `ai_prompt_templates`

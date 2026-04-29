@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   aiAuditLogSchema,
   automationRuleSchema,
+  automationRunSchema,
   calendarBlockSchema,
   channelAccountSchema,
   channelSyncEventSchema,
@@ -188,6 +189,14 @@ describe("automation validators", () => {
     });
 
     expect(parsed.success).toBe(false);
+  });
+
+  it("accepts manual automation runs with optional reservation context", () => {
+    const parsed = automationRunSchema.safeParse({
+      reservationId: uuid,
+    });
+
+    expect(parsed.success).toBe(true);
   });
 });
 

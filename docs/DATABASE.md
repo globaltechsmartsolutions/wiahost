@@ -56,6 +56,10 @@ Los workflows de check-in/check-out del MVP viven sobre `automation_rules` para 
 
 Las variables visibles en UI (`{{guest_name}}`, `{{property_name}}`, `{{checkin_date}}`, `{{checkout_date}}`, `{{access_code}}`, `{{house_rules}}`, `{{support_phone}}`) son placeholders de plantilla. La resolucion base ya vive en `@wiahost/shared` para preview y validacion visual; el envio real reutilizara ese motor cuando conectemos proveedores de email/WhatsApp/canales.
 
+## Ejecuciones de automatizaciones
+
+La tabla `automation_runs` ya se alimenta desde `/automations` y desde `POST /api/automations/:ruleId/run`. En el MVP la ejecucion manual no envia mensajes reales a canales externos: renderiza la plantilla con una reserva opcional, registra estado, hora, variables pendientes y un `operational_events` con el preview. Esto permite probar reglas antes de conectar proveedores reales.
+
 ## Distribucion y canales
 
 El modulo `/distribution` conecta dos tablas ya existentes:

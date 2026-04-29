@@ -2,13 +2,14 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { automationRuleSchema } from "@wiahost/shared";
+import { automationRuleSchema, automationRunSchema } from "@wiahost/shared";
 import { z } from "zod";
 
 import {
   AutomationMutationError,
   createAutomationRule,
   deleteAutomationRule,
+  runAutomationRule,
   updateAutomationRule,
 } from "@/lib/services/automations";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
@@ -134,4 +135,39 @@ export async function deleteAutomationRuleAction(formData: FormData) {
   revalidatePath("/automations");
   revalidatePath("/dashboard");
   redirect("/automations?deleted=1");
+}
+
+export async function runAutomationRuleAction(formData: FormData) {
+  const ruleId = String(formData.get("ruleId") ?? "");
+  const validRuleId = idSchema.safeParse(ruleId);
+
+  if (!validRuleId.success) {
+    redirectWithError("El identificador de automatizacion no es valido.");
+  }
+
+  const parsed = automationRunSchema.safeParse({
+    reservationId: formData.get("reservationId"),
+  });
+
+  if (!parsed.success) {
+    redirectWithError(
+      parsed.error.issues[0]?.message ?? "Ejecucion no valida.",
+    );
+  }
+
+  const { supabase, userId } = await requireAutomationClient();
+
+  try {
+    await runAutomationRule(supabase, validRuleId.data, parsed.data, userId);
+  } catch (error) {
+    if (error instanceof AutomationMutationError) {
+      redirectWithError(error.message);
+    }
+
+    redirectWithError("No se ha podido ejecutar la automatizacion.");
+  }
+
+  revalidatePath("/automations");
+  revalidatePath("/audit");
+  redirect("/automations?ran=1");
 }

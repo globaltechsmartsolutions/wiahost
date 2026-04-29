@@ -1,12 +1,16 @@
 import {
   createAutomationRuleAction,
   deleteAutomationRuleAction,
+  runAutomationRuleAction,
   updateAutomationRuleAction,
 } from "@/lib/actions/automations";
 import {
   channelOptions,
+  getAutomationRunOptions,
+  getAutomationRuns,
   getAutomationRules,
   triggerOptions,
+  type AutomationRunListItem,
 } from "@/lib/data/automations";
 import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader } from "@/components/page-header";
@@ -30,6 +34,7 @@ type AutomationsPageProps = {
     created?: string;
     deleted?: string;
     error?: string;
+    ran?: string;
     updated?: string;
   }>;
 };
@@ -37,8 +42,10 @@ type AutomationsPageProps = {
 export default async function AutomationsPage({
   searchParams,
 }: AutomationsPageProps) {
-  const [rules, params] = await Promise.all([
+  const [rules, runs, runOptions, params] = await Promise.all([
     getAutomationRules(),
+    getAutomationRuns(),
+    getAutomationRunOptions(),
     searchParams,
   ]);
   const activeRules = rules.filter((rule) => rule.raw.enabled).length;
@@ -72,11 +79,17 @@ export default async function AutomationsPage({
           Automatizacion eliminada correctamente.
         </div>
       ) : null}
+      {params?.ran ? (
+        <div className="rounded-3xl border border-emerald-200 bg-emerald-50 px-5 py-4 text-sm text-emerald-800">
+          Prueba de automatizacion registrada correctamente.
+        </div>
+      ) : null}
 
-      <section className="grid gap-4 md:grid-cols-3">
+      <section className="grid gap-4 md:grid-cols-4">
         <MetricCard label="Reglas" value={String(rules.length)} />
         <MetricCard label="Activas" value={String(activeRules)} />
         <MetricCard label="Pausadas" value={String(pausedRules)} />
+        <MetricCard label="Ejecuciones" value={String(runs.length)} />
       </section>
 
       <section className="grid gap-5 xl:grid-cols-[0.85fr_1.35fr]">
@@ -122,6 +135,45 @@ export default async function AutomationsPage({
                     variables={rule.variables}
                   />
                   <form
+                    action={runAutomationRuleAction}
+                    className="rounded-2xl border border-[#dfd2bf] bg-white/55 p-4"
+                  >
+                    <input type="hidden" name="ruleId" value={rule.id} />
+                    <div className="grid gap-3 md:grid-cols-[1fr_auto] md:items-end">
+                      <Field
+                        id={`${rule.id}-reservationId`}
+                        label="Probar con reserva"
+                      >
+                        <select
+                          id={`${rule.id}-reservationId`}
+                          name="reservationId"
+                          className="h-10 rounded-xl border border-input bg-background px-3 text-sm"
+                          defaultValue=""
+                        >
+                          <option value="">Sin reserva vinculada</option>
+                          {runOptions.map((option) => (
+                            <option key={option.id} value={option.id}>
+                              {option.helper
+                                ? `${option.label} - ${option.helper}`
+                                : option.label}
+                            </option>
+                          ))}
+                        </select>
+                      </Field>
+                      <Button
+                        type="submit"
+                        variant="outline"
+                        className="rounded-full"
+                      >
+                        Ejecutar prueba
+                      </Button>
+                    </div>
+                    <p className="mt-3 text-xs text-muted-foreground">
+                      Registra una ejecucion y un evento de auditoria sin enviar
+                      mensajes reales a canales externos.
+                    </p>
+                  </form>
+                  <form
                     action={updateAutomationRuleAction}
                     className="grid gap-4"
                   >
@@ -156,7 +208,55 @@ export default async function AutomationsPage({
           )}
         </section>
       </section>
+
+      <AutomationRunsPanel runs={runs} />
     </AppShell>
+  );
+}
+
+function AutomationRunsPanel({ runs }: { runs: AutomationRunListItem[] }) {
+  return (
+    <Card className="rounded-[2rem] border-border/80 bg-card/80">
+      <CardHeader>
+        <CardTitle>Ultimas ejecuciones</CardTitle>
+        <CardDescription>
+          Historial de pruebas y ejecuciones registradas en `automation_runs`.
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="grid gap-3">
+        {runs.length ? (
+          runs.map((run) => (
+            <div
+              className="rounded-2xl border border-[#dfd2bf] bg-white/60 p-4"
+              key={run.id}
+            >
+              <div className="flex flex-wrap items-start justify-between gap-3">
+                <div>
+                  <p className="font-semibold">{run.ruleName}</p>
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    {run.context} - {run.trigger} - {run.channel}
+                  </p>
+                </div>
+                <StatusBadge value={run.status} />
+              </div>
+              <p className="mt-3 text-xs uppercase tracking-[0.2em] text-muted-foreground">
+                {run.executedAt}
+              </p>
+              {run.errorMessage ? (
+                <p className="mt-2 text-sm text-amber-700">
+                  {run.errorMessage}
+                </p>
+              ) : null}
+            </div>
+          ))
+        ) : (
+          <div className="rounded-2xl border border-dashed border-[#dfd2bf] bg-white/50 p-4 text-sm text-muted-foreground">
+            Aun no hay ejecuciones. Ejecuta una prueba desde cualquier regla
+            para validar plantilla, contexto y trazabilidad.
+          </div>
+        )}
+      </CardContent>
+    </Card>
   );
 }
 
