@@ -3,6 +3,7 @@ export * from "./ai";
 export * from "./automation";
 export * from "./calendar";
 export * from "./document";
+export * from "./distribution";
 export * from "./guest";
 export * from "./incident";
 export * from "./message";

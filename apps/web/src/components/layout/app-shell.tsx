@@ -13,6 +13,7 @@ import {
   KeyRound,
   Landmark,
   MessageSquareWarning,
+  RadioTower,
   ScrollText,
   Search,
   Send,
@@ -48,6 +49,7 @@ const navSections = [
     items: [
       { label: "Propietarios", href: "/owners", icon: Landmark },
       { label: "Liquidaciones", href: "/statements", icon: CreditCard },
+      { label: "Distribucion", href: "/distribution", icon: RadioTower },
       { label: "Automatizaciones", href: "/automations", icon: Bot },
       { label: "Check-in/out", href: "/workflows", icon: Send },
       { label: "Auditoria", href: "/audit", icon: ScrollText },

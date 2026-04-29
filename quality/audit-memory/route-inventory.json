@@ -55,6 +55,12 @@
       "tests": ["critical", "data", "a11y", "visual"]
     },
     {
+      "path": "/distribution",
+      "auth": "protected",
+      "primaryCheck": "Distribution listings can be created, edited, synced and deleted through API/UI context",
+      "tests": ["critical", "data", "a11y", "visual"]
+    },
+    {
       "path": "/guests",
       "auth": "protected",
       "primaryCheck": "Guest CRM lists Supabase guests, creates new guests, links to guest details and filters updated records",

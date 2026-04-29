@@ -542,6 +542,104 @@ test.describe("operations flows with Supabase @critical @data", () => {
     await expect(page.getByText(updatedWorkflowName)).not.toBeVisible();
   });
 
+  test("creates, updates and deletes distribution listings through API routes", async ({
+    page,
+  }) => {
+    const existingListingsResponse = await page.request.get(
+      "/api/distribution/listings",
+    );
+    if (existingListingsResponse.ok()) {
+      const existingListings = (await existingListingsResponse.json()) as {
+        data: Array<{ id: string; title: string }>;
+      };
+
+      for (const listing of existingListings.data.filter((item) =>
+        item.title.startsWith("E2E Listing"),
+      )) {
+        await page.request.delete(`/api/distribution/listings/${listing.id}`);
+      }
+    }
+
+    const listingTitle = uniqueName("E2E Listing");
+    const externalListingId = `e2e-${Date.now()}`;
+    const listingResponse = await page.request.post(
+      "/api/distribution/listings",
+      {
+        data: {
+          channel: "airbnb",
+          channelUrl: "https://airbnb.example/listing/e2e",
+          externalListingId,
+          propertyId: seedIds.propertyId,
+          publicSlug: externalListingId,
+          status: "published",
+          syncEnabled: true,
+          syncNotes: "Creado por Playwright para validar distribucion.",
+          title: listingTitle,
+        },
+      },
+    );
+    expect(listingResponse.status()).toBe(201);
+
+    const listingBody = (await listingResponse.json()) as {
+      data: { id: string };
+    };
+    const updatedListingTitle = `${listingTitle} editada`;
+    const listingPatchResponse = await page.request.patch(
+      `/api/distribution/listings/${listingBody.data.id}`,
+      {
+        data: {
+          channel: "booking",
+          channelUrl: "https://booking.example/hotel/e2e",
+          externalListingId,
+          propertyId: seedIds.propertyId,
+          publicSlug: `${externalListingId}-edit`,
+          status: "paused",
+          syncEnabled: false,
+          syncNotes: "Actualizado por Playwright antes de registrar sync.",
+          title: updatedListingTitle,
+        },
+      },
+    );
+    expect(listingPatchResponse.status()).toBe(200);
+
+    const syncResponse = await page.request.post(
+      "/api/distribution/sync-events",
+      {
+        data: {
+          channel: "booking",
+          direction: "outbound",
+          listingId: listingBody.data.id,
+          payload: { action: "availability_update", source: "playwright" },
+          status: "synced",
+        },
+      },
+    );
+    expect(syncResponse.status()).toBe(201);
+
+    await page.goto("/distribution");
+    await expect(
+      page.getByRole("heading", { name: /canales y sincronizacion/i }),
+    ).toBeVisible();
+    await expect(
+      page
+        .locator('[data-slot="card-title"]')
+        .filter({ hasText: updatedListingTitle })
+        .first(),
+    ).toBeVisible();
+    await expect(
+      page.locator("span").filter({ hasText: "Pausado" }).first(),
+    ).toBeVisible();
+    await expect(page.getByText("availability_update")).toBeVisible();
+
+    const listingDeleteResponse = await page.request.delete(
+      `/api/distribution/listings/${listingBody.data.id}`,
+    );
+    expect(listingDeleteResponse.status()).toBe(200);
+
+    await page.goto("/distribution");
+    await expect(page.getByText(updatedListingTitle)).not.toBeVisible();
+  });
+
   test("creates, updates and deletes payments through API routes", async ({
     page,
   }) => {

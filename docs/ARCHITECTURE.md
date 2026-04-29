@@ -80,5 +80,6 @@ La UI combina datos demo con primeras integraciones reales:
 - Documents gestiona evidencias y referencias de storage vinculadas a propiedades, reservas e incidencias mediante Server Actions y API REST preparada para mobile.
 - Statements gestiona liquidaciones de propietario con ingresos, costes, fees, periodo, estado y API REST preparada para mobile.
 - Payments gestiona pagos manuales vinculados a reservas con estado, proveedor, importe y fecha mediante Server Actions y API REST preparada para mobile.
+- Distribution gestiona publicaciones por canal con `property_listings` y registra sincronizaciones con `channel_sync_events`. Es la base para publicar anuncios, motor de reserva directa, import/export iCal y mensajes entrantes por canal.
 
 La prioridad tecnica actual es conectar cada pantalla PMS a Supabase manteniendo RLS, validadores compartidos y tests.

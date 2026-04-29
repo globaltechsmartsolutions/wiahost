@@ -54,6 +54,15 @@ Los workflows de check-in/check-out del MVP viven sobre `automation_rules` para 
 
 Las variables visibles en UI (`{{guest_name}}`, `{{property_name}}`, `{{checkin_date}}`, `{{checkout_date}}`, `{{access_code}}`, `{{house_rules}}`, `{{support_phone}}`) son placeholders de plantilla. La resolucion real por reserva se implementara cuando conectemos el motor de envio.
 
+## Distribucion y canales
+
+El modulo `/distribution` conecta dos tablas ya existentes:
+
+- `property_listings`: publicacion de una propiedad en un canal, con estado, URL publica, ID externo, slug para web directa y bandera `sync_enabled`.
+- `channel_sync_events`: registro de cada intercambio con canales, con direccion `inbound/outbound`, estado de sync, payload JSON y error si existe.
+
+Esto no publica todavia en Airbnb/Booking/Vrbo de forma automatica. Deja preparado el modelo operativo para API oficiales, iCal, web directa y normalizacion de mensajes entrantes.
+
 ## Auditoria operativa
 
 La tabla `operational_events` ya tiene modulo web en `/audit` y API REST en `/api/audit-events`. Permite registrar eventos manuales o de sistema con `event_name`, `entity_type`, entidad vinculada, fuente, actor y `metadata`.

@@ -87,6 +87,12 @@
 - Channel sync events.
 - Control de disponibilidad y precios.
 
+### Estado actual de Fase 3
+
+- Implementado: modulo web de distribucion con publicaciones por canal sobre `property_listings`, alta, edicion, eliminacion, estado, URL, ID externo, slug de web directa, sync activo y API GET/POST/GET detail/PATCH/DELETE.
+- Implementado: registro de eventos de sincronizacion sobre `channel_sync_events`, con canal, direccion, estado, payload JSON, errores y API GET/POST.
+- Pendiente: motor publico de reserva directa, import/export iCal real, APIs oficiales por canal, normalizacion de mensajes entrantes y control de precios por canal.
+
 ## Fase 4 - App movil
 
 - Crear `apps/mobile` con Expo.

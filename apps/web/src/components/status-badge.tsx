@@ -4,6 +4,11 @@ const toneByValue: Record<string, string> = {
   Activo: "border-emerald-300 bg-emerald-50 text-emerald-800",
   Archivado: "border-zinc-300 bg-zinc-50 text-zinc-700",
   Borrador: "border-amber-300 bg-amber-50 text-amber-800",
+  Publicado: "border-emerald-300 bg-emerald-50 text-emerald-800",
+  "Error sync": "border-red-300 bg-red-50 text-red-800",
+  Sincronizado: "border-emerald-300 bg-emerald-50 text-emerald-800",
+  Fallido: "border-red-300 bg-red-50 text-red-800",
+  Ignorado: "border-zinc-300 bg-zinc-50 text-zinc-700",
   Confirmada: "border-emerald-300 bg-emerald-50 text-emerald-800",
   "En estancia": "border-blue-300 bg-blue-50 text-blue-800",
   Pendiente: "border-amber-300 bg-amber-50 text-amber-800",
@@ -18,7 +23,10 @@ const toneByValue: Record<string, string> = {
 
 export function StatusBadge({ value }: { value: string }) {
   return (
-    <Badge variant="outline" className={`rounded-full ${toneByValue[value] ?? "bg-muted text-muted-foreground"}`}>
+    <Badge
+      variant="outline"
+      className={`rounded-full ${toneByValue[value] ?? "bg-muted text-muted-foreground"}`}
+    >
       {value}
     </Badge>
   );

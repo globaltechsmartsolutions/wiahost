@@ -4,9 +4,11 @@ import {
   aiAuditLogSchema,
   automationRuleSchema,
   calendarBlockSchema,
+  channelSyncEventSchema,
   documentSchema,
   guestWorkflowSchema,
   incidentSchema,
+  listingSchema,
   loginSchema,
   manualReservationSchema,
   messageLabelSchema,
@@ -207,6 +209,56 @@ describe("workflow validators", () => {
       template:
         "Hola {{guest_name}}, estamos revisando tu mensaje con prioridad.",
       trigger: "message_unanswered",
+    });
+
+    expect(parsed.success).toBe(false);
+  });
+});
+
+describe("distribution validators", () => {
+  it("accepts channel listing inputs", () => {
+    const parsed = listingSchema.safeParse({
+      channel: "airbnb",
+      channelUrl: "https://airbnb.example/listing/e2e",
+      externalListingId: "airbnb-e2e",
+      propertyId: seededUuid,
+      publicSlug: "atico-gran-via",
+      status: "published",
+      syncEnabled: "true",
+      syncNotes: "Sync activo para disponibilidad y mensajes.",
+      title: "Atico Gran Via Sky",
+    });
+
+    expect(parsed.success).toBe(true);
+    if (parsed.success) {
+      expect(parsed.data.syncEnabled).toBe(true);
+    }
+  });
+
+  it("parses sync event JSON payloads", () => {
+    const parsed = channelSyncEventSchema.safeParse({
+      channel: "booking",
+      direction: "outbound",
+      listingId: seededUuid,
+      payload: '{"action":"publish","source":"e2e"}',
+      status: "synced",
+    });
+
+    expect(parsed.success).toBe(true);
+    if (parsed.success) {
+      expect(parsed.data.payload).toEqual({
+        action: "publish",
+        source: "e2e",
+      });
+    }
+  });
+
+  it("rejects sync events without listing or property context", () => {
+    const parsed = channelSyncEventSchema.safeParse({
+      channel: "direct",
+      direction: "inbound",
+      payload: "{}",
+      status: "pending",
     });
 
     expect(parsed.success).toBe(false);
