@@ -16,15 +16,18 @@ El comando principal es:
 
 ```bash
 pnpm quality:prod
+pnpm quality:db
 ```
 
-Genera `quality/reports/production-readiness.json` y revisa:
+Genera `quality/reports/production-readiness.json`, `quality/reports/database-security.json` y revisa:
 
 - Que `.env.example` y `apps/web/.env.example` documenten las variables necesarias.
 - Que no haya patrones evidentes de secretos reales en ejemplos.
 - Que `apps/web/.env.local`, si existe, tenga valores configurados para desarrollo conectado.
 - Que Stripe Checkout no este configurado sin `STRIPE_WEBHOOK_SECRET`.
 - Que variables server-only no aparezcan en componentes cliente.
+- Que cada tabla publica creada en migraciones tenga RLS activado y al menos una politica.
+- Que cada bucket de Storage creado en migraciones tenga politica sobre `storage.objects`.
 - Que `pnpm quality:summary` pueda recoger el resultado como parte de la memoria de calidad.
 
 ## Health endpoint
@@ -55,4 +58,4 @@ En modo produccion se espera `https`, sin `localhost`, y se bloquea si faltan va
 - Probar Stripe con claves de test, webhook firmado y eventos reales.
 - Revisar Storage policies antes de subir documentos sensibles.
 - Activar logs, alertas y monitorizacion de errores.
-- Ejecutar `pnpm typecheck`, `pnpm lint`, `pnpm test`, `pnpm build:web`, `pnpm quality:prod`, `pnpm test:e2e`, `pnpm test:a11y` y `pnpm test:visual`.
+- Ejecutar `pnpm typecheck`, `pnpm lint`, `pnpm test`, `pnpm build:web`, `pnpm quality:db`, `pnpm quality:prod`, `pnpm test:e2e`, `pnpm test:a11y` y `pnpm test:visual`.

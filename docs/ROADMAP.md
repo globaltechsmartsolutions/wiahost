@@ -62,6 +62,7 @@
 - Implementado: estados globales de carga/error para rutas Next.js, con fallback visual de producto y codigo de seguimiento de errores.
 - Implementado: memoria versionada en `quality/audit-memory` con reglas visuales, riesgos, rutas y hallazgos previos.
 - Implementado: auditor estatico `pnpm quality:routes` para verificar que el inventario de rutas mantiene cobertura visual/accesibilidad.
+- Implementado: auditor estatico `pnpm quality:db` para revisar RLS/politicas de tablas publicas y politicas de buckets Storage desde migraciones.
 - Implementado: reporte consolidado `pnpm quality:summary` con cobertura de rutas, memoria de auditoria, baselines visuales, Lighthouse y scripts de calidad.
 - Implementado: reportes JSON de Playwright para E2E, a11y y visual, detectados por `pnpm quality:summary` como memoria de ultima ejecucion.
 - Implementado: auditor `pnpm quality:prod` para readiness de entorno, secretos server-only, placeholders y configuracion Stripe/webhook sin imprimir valores sensibles.

@@ -88,6 +88,7 @@ pnpm test:a11y
 pnpm test:visual
 pnpm test:visual:update
 pnpm quality:routes
+pnpm quality:db
 pnpm quality:prod
 pnpm quality:ci
 pnpm quality:summary

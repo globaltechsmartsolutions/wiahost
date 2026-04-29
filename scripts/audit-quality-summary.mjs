@@ -30,6 +30,10 @@ const productionReadinessPath = resolve(
   root,
   "quality/reports/production-readiness.json",
 );
+const databaseSecurityPath = resolve(
+  root,
+  "quality/reports/database-security.json",
+);
 const lighthouseConfigPath = resolve(root, ".lighthouserc.cjs");
 const packageJsonPath = resolve(root, "package.json");
 const reportPath = resolve(root, "quality/reports/quality-summary.json");
@@ -177,6 +181,7 @@ const missingScripts = [
   "test:a11y",
   "test:visual",
   "quality:routes",
+  "quality:db",
   "quality:prod",
   "quality:ci",
   "build:web",
@@ -255,11 +260,18 @@ const report = {
         note: "No production readiness report detected yet. Run pnpm quality:prod to generate it.",
         status: "not_run",
       },
+  databaseSecurity: existsSync(databaseSecurityPath)
+    ? readJson(databaseSecurityPath)
+    : {
+        note: "No database security report detected yet. Run pnpm quality:db to generate it.",
+        status: "not_run",
+      },
   qualityScripts: {
     build: rootPackage.scripts?.["build:web"],
     e2e: rootPackage.scripts?.["test:e2e"],
     lint: rootPackage.scripts?.lint,
     routes: rootPackage.scripts?.["quality:routes"],
+    databaseSecurity: rootPackage.scripts?.["quality:db"],
     productionReadiness: rootPackage.scripts?.["quality:prod"],
     ci: rootPackage.scripts?.["quality:ci"],
     typecheck: rootPackage.scripts?.typecheck,
