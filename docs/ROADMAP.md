@@ -49,6 +49,7 @@
 - Implementado: actualizacion de estado de conversaciones desde inbox y API `PATCH /api/inbox/:conversationId` para resolver, reabrir o archivar hilos.
 - Implementado: eventos automaticos de auditoria para respuestas y cambios de estado de conversaciones.
 - Implementado: eventos automaticos de auditoria para creacion, edicion y cambios de estado de reservas, tareas, incidencias y leads directos.
+- Implementado: filtros de auditoria por busqueda, fuente y entidad para revisar trazabilidad operativa sin perderse en el timeline.
 - Implementado: etiquetas humanas en detalle de inbox y API `POST /api/inbox/:conversationId/labels` para capturar urgencia, sentimiento, categoria, intencion e idioma como dataset futuro de IA.
 - Implementado: Supabase local verificado con Auth, seed demo, tipos generados y escrituras reales desde UI/API.
 - Implementado: proteccion de rutas web con `proxy.ts` de Next.js 16 usando Supabase Auth.

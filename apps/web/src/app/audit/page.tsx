@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 import { createAuditEventAction } from "@/lib/actions/audit-events";
 import {
   getAuditEventFormOptions,
@@ -25,7 +27,10 @@ type AuditPageProps = {
   searchParams?: Promise<{
     created?: string;
     deleted?: string;
+    entity?: string;
     error?: string;
+    q?: string;
+    source?: string;
   }>;
 };
 
@@ -43,6 +48,26 @@ export default async function AuditPage({ searchParams }: AuditPageProps) {
     event.occurredAt.toLowerCase().includes(today.toLowerCase()),
   ).length;
   const sources = new Set(events.map((event) => event.source)).size;
+  const sourceOptions = [...new Set(events.map((event) => event.source))].sort();
+  const entityOptions = [...new Set(events.map((event) => event.entity))].sort();
+  const query = params?.q?.trim() ?? "";
+  const selectedSource = params?.source?.trim() ?? "";
+  const selectedEntity = params?.entity?.trim() ?? "";
+  const filteredEvents = events.filter((event) => {
+    const matchesQuery = query
+      ? normalize(
+          `${event.title} ${event.context} ${event.actor} ${event.entity} ${event.metadataSummary}`,
+        ).includes(normalize(query))
+      : true;
+    const matchesSource = selectedSource
+      ? event.source === selectedSource
+      : true;
+    const matchesEntity = selectedEntity
+      ? event.entity === selectedEntity
+      : true;
+
+    return matchesQuery && matchesSource && matchesEntity;
+  });
 
   return (
     <AppShell>
@@ -68,8 +93,9 @@ export default async function AuditPage({ searchParams }: AuditPageProps) {
         </div>
       ) : null}
 
-      <section className="grid gap-4 md:grid-cols-3">
+      <section className="grid gap-4 md:grid-cols-4">
         <MetricCard label="Eventos" value={String(events.length)} />
+        <MetricCard label="Filtrados" value={String(filteredEvents.length)} />
         <MetricCard label="Hoy" value={String(todayEvents)} />
         <MetricCard label="Fuentes" value={String(sources)} />
       </section>
@@ -94,8 +120,52 @@ export default async function AuditPage({ searchParams }: AuditPageProps) {
         </Card>
 
         <section className="grid gap-4">
-          {events.length ? (
-            events.map((event) => (
+          <Card className="rounded-[2rem] border-border/80 bg-card/80">
+            <CardHeader>
+              <CardTitle>Filtrar eventos</CardTitle>
+              <CardDescription>
+                Encuentra rapidamente reservas, tareas, incidencias, leads o
+                acciones de sistema.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <form
+                action="/audit"
+                className="grid gap-3 md:grid-cols-[minmax(0,1fr)_11rem_11rem_auto_auto]"
+              >
+                <Input
+                  name="q"
+                  placeholder="Buscar por evento, actor o metadata..."
+                  defaultValue={query}
+                />
+                <FilterSelect
+                  label="Fuente"
+                  name="source"
+                  options={sourceOptions}
+                  value={selectedSource}
+                />
+                <FilterSelect
+                  label="Entidad"
+                  name="entity"
+                  options={entityOptions}
+                  value={selectedEntity}
+                />
+                <Button type="submit" className="rounded-full">
+                  Filtrar
+                </Button>
+                <Button
+                  asChild
+                  variant="outline"
+                  className="rounded-full"
+                >
+                  <Link href="/audit">Limpiar</Link>
+                </Button>
+              </form>
+            </CardContent>
+          </Card>
+
+          {filteredEvents.length ? (
+            filteredEvents.map((event) => (
               <Card
                 key={event.id}
                 className="rounded-[2rem] border-border/80 bg-card/80"
@@ -139,13 +209,52 @@ export default async function AuditPage({ searchParams }: AuditPageProps) {
             ))
           ) : (
             <EmptyState
-              title="Todavia no hay eventos"
-              description="Registra el primer evento operativo para empezar a construir trazabilidad historica."
+              title={events.length ? "Sin eventos para esos filtros" : "Todavia no hay eventos"}
+              description={
+                events.length
+                  ? "Prueba con otra busqueda, fuente o entidad para revisar la trazabilidad."
+                  : "Registra el primer evento operativo para empezar a construir trazabilidad historica."
+              }
             />
           )}
         </section>
       </section>
     </AppShell>
+  );
+}
+
+function normalize(value: string) {
+  return value
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
+}
+
+function FilterSelect({
+  label,
+  name,
+  options,
+  value,
+}: {
+  label: string;
+  name: string;
+  options: string[];
+  value: string;
+}) {
+  return (
+    <select
+      aria-label={label}
+      className="h-10 rounded-xl border border-input bg-background px-3 text-sm"
+      defaultValue={value}
+      name={name}
+    >
+      <option value="">{label}</option>
+      {options.map((option) => (
+        <option key={option} value={option}>
+          {option}
+        </option>
+      ))}
+    </select>
   );
 }
 
