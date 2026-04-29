@@ -178,6 +178,7 @@ const missingScripts = [
   "test:visual",
   "quality:routes",
   "quality:prod",
+  "quality:ci",
   "build:web",
 ].filter((scriptName) => !rootPackage.scripts?.[scriptName]);
 
@@ -260,6 +261,7 @@ const report = {
     lint: rootPackage.scripts?.lint,
     routes: rootPackage.scripts?.["quality:routes"],
     productionReadiness: rootPackage.scripts?.["quality:prod"],
+    ci: rootPackage.scripts?.["quality:ci"],
     typecheck: rootPackage.scripts?.typecheck,
     unit: rootPackage.scripts?.test,
     visual: rootPackage.scripts?.["test:visual"],

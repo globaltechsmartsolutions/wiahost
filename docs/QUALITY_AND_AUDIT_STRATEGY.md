@@ -30,6 +30,7 @@ Ya existe:
 - Auditor de readiness `pnpm quality:prod` que revisa variables de entorno, placeholders, pares Stripe/webhook y exposicion accidental de claves server-only sin imprimir secretos.
 - Lighthouse CI configurado para landing/login/register con budgets iniciales, reportes en filesystem y wrapper local para estabilizar Chrome en Windows.
 - CI inicial con typecheck, lint, unit tests y build web.
+- CI ejecuta `pnpm quality:ci` y sube reportes JSON de calidad como artefacto para poder revisar estado de rutas, readiness y resumen global.
 
 Falta:
 
@@ -281,7 +282,7 @@ pnpm install
 pnpm typecheck
 pnpm lint
 pnpm test
-pnpm quality:routes
+pnpm quality:ci
 pnpm build:web
 pnpm test:e2e -- --grep @smoke
 pnpm test:e2e -- --grep @a11y

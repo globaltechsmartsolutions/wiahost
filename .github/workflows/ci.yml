@@ -35,11 +35,8 @@ jobs:
       - name: Unit tests
         run: pnpm test
 
-      - name: Route coverage audit
-        run: pnpm quality:routes
-
-      - name: Quality memory summary
-        run: pnpm quality:summary
+      - name: Quality audits
+        run: pnpm quality:ci
 
       - name: Build web
         run: pnpm build:web
@@ -54,4 +51,12 @@ jobs:
         with:
           name: lighthouse-reports
           path: quality/reports/lighthouse
+          if-no-files-found: ignore
+
+      - name: Upload quality JSON reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: quality-json-reports
+          path: quality/reports/*.json
           if-no-files-found: ignore

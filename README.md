@@ -89,6 +89,7 @@ pnpm test:visual
 pnpm test:visual:update
 pnpm quality:routes
 pnpm quality:prod
+pnpm quality:ci
 pnpm quality:summary
 pnpm audit:web
 pnpm audit:lighthouse
