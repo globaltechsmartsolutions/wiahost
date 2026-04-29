@@ -100,7 +100,20 @@ export type ConversationMessageItem = {
   sentAt: string;
 };
 
+export type ConversationLabelItem = {
+  category: string;
+  createdAt: string;
+  id: string;
+  intent: string;
+  language: string;
+  rationale: string;
+  sentiment: string;
+  source: string;
+  urgency: string;
+};
+
 export type ConversationDetail = InboxThreadItem & {
+  labels: ConversationLabelItem[];
   messages: ConversationMessageItem[];
 };
 
@@ -158,6 +171,18 @@ type MessageRow = {
   sent_at: string;
   direction: string;
   read_at?: string | null;
+};
+
+type MessageLabelRow = {
+  category: string | null;
+  created_at: string;
+  id: string;
+  intent: string | null;
+  language: string | null;
+  rationale: string | null;
+  sentiment: string | null;
+  source: string;
+  urgency: string | null;
 };
 
 type TaskRow = {
@@ -255,6 +280,21 @@ const channelLabels: Record<string, string> = {
   whatsapp: "WhatsApp",
 };
 
+const sentimentLabels: Record<string, string> = {
+  mixed: "Mixto",
+  negative: "Negativo",
+  neutral: "Neutral",
+  positive: "Positivo",
+  unknown: "Sin clasificar",
+};
+
+const aiSourceLabels: Record<string, string> = {
+  human: "Humana",
+  import: "Importacion",
+  model: "Modelo",
+  rule: "Regla",
+};
+
 const taskTypeLabels: Record<string, string> = {
   admin: "Administracion",
   cleaning: "Limpieza",
@@ -271,9 +311,25 @@ function label(value: string | null | undefined) {
   return (
     statusLabels[value] ??
     channelLabels[value] ??
+    sentimentLabels[value] ??
+    aiSourceLabels[value] ??
     taskTypeLabels[value] ??
     value
   );
+}
+
+function mapMessageLabel(row: MessageLabelRow): ConversationLabelItem {
+  return {
+    category: row.category ?? "Sin categoria",
+    createdAt: dueLabel(row.created_at),
+    id: row.id,
+    intent: row.intent ?? "Sin intencion",
+    language: row.language ?? "Sin idioma",
+    rationale: row.rationale ?? "Sin notas",
+    sentiment: label(row.sentiment),
+    source: label(row.source),
+    urgency: label(row.urgency),
+  };
 }
 
 function one<T>(relation: Relation<T>): T | null {
@@ -1028,6 +1084,7 @@ export async function getConversationDetail(
 
     return {
       ...thread,
+      labels: [],
       messages: [
         {
           body: thread.message,
@@ -1045,6 +1102,7 @@ export async function getConversationDetail(
     const [
       { data: conversation, error: conversationError },
       { data: messages, error: messagesError },
+      { data: labels },
     ] = await Promise.all([
       supabase
         .from("conversations")
@@ -1058,6 +1116,14 @@ export async function getConversationDetail(
         .select("id,conversation_id,channel,direction,body,sent_at,read_at")
         .eq("conversation_id", conversationId)
         .order("sent_at", { ascending: true }),
+      supabase
+        .from("message_labels")
+        .select(
+          "id,source,category,urgency,sentiment,intent,language,rationale,created_at",
+        )
+        .eq("conversation_id", conversationId)
+        .order("created_at", { ascending: false })
+        .limit(8),
     ]);
 
     if (conversationError || messagesError || !conversation) {
@@ -1079,6 +1145,7 @@ export async function getConversationDetail(
       channel: label(latestMessage?.channel ?? reservation?.channel ?? "inbox"),
       guest: one(row.guests)?.full_name ?? "Contacto sin nombre",
       id: row.id,
+      labels: ((labels ?? []) as MessageLabelRow[]).map(mapMessageLabel),
       message: latestMessage?.body ?? "Sin mensajes recientes.",
       messages: ((messages ?? []) as MessageRow[]).map((message) => ({
         body: message.body,

@@ -3,6 +3,7 @@ import type {
   IncidentInput,
   ManualReservationInput,
   MessageInput,
+  MessageLabelInput,
   TaskInput,
 } from "@wiahost/shared";
 import type { createSupabaseServerClient } from "@/lib/supabase/server";
@@ -569,6 +570,57 @@ export async function updateConversationStatus(
     eventName: "conversation.status_updated",
     metadata: {
       status,
+    },
+    userId,
+  });
+
+  return data;
+}
+
+export async function createConversationMessageLabel(
+  supabase: SupabaseServerClient,
+  input: MessageLabelInput,
+  userId: string,
+) {
+  const { data, error } = await supabase
+    .from("message_labels")
+    .insert({
+      category: input.category ?? null,
+      confidence: input.confidence ?? null,
+      conversation_id: input.conversationId,
+      intent: input.intent ?? null,
+      labeled_by: userId,
+      language: input.language ?? null,
+      message_id: input.messageId ?? null,
+      metadata: {
+        ...input.metadata,
+        source_ui: "inbox_detail",
+      },
+      rationale: input.rationale ?? null,
+      sentiment: input.sentiment ?? null,
+      source: input.source,
+      urgency: input.urgency ?? null,
+    })
+    .select("id,conversation_id")
+    .single();
+
+  if (error || !data) {
+    mutationError(
+      "message_label_create_failed",
+      "No se ha podido guardar la etiqueta del hilo.",
+    );
+  }
+
+  await recordOperationalEvent(supabase, {
+    conversationId: input.conversationId,
+    entityType: "conversation",
+    eventName: "conversation.label_created",
+    metadata: {
+      category: input.category ?? null,
+      intent: input.intent ?? null,
+      labelId: data.id,
+      sentiment: input.sentiment ?? null,
+      urgency: input.urgency ?? null,
     },
     userId,
   });

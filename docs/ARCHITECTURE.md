@@ -95,6 +95,7 @@ La UI combina datos demo con primeras integraciones reales:
 - Inbox prioriza conversaciones con reglas explicables compartidas en `@wiahost/shared`: SLA, check-in cercano y palabras operativas/acceso. No toma decisiones automaticas; solo ordena la atencion y muestra motivo.
 - Conversaciones de inbox tienen endpoint `PATCH /api/inbox/:conversationId` y Server Action para actualizar estado (`open`, `pending_team`, `pending_guest`, `resolved`, `archived`) sin duplicar logica.
 - Respuestas y cambios de estado de inbox registran `operational_events` no bloqueantes para trazabilidad, soporte y datasets futuros.
+- El detalle de inbox permite guardar etiquetas humanas en `message_labels`; esta memoria revisada por personas alimentara reglas, evals y modelos futuros sin automatizar decisiones sensibles.
 - Pricing conecta `/pricing` y `/api/pricing/observations` con `pricing_observations`. Permite guardar recomendaciones manuales o importadas por canal y registrar un `price_update` outbound en `channel_sync_events` antes de conectar PriceLabs, Beyond, Wheelhouse o motores propios.
 
 La prioridad tecnica actual es conectar cada pantalla PMS a Supabase manteniendo RLS, validadores compartidos y tests.

@@ -162,6 +162,8 @@ Tablas ya preparadas:
 - `ai_audit_log`
 - `quality_audit_memories`
 
+`message_labels` ya se alimenta desde el detalle de inbox y desde `POST /api/inbox/:conversationId/labels`: urgencia, sentimiento, categoria, intencion, idioma y rationale humano. Esto crea dataset revisado por operaciones antes de activar clasificadores o LLMs.
+
 Tablas futuras recomendadas:
 
 - `ai_prompt_templates`

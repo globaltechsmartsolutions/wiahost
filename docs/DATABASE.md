@@ -111,6 +111,10 @@ La normalizacion de mensajes entrantes no crea tablas nuevas. El endpoint `/api/
 
 Los canales `email`, `whatsapp`, `sms` e `inbox` se registran como sync `manual` porque `channel_sync_events.channel` representa canales de distribucion. Airbnb, Booking y Vrbo conservan su canal.
 
+## Etiquetas humanas de inbox
+
+La tabla `message_labels` ya se usa desde el detalle de inbox y desde `POST /api/inbox/:conversationId/labels`. Operaciones puede capturar categoria, urgencia, sentimiento, intencion, idioma y una justificacion breve. Estas etiquetas no automatizan respuestas; sirven para auditoria, reglas futuras, evals y datasets de IA revisados por humanos.
+
 ## Pricing y revenue
 
 El modulo `/pricing` activa la tabla `pricing_observations`. Cada registro guarda propiedad, fecha, origen/canal, precio actual, sugerido, aprobado, final, ocupacion, booking pace, lead time y estado de conversion.

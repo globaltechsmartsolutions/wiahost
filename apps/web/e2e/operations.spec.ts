@@ -217,6 +217,27 @@ test.describe("operations flows with Supabase @critical @data", () => {
       page.getByText("Conversacion cerrada o archivada."),
     ).toBeVisible();
 
+    const labelCategory = uniqueName("E2E etiqueta inbox");
+    const labelResponse = await page.request.post(
+      `/api/inbox/${seedIds.conversationId}/labels`,
+      {
+        data: {
+          category: labelCategory,
+          intent: "validar trazabilidad del hilo",
+          language: "es",
+          rationale:
+            "Etiqueta humana creada por Playwright para proteger datasets futuros.",
+          sentiment: "negative",
+          urgency: "high",
+        },
+      },
+    );
+    expect(labelResponse.status()).toBe(201);
+
+    await page.goto(`/inbox/${seedIds.conversationId}`);
+    await expect(page.getByText(labelCategory)).toBeVisible();
+    await expect(page.getByText("validar trazabilidad del hilo")).toBeVisible();
+
     const auditEventsResponse = await page.request.get("/api/audit-events");
     expect(auditEventsResponse.status()).toBe(200);
     const auditEventsBody = (await auditEventsResponse.json()) as {
@@ -226,6 +247,13 @@ test.describe("operations flows with Supabase @critical @data", () => {
       auditEventsBody.data.some(
         (event) =>
           event.title === "conversation.status_updated" &&
+          event.raw?.conversationId === seedIds.conversationId,
+      ),
+    ).toBe(true);
+    expect(
+      auditEventsBody.data.some(
+        (event) =>
+          event.title === "conversation.label_created" &&
           event.raw?.conversationId === seedIds.conversationId,
       ),
     ).toBe(true);

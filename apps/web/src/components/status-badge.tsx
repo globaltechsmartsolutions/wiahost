@@ -35,6 +35,17 @@ const toneByValue: Record<string, string> = {
   Abierta: "border-red-300 bg-red-50 text-red-800",
   Investigando: "border-blue-300 bg-blue-50 text-blue-800",
   Programada: "border-blue-300 bg-blue-50 text-blue-800",
+  Baja: "border-emerald-300 bg-emerald-50 text-emerald-800",
+  Critica: "border-red-300 bg-red-50 text-red-800",
+  Humana: "border-blue-300 bg-blue-50 text-blue-800",
+  Importacion: "border-zinc-300 bg-zinc-50 text-zinc-700",
+  Mixto: "border-amber-300 bg-amber-50 text-amber-800",
+  Modelo: "border-sky-300 bg-sky-50 text-sky-800",
+  Negativo: "border-red-300 bg-red-50 text-red-800",
+  Neutral: "border-zinc-300 bg-zinc-50 text-zinc-700",
+  Positivo: "border-emerald-300 bg-emerald-50 text-emerald-800",
+  Regla: "border-amber-300 bg-amber-50 text-amber-800",
+  "Sin clasificar": "border-zinc-300 bg-zinc-50 text-zinc-700",
 };
 
 export function StatusBadge({ value }: { value: string }) {

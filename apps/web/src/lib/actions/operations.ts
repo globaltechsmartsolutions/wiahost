@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import {
   incidentSchema,
   manualReservationSchema,
+  messageLabelSchema,
   messageSchema,
   taskSchema,
   updateIncidentStatusSchema,
@@ -16,6 +17,7 @@ import { z } from "zod";
 
 import {
   createIncident,
+  createConversationMessageLabel,
   createManualReservation,
   createTask,
   OperationMutationError,
@@ -36,6 +38,11 @@ const idSchema = z.guid();
 function requiredString(formData: FormData, key: string) {
   const value = formData.get(key);
   return typeof value === "string" ? value.trim() : "";
+}
+
+function optionalString(formData: FormData, key: string) {
+  const value = requiredString(formData, key);
+  return value || undefined;
 }
 
 function formPayload(formData: FormData, keys: string[]) {
@@ -497,4 +504,51 @@ export async function updateConversationStatusAction(formData: FormData) {
   revalidatePath(`/inbox/${conversationId.data}`);
   revalidatePath("/dashboard");
   redirect(`/inbox/${conversationId.data}?updated=1`);
+}
+
+export async function createConversationLabelAction(formData: FormData) {
+  const conversationId = idSchema.safeParse(
+    requiredString(formData, "conversationId"),
+  );
+
+  if (!conversationId.success) {
+    redirectWithError("/inbox", "Conversacion no valida.");
+  }
+
+  const path = `/inbox/${conversationId.data}`;
+  const parsed = messageLabelSchema.safeParse({
+    category: optionalString(formData, "category"),
+    conversationId: conversationId.data,
+    intent: optionalString(formData, "intent"),
+    language: optionalString(formData, "language"),
+    metadata: {
+      capture: "human_feedback_form",
+    },
+    rationale: optionalString(formData, "rationale"),
+    sentiment: optionalString(formData, "sentiment"),
+    source: "human",
+    urgency: optionalString(formData, "urgency"),
+  });
+
+  if (!parsed.success) {
+    redirectWithError(
+      path,
+      parsed.error.issues[0]?.message ?? "Etiqueta de conversacion invalida.",
+    );
+  }
+
+  const { supabase, userId } = await getMutationContext(path);
+
+  try {
+    await createConversationMessageLabel(supabase, parsed.data, userId);
+  } catch (error) {
+    redirectWithError(
+      path,
+      mutationMessage(error, "No se ha podido guardar la etiqueta."),
+    );
+  }
+
+  revalidatePath("/inbox");
+  revalidatePath(path);
+  redirect(`${path}?labeled=1`);
 }
