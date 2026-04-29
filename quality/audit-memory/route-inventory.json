@@ -187,6 +187,12 @@
       "tests": ["critical", "data", "a11y", "visual"]
     },
     {
+      "path": "/pricing",
+      "auth": "protected",
+      "primaryCheck": "Pricing observations can be created, edited and deleted while keeping revenue context visible",
+      "tests": ["critical", "data", "a11y", "visual"]
+    },
+    {
       "path": "/statements",
       "auth": "protected",
       "primaryCheck": "Owner statements can be created, edited and deleted while keeping period and payout totals visible",

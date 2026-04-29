@@ -838,6 +838,74 @@ test.describe("operations flows with Supabase @critical @data", () => {
     await expect(page.getByText(`${updatedAmount} EUR`)).not.toBeVisible();
   });
 
+  test("creates, updates and deletes pricing observations through API routes", async ({
+    page,
+  }) => {
+    const source = uniqueName("e2e-pricing");
+    const pricingResponse = await page.request.post(
+      "/api/pricing/observations",
+      {
+        data: {
+          approvedPrice: 175,
+          conversionStatus: "viewed",
+          currency: "EUR",
+          currentPrice: 150,
+          finalPrice: 175,
+          leadTimeDays: 21,
+          observedFor: isoDateFromToday(90),
+          occupancyRate: 0.72,
+          propertyId: seedIds.propertyId,
+          source,
+          suggestedPrice: 180,
+        },
+      },
+    );
+    expect(pricingResponse.status()).toBe(201);
+
+    const pricingBody = (await pricingResponse.json()) as {
+      data: { id: string };
+    };
+    const updatedSource = `${source}-updated`;
+    const pricingPatchResponse = await page.request.patch(
+      `/api/pricing/observations/${pricingBody.data.id}`,
+      {
+        data: {
+          approvedPrice: 190,
+          bookingPace: 4,
+          conversionStatus: "booked",
+          currency: "EUR",
+          currentPrice: 160,
+          finalPrice: 190,
+          leadTimeDays: 18,
+          observedFor: isoDateFromToday(91),
+          occupancyRate: 0.81,
+          propertyId: seedIds.propertyId,
+          reservationId: seedIds.reservationId,
+          source: updatedSource,
+          suggestedPrice: 195,
+        },
+      },
+    );
+    expect(pricingPatchResponse.status()).toBe(200);
+
+    await page.goto("/pricing");
+    await expect(
+      page.getByRole("heading", { name: /control de precios/i }),
+    ).toBeVisible();
+    await expect(page.getByText(updatedSource).first()).toBeVisible();
+    await expect(
+      page.locator("span").filter({ hasText: "Reservado" }).first(),
+    ).toBeVisible();
+
+    const pricingDeleteResponse = await page.request.delete(
+      `/api/pricing/observations/${pricingBody.data.id}`,
+    );
+    expect(pricingDeleteResponse.status()).toBe(200);
+
+    await page.goto("/pricing");
+    await expect(page.getByText(updatedSource)).not.toBeVisible();
+  });
+
   test("creates, updates and deletes document evidence through API routes", async ({
     page,
   }) => {

@@ -96,7 +96,8 @@
 - Implementado: export iCal publico `/api/ical/[slug]` para disponibilidad de anuncios publicados, sin exponer datos personales de huespedes.
 - Implementado: import iCal basico `/api/ical/import` y formulario en `/distribution` para convertir VEVENT externos en bloqueos de calendario y registrar sync inbound.
 - Implementado: normalizacion de mensajes entrantes `/api/channels/messages` y formulario en `/inbox` para convertir mensajes de Airbnb/Booking/Vrbo/email/WhatsApp en contacto, conversacion, mensaje inbound y evento de sync.
-- Pendiente: confirmacion/pago online, APIs oficiales por canal y control de precios por canal.
+- Implementado: control inicial de precios `/pricing` sobre `pricing_observations`, con API GET/POST/GET detail/PATCH/DELETE para precio actual, sugerido, aprobado/final, ocupacion y conversion.
+- Pendiente: confirmacion/pago online, APIs oficiales por canal y sincronizacion automatica de precios con proveedores externos.
 
 ## Fase 4 - App movil
 

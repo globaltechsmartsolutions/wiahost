@@ -10,6 +10,7 @@ export * from "./incident";
 export * from "./message";
 export * from "./owner-statement";
 export * from "./payment";
+export * from "./pricing";
 export * from "./property";
 export * from "./reservation";
 export * from "./task";

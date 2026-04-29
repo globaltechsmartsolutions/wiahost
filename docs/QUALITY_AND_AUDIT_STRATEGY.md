@@ -20,9 +20,9 @@ Ya existe:
 - Tests iniciales de validadores compartidos.
 - Test inicial de configuracion Supabase.
 - `playwright.config.ts` formal en `apps/web`.
-- Tests E2E versionados para smoke publico/auth, login demo, iCal publico/import, mensajes entrantes de canal, creacion/edicion de reserva UI/API, leads directos, owners/settings, guest list/detail/edit, calendar blocks y mutaciones API completas de tareas, incidencias e inbox.
-- Auditoria de accesibilidad con `@axe-core/playwright` sobre rutas publicas, reserva directa, protegidas, leads, audit, workflows, distribution, calendario, guests, documentos, detalle, edicion de operaciones, owners, statements y settings.
-- Baseline visual inicial para landing/auth y check de overflow/alineacion de reserva directa, leads, dashboard, operaciones, editores, audit, workflows, distribution, calendar/guests, documentos, owners, statements y settings.
+- Tests E2E versionados para smoke publico/auth, login demo, iCal publico/import, mensajes entrantes de canal, pricing, creacion/edicion de reserva UI/API, leads directos, owners/settings, guest list/detail/edit, calendar blocks y mutaciones API completas de tareas, incidencias e inbox.
+- Auditoria de accesibilidad con `@axe-core/playwright` sobre rutas publicas, reserva directa, protegidas, leads, audit, workflows, distribution, pricing, calendario, guests, documentos, detalle, edicion de operaciones, owners, statements y settings.
+- Baseline visual inicial para landing/auth y check de overflow/alineacion de reserva directa, leads, dashboard, operaciones, editores, audit, workflows, distribution, pricing, calendar/guests, documentos, owners, statements y settings.
 - Memoria versionada en `quality/audit-memory`.
 - Lighthouse CI configurado para landing/login/register con budgets iniciales, reportes en filesystem y wrapper local para estabilizar Chrome en Windows.
 - CI inicial con typecheck, lint, unit tests y build web.
@@ -148,6 +148,7 @@ Rutas iniciales:
 - `/owners`
 - `/workflows`
 - `/distribution`
+- `/pricing`
 - `/settings`
 
 ### 6. Performance, SEO and best practices

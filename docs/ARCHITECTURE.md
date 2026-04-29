@@ -86,5 +86,6 @@ La UI combina datos demo con primeras integraciones reales:
 - iCal export expone `/api/ical/[slug]` para anuncios publicados. Genera un calendario `text/calendar` con reservas/bloqueos de la propiedad y oculta datos personales, sirviendo como puente hasta integrar APIs oficiales.
 - iCal import recibe calendarios externos en `/api/ical/import` o desde `/distribution`, parsea `VEVENT`, crea `calendar_blocks` no duplicados y registra `channel_sync_events` inbound para auditoria.
 - Inbound channel messages entran por `/api/channels/messages` o desde `/inbox`: se normalizan en `guests`, `conversations`, `conversation_messages` y `channel_sync_events` para que futuros webhooks de portales acaben en la misma bandeja operativa.
+- Pricing conecta `/pricing` y `/api/pricing/observations` con `pricing_observations`. Permite guardar recomendaciones manuales o importadas por canal antes de conectar PriceLabs, Beyond, Wheelhouse o motores propios.
 
 La prioridad tecnica actual es conectar cada pantalla PMS a Supabase manteniendo RLS, validadores compartidos y tests.

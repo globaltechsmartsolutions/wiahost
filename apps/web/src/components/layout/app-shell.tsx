@@ -19,6 +19,7 @@ import {
   Search,
   Send,
   Settings,
+  TrendingUp,
   Users,
 } from "lucide-react";
 
@@ -52,6 +53,7 @@ const navSections = [
       { label: "Propietarios", href: "/owners", icon: Landmark },
       { label: "Liquidaciones", href: "/statements", icon: CreditCard },
       { label: "Distribucion", href: "/distribution", icon: RadioTower },
+      { label: "Precios", href: "/pricing", icon: TrendingUp },
       { label: "Automatizaciones", href: "/automations", icon: Bot },
       { label: "Check-in/out", href: "/workflows", icon: Send },
       { label: "Auditoria", href: "/audit", icon: ScrollText },

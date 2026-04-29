@@ -105,6 +105,12 @@ La normalizacion de mensajes entrantes no crea tablas nuevas. El endpoint `/api/
 
 Los canales `email`, `whatsapp`, `sms` e `inbox` se registran como sync `manual` porque `channel_sync_events.channel` representa canales de distribucion. Airbnb, Booking y Vrbo conservan su canal.
 
+## Pricing y revenue
+
+El modulo `/pricing` activa la tabla `pricing_observations`. Cada registro guarda propiedad, fecha, origen/canal, precio actual, sugerido, aprobado, final, ocupacion, booking pace, lead time y estado de conversion.
+
+Esta capa no cambia automaticamente tarifas publicadas. Es un control humano y auditable para comparar recomendaciones contra resultado real antes de integrar PriceLabs, motores de pricing o automatizaciones.
+
 ## Auditoria operativa
 
 La tabla `operational_events` ya tiene modulo web en `/audit` y API REST en `/api/audit-events`. Permite registrar eventos manuales o de sistema con `event_name`, `entity_type`, entidad vinculada, fuente, actor y `metadata`.
