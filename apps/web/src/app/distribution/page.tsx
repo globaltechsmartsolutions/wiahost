@@ -225,9 +225,10 @@ function ListingCard({
         </div>
       </CardHeader>
       <CardContent className="grid gap-4">
-        <div className="grid gap-3 rounded-2xl border border-[#dfd2bf] bg-white/55 p-4 md:grid-cols-3">
+        <div className="grid gap-3 rounded-2xl border border-[#dfd2bf] bg-white/55 p-4 md:grid-cols-4">
           <MiniFact label="ID externo" value={listing.externalListingId} />
           <MiniFact label="URL canal" value={listing.channelUrl} />
+          <MiniFact label="Feed iCal" value={listing.icalUrl} />
           <MiniFact label="Ultimo sync" value={listing.lastSyncedAt} />
         </div>
         <p className="text-sm text-muted-foreground">{listing.syncNotes}</p>

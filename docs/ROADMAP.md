@@ -93,7 +93,8 @@
 - Implementado: registro de eventos de sincronizacion sobre `channel_sync_events`, con canal, direccion, estado, payload JSON, errores y API GET/POST.
 - Implementado: motor publico de reserva directa `/book/[slug]`, conectado a `property_listings.public_slug`, con formulario de solicitud, creacion segura de guest, reservation en estado `inquiry`, conversation, mensaje inbound y evento de sync directo.
 - Implementado: pipeline comercial `/leads` para revisar solicitudes directas, abrir el hilo de inbox, ver la reserva y convertir/cancelar leads mediante Server Action y API PATCH.
-- Pendiente: confirmacion/pago online, import/export iCal real, APIs oficiales por canal, normalizacion de mensajes entrantes y control de precios por canal.
+- Implementado: export iCal publico `/api/ical/[slug]` para disponibilidad de anuncios publicados, sin exponer datos personales de huespedes.
+- Pendiente: import iCal real, confirmacion/pago online, APIs oficiales por canal, normalizacion de mensajes entrantes y control de precios por canal.
 
 ## Fase 4 - App movil
 

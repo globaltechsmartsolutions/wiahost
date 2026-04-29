@@ -34,9 +34,9 @@ La idea no es solo listar viviendas, sino controlar toda la operacion diaria: ca
 
 ## MVP actual
 
-Ya existe una primera version visual navegable con landing profesional, dashboard tipo command center, rutas internas principales, modelo Supabase preparado y seed demo.
+Ya existe una primera version web conectada a Supabase con landing profesional, dashboard tipo command center, rutas internas principales, operaciones PMS, distribucion, reserva directa, leads comerciales, iCal publico, modelo Supabase y seed demo.
 
-La UI actual usa datos demo. La logica real contra Supabase se implementa en la siguiente fase.
+La UI mantiene fallback demo para desarrollo sin entorno local, pero los modulos clave ya trabajan contra Supabase cuando las variables estan configuradas.
 
 ## Principio de producto
 

@@ -68,4 +68,19 @@ test.describe("public and auth smoke @smoke", () => {
     await expect(page).toHaveURL(/\/book\/loft-malaga-centro\?sent=1$/);
     await expect(page.getByText(/solicitud enviada/i)).toBeVisible();
   });
+
+  test("serves a public iCal availability feed without guest data", async ({
+    page,
+  }) => {
+    const response = await page.request.get("/api/ical/loft-malaga-centro");
+
+    expect(response.status()).toBe(200);
+    expect(response.headers()["content-type"]).toContain("text/calendar");
+
+    const body = await response.text();
+    expect(body).toContain("BEGIN:VCALENDAR");
+    expect(body).toContain("VERSION:2.0");
+    expect(body).toContain("SUMMARY:Reservado");
+    expect(body.toLowerCase()).not.toContain("sofia");
+  });
 });

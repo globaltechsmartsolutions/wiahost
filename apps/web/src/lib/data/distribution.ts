@@ -51,6 +51,7 @@ export type ListingListItem = {
   channel: string;
   channelUrl: string;
   externalListingId: string;
+  icalUrl: string;
   id: string;
   lastSyncedAt: string;
   property: string;
@@ -133,6 +134,7 @@ const fallbackListings: ListingListItem[] = demoChannelHealth.map(
         ? "http://localhost:3002/book/loft-malaga-centro"
         : `https://${channel.channel.toLowerCase().replaceAll(".", "")}.example/listing/demo-${index + 1}`,
     externalListingId: `demo-${index + 1}`,
+    icalUrl: `/api/ical/demo-listing-${index + 1}`,
     id: `demo-listing-${index + 1}`,
     lastSyncedAt: "Demo",
     property: demoProperties[index % demoProperties.length]?.name ?? "Demo",
@@ -230,6 +232,7 @@ function mapListing(row: ListingRow): ListingListItem {
     channel: labelFromOptions(channelOptions, row.channel),
     channelUrl: row.channel_url ?? "Sin URL",
     externalListingId: row.external_listing_id ?? "Sin ID externo",
+    icalUrl: row.public_slug ? `/api/ical/${row.public_slug}` : "Sin feed",
     id: row.id,
     lastSyncedAt: shortDate(row.last_synced_at),
     property: property?.name ?? "Propiedad",
