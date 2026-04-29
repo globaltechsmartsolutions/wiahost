@@ -10,6 +10,7 @@ import {
   type DocumentListItem,
 } from "@/lib/data/documents";
 import { AppShell } from "@/components/layout/app-shell";
+import { DocumentUploadForm } from "@/components/forms/document-upload-form";
 import { PageHeader } from "@/components/page-header";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -86,24 +87,39 @@ export default async function DocumentsPage({
         <MetricCard label="Incidencias" value={String(linkedToIncidents)} />
       </section>
 
-      <section className="grid gap-5 xl:grid-cols-[0.85fr_1.35fr]">
-        <Card className="rounded-[2rem] border-border/80 bg-card/80">
-          <CardHeader>
-            <CardTitle>Nuevo documento</CardTitle>
-            <CardDescription>
-              Registra la evidencia ahora y conserva la ruta exacta para cuando
-              activemos upload avanzado.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form action={createDocumentAction} className="grid gap-4">
-              <DocumentFields options={options} />
-              <Button type="submit" className="rounded-full">
-                Crear documento
-              </Button>
-            </form>
-          </CardContent>
-        </Card>
+      <section className="grid gap-5 xl:grid-cols-[0.95fr_1.25fr]">
+        <div className="grid content-start gap-5">
+          <Card className="rounded-[2rem] border-border/80 bg-card/80">
+            <CardHeader>
+              <CardTitle>Subir evidencia</CardTitle>
+              <CardDescription>
+                Sube contratos, fotos de incidencias o evidencias de check-in
+                con URL firmada temporal y registro automatico.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <DocumentUploadForm options={options} />
+            </CardContent>
+          </Card>
+
+          <Card className="rounded-[2rem] border-border/80 bg-card/80">
+            <CardHeader>
+              <CardTitle>Registro manual</CardTitle>
+              <CardDescription>
+                Usa este modo si el archivo ya existe en Storage o se ha subido
+                desde una integracion externa.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <form action={createDocumentAction} className="grid gap-4">
+                <DocumentFields options={options} />
+                <Button type="submit" className="rounded-full">
+                  Crear documento
+                </Button>
+              </form>
+            </CardContent>
+          </Card>
+        </div>
 
         <section className="grid gap-4">
           {documents.length ? (

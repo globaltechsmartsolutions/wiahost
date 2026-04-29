@@ -148,12 +148,12 @@ Buckets preparados:
 
 El modulo `documents` ya esta conectado desde la web. En el MVP guarda metadatos y la ruta de storage para evidencias de check-in, contratos, adjuntos de incidencias o archivos operativos. Cada documento puede quedar asociado a una propiedad, una reserva y/o una incidencia.
 
-Los buckets se mantienen privados. La web ya prepara URL firmadas:
+Los buckets se mantienen privados. La web ya usa URL firmadas:
 
 - `POST /api/documents/upload-url`: crea URL firmada de subida para clientes web/mobile autenticados.
 - `GET /api/documents/:documentId/download`: valida sesion/RLS y redirige a una URL firmada temporal de descarga.
 
-El upload visual completo se activara sobre estos endpoints; hasta entonces, la pantalla conserva trazabilidad del archivo y contexto operativo.
+La pantalla `/documents` permite subir el archivo real desde navegador con token temporal, registrar despues el metadata en `documents` y mantener el contexto de propiedad, reserva o incidencia. El registro manual sigue disponible para integraciones externas o archivos ya existentes en Storage.
 
 ## Seed
 
@@ -162,7 +162,6 @@ El upload visual completo se activara sobre estos endpoints; hasta entonces, la 
 ## Pendientes
 
 - Generar tipos reales con `pnpm db:types`.
-- Completar upload avanzado de documentos y evidencias desde la UI.
 - Crear Edge Functions para operaciones sensibles.
 - Auditar politicas RLS antes de produccion.
 - Conectar tracking real de eventos y feedback humano desde la web.
