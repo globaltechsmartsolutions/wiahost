@@ -17,6 +17,7 @@ const protectedRoutes = [
   "/settings",
   "/statements",
   "/tasks",
+  "/workflows",
 ];
 
 const authRoutes = ["/login", "/register"];
@@ -142,5 +143,6 @@ export const config = {
     "/settings/:path*",
     "/statements/:path*",
     "/tasks/:path*",
+    "/workflows/:path*",
   ],
 };

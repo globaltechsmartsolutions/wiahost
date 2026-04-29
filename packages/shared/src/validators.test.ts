@@ -5,6 +5,7 @@ import {
   automationRuleSchema,
   calendarBlockSchema,
   documentSchema,
+  guestWorkflowSchema,
   incidentSchema,
   loginSchema,
   manualReservationSchema,
@@ -176,6 +177,36 @@ describe("automation validators", () => {
       name: "Aviso",
       template: "Hola",
       trigger: "reservation_confirmed",
+    });
+
+    expect(parsed.success).toBe(false);
+  });
+});
+
+describe("workflow validators", () => {
+  it("accepts guest lifecycle workflow templates", () => {
+    const parsed = guestWorkflowSchema.safeParse({
+      channel: "whatsapp",
+      delayMinutes: "0",
+      enabled: true,
+      name: "Enviar instrucciones 24h antes",
+      template:
+        "Hola {{guest_name}}, manana es tu llegada a {{property_name}}.",
+      trigger: "checkin_24h",
+    });
+
+    expect(parsed.success).toBe(true);
+  });
+
+  it("rejects non guest lifecycle automation triggers", () => {
+    const parsed = guestWorkflowSchema.safeParse({
+      channel: "inbox",
+      delayMinutes: 0,
+      enabled: true,
+      name: "Responder mensaje sin SLA",
+      template:
+        "Hola {{guest_name}}, estamos revisando tu mensaje con prioridad.",
+      trigger: "message_unanswered",
     });
 
     expect(parsed.success).toBe(false);

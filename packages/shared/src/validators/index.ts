@@ -11,3 +11,4 @@ export * from "./payment";
 export * from "./property";
 export * from "./reservation";
 export * from "./task";
+export * from "./workflow";

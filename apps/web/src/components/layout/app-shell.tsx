@@ -15,6 +15,7 @@ import {
   MessageSquareWarning,
   ScrollText,
   Search,
+  Send,
   Settings,
   Users,
 } from "lucide-react";
@@ -48,6 +49,7 @@ const navSections = [
       { label: "Propietarios", href: "/owners", icon: Landmark },
       { label: "Liquidaciones", href: "/statements", icon: CreditCard },
       { label: "Automatizaciones", href: "/automations", icon: Bot },
+      { label: "Check-in/out", href: "/workflows", icon: Send },
       { label: "Auditoria", href: "/audit", icon: ScrollText },
       { label: "Documentos", href: "/documents", icon: FileText },
       { label: "Pagos", href: "/payments", icon: CreditCard },

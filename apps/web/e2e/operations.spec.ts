@@ -474,6 +474,74 @@ test.describe("operations flows with Supabase @critical @data", () => {
     await expect(page.getByText(updatedRuleName)).not.toBeVisible();
   });
 
+  test("creates, updates and deletes guest workflows through API routes", async ({
+    page,
+  }) => {
+    const existingWorkflowsResponse = await page.request.get("/api/workflows");
+    if (existingWorkflowsResponse.ok()) {
+      const existingWorkflows = (await existingWorkflowsResponse.json()) as {
+        data: Array<{ id: string; name: string }>;
+      };
+
+      for (const workflow of existingWorkflows.data.filter((item) =>
+        item.name.startsWith("E2E Workflow"),
+      )) {
+        await page.request.delete(`/api/workflows/${workflow.id}`);
+      }
+    }
+
+    const workflowName = uniqueName("E2E Workflow");
+    const workflowResponse = await page.request.post("/api/workflows", {
+      data: {
+        channel: "whatsapp",
+        delayMinutes: 0,
+        enabled: true,
+        name: workflowName,
+        template:
+          "Hola {{guest_name}}, aqui tienes las instrucciones para {{property_name}}.",
+        trigger: "checkin_24h",
+      },
+    });
+    expect(workflowResponse.status()).toBe(201);
+
+    const workflowBody = (await workflowResponse.json()) as {
+      data: { id: string };
+    };
+    const updatedWorkflowName = `${workflowName} editado`;
+    const workflowPatchResponse = await page.request.patch(
+      `/api/workflows/${workflowBody.data.id}`,
+      {
+        data: {
+          channel: "inbox",
+          delayMinutes: 15,
+          enabled: false,
+          name: updatedWorkflowName,
+          template:
+            "Mensaje actualizado para {{guest_name}} con soporte en {{support_phone}}.",
+          trigger: "checkout_time",
+        },
+      },
+    );
+    expect(workflowPatchResponse.status()).toBe(200);
+
+    await page.goto("/workflows");
+    await expect(
+      page.getByRole("heading", { name: /check-in y check-out/i }),
+    ).toBeVisible();
+    await expect(page.getByText(updatedWorkflowName)).toBeVisible();
+    await expect(
+      page.locator("span").filter({ hasText: "Pausada" }).first(),
+    ).toBeVisible();
+
+    const workflowDeleteResponse = await page.request.delete(
+      `/api/workflows/${workflowBody.data.id}`,
+    );
+    expect(workflowDeleteResponse.status()).toBe(200);
+
+    await page.goto("/workflows");
+    await expect(page.getByText(updatedWorkflowName)).not.toBeVisible();
+  });
+
   test("creates, updates and deletes payments through API routes", async ({
     page,
   }) => {

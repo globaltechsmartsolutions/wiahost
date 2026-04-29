@@ -48,6 +48,12 @@ Estas tablas no activan IA automaticamente. Su objetivo es guardar datos limpios
 
 La estrategia IA canonica esta en `AI.md`.
 
+## Workflows de huesped
+
+Los workflows de check-in/check-out del MVP viven sobre `automation_rules` para evitar duplicar modelos. La pantalla `/workflows` filtra los triggers `reservation_confirmed`, `checkin_24h`, `checkin_1h` y `checkout_time`, y usa `template`, `channel`, `delay_minutes` y `enabled` como fuente de verdad.
+
+Las variables visibles en UI (`{{guest_name}}`, `{{property_name}}`, `{{checkin_date}}`, `{{checkout_date}}`, `{{access_code}}`, `{{house_rules}}`, `{{support_phone}}`) son placeholders de plantilla. La resolucion real por reserva se implementara cuando conectemos el motor de envio.
+
 ## Auditoria operativa
 
 La tabla `operational_events` ya tiene modulo web en `/audit` y API REST en `/api/audit-events`. Permite registrar eventos manuales o de sistema con `event_name`, `entity_type`, entidad vinculada, fuente, actor y `metadata`.

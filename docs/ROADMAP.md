@@ -72,6 +72,7 @@
 ### Estado actual de Fase 2
 
 - Implementado: modulo web de automatizaciones con alta, edicion, pausa/activacion, eliminacion, plantillas, trigger, canal, delay y API GET/POST/GET detail/PATCH/DELETE.
+- Implementado: modulo web de workflows de check-in/check-out sobre `automation_rules`, con plantillas reutilizables por etapa, variables dinamicas, alta, edicion, pausa/activacion, eliminacion y API GET/POST/GET detail/PATCH/DELETE.
 - Implementado: modulo web de auditoria operativa con timeline de eventos, alta manual, metadata, vinculacion a entidades y API GET/POST/GET detail/DELETE.
 - Implementado: modulo web de documentos y evidencias con alta, edicion, eliminacion, vinculacion a propiedad/reserva/incidencia y API GET/POST/GET detail/PATCH/DELETE.
 - Implementado: modulo web de owner statements con alta, edicion, eliminacion, periodos, costes, payout neto y API GET/POST/GET detail/PATCH/DELETE.

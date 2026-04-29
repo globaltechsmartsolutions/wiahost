@@ -32,6 +32,13 @@ export const automationTriggers = [
   "low_review",
 ] as const;
 
+export const guestWorkflowTriggers = [
+  "reservation_confirmed",
+  "checkin_24h",
+  "checkin_1h",
+  "checkout_time",
+] as const;
+
 export const reservationStatuses = [
   "inquiry",
   "pending",
