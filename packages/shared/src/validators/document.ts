@@ -21,7 +21,11 @@ export const documentSchema = z.object({
     .string()
     .trim()
     .min(3, "Indica la ruta del documento en storage.")
-    .max(500, "La ruta del documento es demasiado larga."),
+    .max(500, "La ruta del documento es demasiado larga.")
+    .refine(
+      (value) => !value.startsWith("/") && !value.includes(".."),
+      "La ruta del documento no es segura.",
+    ),
   title: z
     .string()
     .trim()
@@ -29,4 +33,18 @@ export const documentSchema = z.object({
     .max(120, "El titulo no puede superar 120 caracteres."),
 });
 
+export const documentUploadUrlSchema = z.object({
+  storagePath: z
+    .string()
+    .trim()
+    .min(3, "Indica la ruta del documento en storage.")
+    .max(500, "La ruta del documento es demasiado larga.")
+    .refine(
+      (value) => !value.startsWith("/") && !value.includes(".."),
+      "La ruta del documento no es segura.",
+    ),
+  upsert: z.coerce.boolean().default(false),
+});
+
 export type DocumentInput = z.infer<typeof documentSchema>;
+export type DocumentUploadUrlInput = z.infer<typeof documentUploadUrlSchema>;

@@ -8,6 +8,7 @@
 - Supabase RLS es la defensa principal de datos. La UI y los Route Handlers ayudan, pero no sustituyen RLS.
 - Stripe solo confirma pagos desde webhook firmado y con `payment_status = paid`.
 - Las cuentas externas de canales se documentan en `channel_accounts`, pero las credenciales reales deben vivir en variables seguras o vault del proveedor.
+- Los documentos usan buckets privados y URL firmadas temporales para subida/descarga; no se deben publicar rutas de storage como enlaces permanentes.
 
 ## Auditor local
 

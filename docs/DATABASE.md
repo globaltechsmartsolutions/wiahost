@@ -148,7 +148,12 @@ Buckets preparados:
 
 El modulo `documents` ya esta conectado desde la web. En el MVP guarda metadatos y la ruta de storage para evidencias de check-in, contratos, adjuntos de incidencias o archivos operativos. Cada documento puede quedar asociado a una propiedad, una reserva y/o una incidencia.
 
-El upload avanzado de ficheros se activara sobre los buckets `reservation-documents` e `incident-attachments`; hasta entonces, la pantalla conserva trazabilidad del archivo y contexto operativo.
+Los buckets se mantienen privados. La web ya prepara URL firmadas:
+
+- `POST /api/documents/upload-url`: crea URL firmada de subida para clientes web/mobile autenticados.
+- `GET /api/documents/:documentId/download`: valida sesion/RLS y redirige a una URL firmada temporal de descarga.
+
+El upload visual completo se activara sobre estos endpoints; hasta entonces, la pantalla conserva trazabilidad del archivo y contexto operativo.
 
 ## Seed
 

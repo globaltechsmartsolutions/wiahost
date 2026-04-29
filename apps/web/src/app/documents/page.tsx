@@ -162,6 +162,15 @@ function DocumentCard({
           <p className="mt-3 text-sm text-muted-foreground">
             Propiedad: {document.property}
           </p>
+          <Button asChild variant="outline" className="mt-4 rounded-full">
+            <a
+              href={`/api/documents/${document.id}/download`}
+              target="_blank"
+              rel="noreferrer"
+            >
+              Abrir enlace seguro
+            </a>
+          </Button>
         </div>
 
         <form action={updateDocumentAction} className="grid gap-4">

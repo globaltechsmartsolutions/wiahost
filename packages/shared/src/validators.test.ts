@@ -9,6 +9,7 @@ import {
   checkoutConfirmationSchema,
   directBookingInquirySchema,
   documentSchema,
+  documentUploadUrlSchema,
   guestWorkflowSchema,
   incidentSchema,
   listingSchema,
@@ -438,6 +439,15 @@ describe("document validators", () => {
     const parsed = documentSchema.safeParse({
       storagePath: "",
       title: "ID",
+    });
+
+    expect(parsed.success).toBe(false);
+  });
+
+  it("rejects unsafe document storage paths", () => {
+    const parsed = documentUploadUrlSchema.safeParse({
+      storagePath: "../secret.pdf",
+      upsert: "false",
     });
 
     expect(parsed.success).toBe(false);

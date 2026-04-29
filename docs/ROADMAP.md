@@ -82,7 +82,7 @@
 - Implementado: modulo web de workflows de check-in/check-out sobre `automation_rules`, con plantillas reutilizables por etapa, variables dinamicas, preview renderizado, alta, edicion, pausa/activacion, eliminacion y API GET/POST/GET detail/PATCH/DELETE.
 - Implementado: motor compartido de plantillas en `@wiahost/shared` para resolver `{{guest_name}}`, `{{property_name}}`, fechas, access code, normas y telefono de soporte sin duplicar logica entre web/mobile/backend.
 - Implementado: modulo web de auditoria operativa con timeline de eventos, alta manual, metadata, vinculacion a entidades y API GET/POST/GET detail/DELETE.
-- Implementado: modulo web de documentos y evidencias con alta, edicion, eliminacion, vinculacion a propiedad/reserva/incidencia y API GET/POST/GET detail/PATCH/DELETE.
+- Implementado: modulo web de documentos y evidencias con alta, edicion, eliminacion, vinculacion a propiedad/reserva/incidencia, API GET/POST/GET detail/PATCH/DELETE, URL firmada de subida y descarga temporal segura.
 - Implementado: modulo web de owner statements con alta, edicion, eliminacion, periodos, costes, payout neto y API GET/POST/GET detail/PATCH/DELETE.
 - Implementado: modulo web de pagos iniciales con alta, edicion, eliminacion, estados, proveedor, importe, fecha de pago, enlaces tokenizados de checkout, Stripe Checkout opcional si hay claves, webhook firmado, confirmacion solo con `payment_status = paid` y API GET/POST/GET detail/PATCH/DELETE/checkout-link.
 - Implementado: centro de notificaciones `/notifications` con campana en topbar, contador de no leidas, marcado como leido y API GET/POST/PATCH.

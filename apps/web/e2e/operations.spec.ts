@@ -1131,12 +1131,32 @@ test.describe("operations flows with Supabase @critical @data", () => {
     );
     expect(documentPatchResponse.status()).toBe(200);
 
+    const uploadUrlResponse = await page.request.post(
+      "/api/documents/upload-url",
+      {
+        data: {
+          storagePath: updatedStoragePath,
+          upsert: true,
+        },
+      },
+    );
+    expect(uploadUrlResponse.status()).toBe(201);
+    const uploadUrlBody = (await uploadUrlResponse.json()) as {
+      data: { bucket: string; signedUrl: string; token: string };
+    };
+    expect(uploadUrlBody.data.bucket).toBe("reservation-documents");
+    expect(uploadUrlBody.data.signedUrl).toBeTruthy();
+    expect(uploadUrlBody.data.token).toBeTruthy();
+
     await page.goto("/documents");
     await expect(
       page.getByRole("heading", { name: /evidencias operativas/i }),
     ).toBeVisible();
     await expect(page.getByText(updatedTitle)).toBeVisible();
     await expect(page.getByText(updatedStoragePath)).toBeVisible();
+    await expect(
+      page.getByRole("link", { name: /abrir enlace seguro/i }).first(),
+    ).toBeVisible();
 
     const documentDeleteResponse = await page.request.delete(
       `/api/documents/${documentBody.data.id}`,
