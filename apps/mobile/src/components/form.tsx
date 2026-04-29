@@ -13,6 +13,7 @@ import { colors } from "@/src/lib/theme";
 export function Field({
   error,
   label,
+  style,
   ...props
 }: TextInputProps & {
   error?: string;
@@ -24,7 +25,7 @@ export function Field({
       <TextInput
         autoCapitalize="none"
         placeholderTextColor="#9b8f80"
-        style={[styles.input, error && styles.inputError]}
+        style={[styles.input, error && styles.inputError, style]}
         {...props}
       />
       {error ? <Text style={styles.error}>{error}</Text> : null}

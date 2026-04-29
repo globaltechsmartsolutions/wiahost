@@ -1,6 +1,7 @@
 import { router } from "expo-router";
 
 import { Card, EmptyState, ListItem, SectionTitle } from "@/src/components/cards";
+import { PrimaryButton } from "@/src/components/form";
 import { Screen } from "@/src/components/screen";
 import { useMobileDashboard } from "@/src/hooks/use-mobile-dashboard";
 
@@ -16,6 +17,11 @@ export default function IncidentsScreen() {
       refreshing={isRefetching}
       subtitle="Riesgos, tareas criticas e incidencias para proteger activos y ratings."
       title="Riesgo"
+      action={
+        <PrimaryButton onPress={() => router.push("/incidents/new")}>
+          Nueva
+        </PrimaryButton>
+      }
     >
       <Card>
         <SectionTitle helper="Acciones que conviene cerrar antes de que escalen.">
