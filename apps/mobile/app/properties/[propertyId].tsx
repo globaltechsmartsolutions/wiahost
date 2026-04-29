@@ -1,15 +1,20 @@
-import { useLocalSearchParams } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import { StyleSheet, Text, View } from "react-native";
 
 import { Card, EmptyState, SectionTitle, StatusBadge } from "@/src/components/cards";
+import { PrimaryButton } from "@/src/components/form";
 import { Screen } from "@/src/components/screen";
+import { usePropertyDetail } from "@/src/hooks/use-property-detail";
+import { isSupabaseConfigured } from "@/src/lib/supabase";
 import { colors } from "@/src/lib/theme";
-import { useMobileDashboard } from "@/src/hooks/use-mobile-dashboard";
+import { isGuid } from "@/src/lib/utils";
 
 export default function PropertyDetailScreen() {
   const { propertyId } = useLocalSearchParams<{ propertyId: string }>();
-  const { data, isLoading, refetch, isRefetching } = useMobileDashboard();
-  const property = data?.properties.find((item) => item.id === propertyId);
+  const { data: property, isLoading, refetch, isRefetching } =
+    usePropertyDetail(propertyId);
+  const canEditProperty =
+    Boolean(property) && isSupabaseConfigured() && isGuid(property?.id ?? "");
 
   return (
     <Screen
@@ -18,21 +23,39 @@ export default function PropertyDetailScreen() {
       refreshing={isRefetching}
       subtitle="Ficha rapida del activo para revisar contexto antes de actuar."
       title={property?.name ?? "Activo"}
+      action={
+        canEditProperty ? (
+          <PrimaryButton
+            onPress={() =>
+              router.push({
+                pathname: "/properties/edit/[propertyId]",
+                params: { propertyId: propertyId ?? "" },
+              })
+            }
+            variant="secondary"
+          >
+            Editar
+          </PrimaryButton>
+        ) : null
+      }
     >
       {property ? (
         <>
           <Card>
             <View style={styles.headerRow}>
               <View style={styles.avatar}>
-                <Text style={styles.avatarText}>{property.city.slice(0, 3).toUpperCase()}</Text>
+                <Text style={styles.avatarText}>
+                  {property.city.slice(0, 3).toUpperCase()}
+                </Text>
               </View>
               <View style={styles.headerCopy}>
                 <Text style={styles.title}>{property.name}</Text>
                 <Text style={styles.meta}>
-                  {property.internalName} - {property.city}
+                  {property.internalName || property.id.slice(0, 8)} -{" "}
+                  {property.city}
                 </Text>
               </View>
-              <StatusBadge label={property.status} />
+              <StatusBadge label={property.statusLabel} />
             </View>
           </Card>
           <Card>
@@ -41,7 +64,18 @@ export default function PropertyDetailScreen() {
             </SectionTitle>
             <DetailRow label="Ciudad" value={property.city} />
             <DetailRow label="Precio base" value={`${property.basePrice} EUR`} />
-            <DetailRow label="Estado" value={property.status} />
+            <DetailRow label="Limpieza" value={`${property.cleaningFee} EUR`} />
+            <DetailRow
+              label="Capacidad"
+              value={`${property.maxGuests} huespedes`}
+            />
+            <DetailRow label="Estado" value={property.statusLabel} />
+            {!canEditProperty ? (
+              <Text style={styles.meta}>
+                Modo demo o dato no editable desde mobile. Conecta Supabase y abre
+                un activo real para editarlo.
+              </Text>
+            ) : null}
           </Card>
         </>
       ) : (

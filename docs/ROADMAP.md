@@ -143,6 +143,7 @@
 - Implementado: tabs moviles de Dashboard, Activos, Reservas, Inbox, Riesgo y Ajustes con UI nativa responsive.
 - Implementado: fichas moviles navegables para activos, reservas, conversaciones e incidencias, con contexto operativo y fallback demo.
 - Implementado: alta nativa de activos desde mobile con validacion compartida `propertySchema`, TanStack Query, Supabase insert y cache invalidation.
+- Implementado: edicion nativa de activos desde mobile con formulario compartido, detalle real, validacion `propertySchema`, Supabase update e invalidacion de cache.
 - Implementado: alta nativa de incidencias desde mobile con validacion compartida `incidentSchema`, seleccion de activo, severidad, coste estimado y Supabase insert.
 - Implementado: envio de respuesta desde ficha de inbox mobile con validacion compartida `messageSchema`, insercion en `conversation_messages` y actualizacion de estado de conversacion.
 - Implementado: alta nativa de reservas desde mobile con validacion compartida `manualReservationSchema`, creacion de huesped y reserva con calculo de noches/importes.
@@ -155,7 +156,7 @@
 - Implementado: TanStack Query para cache/refresco de datos operativos y lectura directa de Supabase con RLS.
 - Implementado: fallback demo para poder revisar la experiencia movil aunque no esten copiadas las variables.
 - Implementado: typecheck movil limpio.
-- Pendiente inmediato: edicion nativa de activos, subida de evidencias/fotos desde camara o galeria, push notifications, EAS Build real con cuenta Expo y tests e2e mobile.
+- Pendiente inmediato: subida de evidencias/fotos desde camara o galeria, push notifications, EAS Build real con cuenta Expo y tests e2e mobile.
 
 ## Fase 5 - IA y automatizacion avanzada
 
