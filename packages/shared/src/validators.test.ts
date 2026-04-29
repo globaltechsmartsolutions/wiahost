@@ -5,6 +5,7 @@ import {
   automationRuleSchema,
   calendarBlockSchema,
   channelSyncEventSchema,
+  checkoutConfirmationSchema,
   directBookingInquirySchema,
   documentSchema,
   guestWorkflowSchema,
@@ -318,6 +319,24 @@ describe("payment validators", () => {
       provider: "manual",
       reservationId: uuid,
       status: "paid",
+    });
+
+    expect(parsed.success).toBe(false);
+  });
+});
+
+describe("checkout validators", () => {
+  it("accepts signed checkout confirmation tokens", () => {
+    const parsed = checkoutConfirmationSchema.safeParse({
+      token: "checkout-token-11111111-2222-4333-8444-555555555555",
+    });
+
+    expect(parsed.success).toBe(true);
+  });
+
+  it("rejects short checkout tokens", () => {
+    const parsed = checkoutConfirmationSchema.safeParse({
+      token: "short",
     });
 
     expect(parsed.success).toBe(false);

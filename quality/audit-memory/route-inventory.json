@@ -31,6 +31,12 @@
       "tests": ["smoke", "critical", "data", "a11y", "visual"]
     },
     {
+      "path": "/checkout/:paymentId",
+      "auth": "public-token",
+      "primaryCheck": "Public payment checkout validates a tokenized payment link and confirms direct checkout",
+      "tests": ["critical", "data"]
+    },
+    {
       "path": "/audit",
       "auth": "protected",
       "primaryCheck": "Operational audit events can be created, listed and deleted through API/UI context",

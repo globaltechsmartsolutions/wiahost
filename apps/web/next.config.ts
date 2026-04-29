@@ -1,7 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  transpilePackages: ["@wiahost/shared", "@wiahost/database"]
+  allowedDevOrigins: ["127.0.0.1"],
+  transpilePackages: ["@wiahost/shared", "@wiahost/database"],
 };
 
 export default nextConfig;

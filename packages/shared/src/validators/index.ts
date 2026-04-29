@@ -2,6 +2,7 @@ export * from "./auth";
 export * from "./ai";
 export * from "./automation";
 export * from "./calendar";
+export * from "./checkout";
 export * from "./document";
 export * from "./distribution";
 export * from "./direct-booking";

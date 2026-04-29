@@ -826,6 +826,36 @@ test.describe("operations flows with Supabase @critical @data", () => {
     const paymentBody = (await paymentResponse.json()) as {
       data: { id: string };
     };
+
+    const checkoutLinkResponse = await page.request.post(
+      `/api/payments/${paymentBody.data.id}/checkout-link`,
+    );
+    expect(checkoutLinkResponse.status()).toBe(201);
+    const checkoutLinkBody = (await checkoutLinkResponse.json()) as {
+      data: { checkoutUrl: string };
+    };
+    expect(checkoutLinkBody.data.checkoutUrl).toContain("/checkout/");
+
+    await page.goto(checkoutLinkBody.data.checkoutUrl);
+    await expect(
+      page.getByRole("heading", { name: /confirma tu reserva directa/i }),
+    ).toBeVisible();
+    await expect(page.getByText(`${amount} EUR`).first()).toBeVisible();
+
+    const checkoutToken = new URL(
+      checkoutLinkBody.data.checkoutUrl,
+    ).searchParams.get("token");
+    expect(checkoutToken).toBeTruthy();
+
+    const checkoutConfirmResponse = await page.request.post(
+      `/api/checkout/${paymentBody.data.id}/confirm`,
+      { data: { token: checkoutToken } },
+    );
+    expect(checkoutConfirmResponse.status()).toBe(200);
+
+    await page.goto(checkoutLinkBody.data.checkoutUrl);
+    await expect(page.getByText("Pago confirmado")).toBeVisible();
+
     const updatedAmount = amount + 1;
     const paymentPatchResponse = await page.request.patch(
       `/api/payments/${paymentBody.data.id}`,

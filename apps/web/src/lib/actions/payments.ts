@@ -7,6 +7,7 @@ import { z } from "zod";
 
 import {
   createPayment,
+  createPaymentCheckoutLink,
   deletePayment,
   PaymentMutationError,
   updatePayment,
@@ -126,4 +127,29 @@ export async function deletePaymentAction(formData: FormData) {
   revalidatePath("/payments");
   revalidatePath("/owners");
   redirect("/payments?deleted=1");
+}
+
+export async function createPaymentCheckoutLinkAction(formData: FormData) {
+  const paymentId = String(formData.get("paymentId") ?? "");
+  const validPaymentId = idSchema.safeParse(paymentId);
+
+  if (!validPaymentId.success) {
+    redirectWithError("El identificador de pago no es valido.");
+  }
+
+  const supabase = await requirePaymentClient();
+
+  try {
+    await createPaymentCheckoutLink(supabase, validPaymentId.data);
+  } catch (error) {
+    if (error instanceof PaymentMutationError) {
+      redirectWithError(error.message);
+    }
+
+    redirectWithError("No se ha podido generar el enlace de cobro.");
+  }
+
+  revalidatePath("/payments");
+  revalidatePath("/leads");
+  redirect("/payments?checkout=1");
 }

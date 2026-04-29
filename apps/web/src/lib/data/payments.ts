@@ -1,4 +1,5 @@
 import { isSupabaseConfigured } from "@/lib/supabase/config";
+import { getSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 type Relation<T> = T | T[] | null | undefined;
@@ -7,8 +8,10 @@ type PaymentRow = {
   amount: number | string | null;
   currency: string;
   id: string;
+  metadata?: unknown;
   paid_at: string | null;
   provider: string;
+  provider_payment_id?: string | null;
   reservation_id: string;
   reservations?: Relation<{
     check_in: string | null;
@@ -21,6 +24,8 @@ type PaymentRow = {
 
 export type PaymentListItem = {
   amount: string;
+  checkoutStatus: string;
+  checkoutUrl: string | null;
   dates: string;
   guest: string;
   id: string;
@@ -30,8 +35,10 @@ export type PaymentListItem = {
   raw: {
     amount: number;
     currency: string;
+    checkoutUrl: string | null;
     paidAt: string;
     provider: string;
+    providerPaymentId: string | null;
     reservationId: string;
     status: string;
   };
@@ -41,6 +48,8 @@ export type PaymentListItem = {
 const fallbackPayments: PaymentListItem[] = [
   {
     amount: "645 EUR",
+    checkoutStatus: "Sin enlace",
+    checkoutUrl: null,
     dates: "29 abr - 02 may",
     guest: "Sofia Martin",
     id: "demo-payment-1",
@@ -49,9 +58,11 @@ const fallbackPayments: PaymentListItem[] = [
     provider: "Airbnb",
     raw: {
       amount: 645,
+      checkoutUrl: null,
       currency: "EUR",
       paidAt: "",
       provider: "airbnb",
+      providerPaymentId: null,
       reservationId: "demo-reservation-1",
       status: "authorized",
     },
@@ -116,11 +127,38 @@ function statusLabel(status: string) {
   );
 }
 
+function asRecord(value: unknown): Record<string, unknown> {
+  if (!value || typeof value !== "object" || Array.isArray(value)) {
+    return {};
+  }
+
+  return value as Record<string, unknown>;
+}
+
+function checkoutFromMetadata(metadata: unknown) {
+  const checkout = asRecord(asRecord(metadata).checkout);
+  const url = typeof checkout.url === "string" ? checkout.url : null;
+  const status = typeof checkout.status === "string" ? checkout.status : null;
+
+  return {
+    status:
+      status === "paid"
+        ? "Pagado"
+        : status === "created"
+          ? "Enlace listo"
+          : "Sin enlace",
+    url,
+  };
+}
+
 function mapPayment(row: PaymentRow): PaymentListItem {
   const reservation = one(row.reservations);
+  const checkout = checkoutFromMetadata(row.metadata);
 
   return {
     amount: money(row.amount, row.currency),
+    checkoutStatus: checkout.status,
+    checkoutUrl: checkout.url,
     dates: dateRange(reservation?.check_in, reservation?.check_out),
     guest: one(reservation?.guests)?.full_name ?? "Huesped sin asignar",
     id: row.id,
@@ -129,9 +167,11 @@ function mapPayment(row: PaymentRow): PaymentListItem {
     provider: row.provider,
     raw: {
       amount: Number(row.amount ?? 0),
+      checkoutUrl: checkout.url,
       currency: row.currency,
       paidAt: dateTimeInput(row.paid_at),
       provider: row.provider,
+      providerPaymentId: row.provider_payment_id ?? null,
       reservationId: row.reservation_id,
       status: row.status,
     },
@@ -149,7 +189,7 @@ export async function getPayments(): Promise<PaymentListItem[]> {
     const { data, error } = await supabase
       .from("payments")
       .select(
-        "id,reservation_id,status,provider,amount,currency,paid_at,reservations(check_in,check_out,properties(name),guests(full_name))",
+        "id,reservation_id,status,provider,provider_payment_id,amount,currency,paid_at,metadata,reservations(check_in,check_out,properties(name),guests(full_name))",
       )
       .order("created_at", { ascending: false })
       .limit(100);
@@ -176,7 +216,7 @@ export async function getPaymentDetail(
     const { data, error } = await supabase
       .from("payments")
       .select(
-        "id,reservation_id,status,provider,amount,currency,paid_at,reservations(check_in,check_out,properties(name),guests(full_name))",
+        "id,reservation_id,status,provider,provider_payment_id,amount,currency,paid_at,metadata,reservations(check_in,check_out,properties(name),guests(full_name))",
       )
       .eq("id", paymentId)
       .single();
@@ -186,6 +226,67 @@ export async function getPaymentDetail(
     }
 
     return mapPayment(data as PaymentRow);
+  } catch {
+    return null;
+  }
+}
+
+export type PublicCheckoutPayment = {
+  amount: string;
+  dates: string;
+  guest: string;
+  id: string;
+  property: string;
+  raw: {
+    amount: number;
+    currency: string;
+    status: string;
+  };
+  status: string;
+};
+
+export async function getPublicCheckoutPayment(
+  paymentId: string,
+  token: string,
+): Promise<PublicCheckoutPayment | null> {
+  if (!isSupabaseConfigured()) {
+    return null;
+  }
+
+  try {
+    const supabase = getSupabaseAdminClient();
+    const { data, error } = await supabase
+      .from("payments")
+      .select(
+        "id,reservation_id,status,provider,provider_payment_id,amount,currency,paid_at,metadata,reservations(check_in,check_out,properties(name),guests(full_name))",
+      )
+      .eq("id", paymentId)
+      .single();
+
+    if (error || !data) {
+      return null;
+    }
+
+    const checkout = asRecord(asRecord(data.metadata).checkout);
+    if (checkout.token !== token) {
+      return null;
+    }
+
+    const mapped = mapPayment(data as PaymentRow);
+
+    return {
+      amount: mapped.amount,
+      dates: mapped.dates,
+      guest: mapped.guest,
+      id: mapped.id,
+      property: mapped.property,
+      raw: {
+        amount: mapped.raw.amount,
+        currency: mapped.raw.currency,
+        status: mapped.raw.status,
+      },
+      status: mapped.status,
+    };
   } catch {
     return null;
   }

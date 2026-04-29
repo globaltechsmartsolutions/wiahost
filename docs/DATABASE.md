@@ -93,9 +93,9 @@ La pantalla combina datos de:
 - `conversations`: hilo operativo para responder desde inbox.
 - `payments`: solicitud de pago pendiente cuando operaciones prepara el checkout directo.
 
-Preparar pago crea o reutiliza un `payments` pendiente con `provider = direct_checkout`, vinculado a la reserva y al huesped. Si la solicitud estaba en `inquiry`, pasa a `pending` para indicar que falta confirmacion final. Tambien registra `channel_sync_events.payload.action = direct_payment_request_prepared`.
+Preparar pago crea o reutiliza un `payments` pendiente con `provider = direct_checkout`, vinculado a la reserva y al huesped. Tambien genera un enlace tokenizado en `payments.metadata.checkout`, expuesto como `/checkout/[paymentId]?token=...`, y deja `provider_payment_id` preparado para sustituir el demo por Stripe. Si la solicitud estaba en `inquiry`, pasa a `pending` para indicar que falta confirmacion final. Tambien registra `channel_sync_events.payload.action = direct_payment_request_prepared` y `direct_checkout_link_created`.
 
-Convertir un lead a confirmado o cancelado actualiza `reservations.status` mediante Server Action/API. El cobro online real y la captura via Stripe quedan para la siguiente iteracion, pero el dato de pago ya queda normalizado.
+Convertir un lead a confirmado o cancelado actualiza `reservations.status` mediante Server Action/API. El checkout demo confirma pagos desde `/api/checkout/[paymentId]/confirm`, marca `payments.status = paid`, rellena `paid_at`, actualiza el metadata y confirma la reserva pendiente. Stripe real debe reemplazar la confirmacion demo con Checkout Session y webhook antes de produccion.
 
 ## Mensajes entrantes de canales
 

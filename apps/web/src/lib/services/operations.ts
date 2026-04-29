@@ -6,6 +6,7 @@ import type {
   TaskInput,
 } from "@wiahost/shared";
 import type { createSupabaseServerClient } from "@/lib/supabase/server";
+import { createPaymentCheckoutLink } from "@/lib/services/payments";
 
 type SupabaseServerClient = Awaited<
   ReturnType<typeof createSupabaseServerClient>
@@ -228,7 +229,10 @@ export async function prepareDirectLeadPayment(
     status: "pending",
   });
 
+  const checkout = await createPaymentCheckoutLink(supabase, payment.id);
+
   return {
+    checkoutUrl: checkout.checkoutUrl,
     created,
     paymentId: payment.id,
     status: payment.status,

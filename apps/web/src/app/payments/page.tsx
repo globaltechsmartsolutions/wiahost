@@ -1,4 +1,5 @@
 import {
+  createPaymentCheckoutLinkAction,
   createPaymentAction,
   deletePaymentAction,
   updatePaymentAction,
@@ -23,6 +24,7 @@ export const dynamic = "force-dynamic";
 
 type PaymentsPageProps = {
   searchParams?: Promise<{
+    checkout?: string;
     created?: string;
     deleted?: string;
     error?: string;
@@ -41,6 +43,9 @@ export default async function PaymentsPage({
   const total = payments.reduce((sum, payment) => sum + payment.raw.amount, 0);
   const paid = payments.filter(
     (payment) => payment.raw.status === "paid",
+  ).length;
+  const checkoutLinks = payments.filter(
+    (payment) => payment.checkoutUrl,
   ).length;
 
   return (
@@ -61,6 +66,11 @@ export default async function PaymentsPage({
           Pago creado correctamente.
         </div>
       ) : null}
+      {params?.checkout ? (
+        <div className="rounded-3xl border border-emerald-200 bg-emerald-50 px-5 py-4 text-sm text-emerald-800">
+          Enlace de cobro generado correctamente.
+        </div>
+      ) : null}
       {params?.updated ? (
         <div className="rounded-3xl border border-emerald-200 bg-emerald-50 px-5 py-4 text-sm text-emerald-800">
           Pago actualizado correctamente.
@@ -72,9 +82,10 @@ export default async function PaymentsPage({
         </div>
       ) : null}
 
-      <section className="grid gap-4 md:grid-cols-3">
+      <section className="grid gap-4 md:grid-cols-4">
         <MetricCard label="Pagos" value={String(payments.length)} />
         <MetricCard label="Pagados" value={String(paid)} />
+        <MetricCard label="Links de cobro" value={String(checkoutLinks)} />
         <MetricCard
           label="Importe"
           value={`${new Intl.NumberFormat("es-ES", { maximumFractionDigits: 0 }).format(total)} EUR`}
@@ -114,7 +125,10 @@ export default async function PaymentsPage({
                         {payment.guest} - {payment.property} - {payment.dates}
                       </CardDescription>
                     </div>
-                    <StatusBadge value={payment.status} />
+                    <div className="flex flex-wrap justify-end gap-2">
+                      <StatusBadge value={payment.status} />
+                      <StatusBadge value={payment.checkoutStatus} />
+                    </div>
                   </div>
                 </CardHeader>
                 <CardContent className="grid gap-4">
@@ -141,6 +155,41 @@ export default async function PaymentsPage({
                       Eliminar pago
                     </Button>
                   </form>
+                  <div className="flex flex-wrap gap-3">
+                    <form action={createPaymentCheckoutLinkAction}>
+                      <input
+                        type="hidden"
+                        name="paymentId"
+                        value={payment.id}
+                      />
+                      <Button
+                        type="submit"
+                        variant="outline"
+                        className="rounded-full"
+                      >
+                        Generar enlace de cobro
+                      </Button>
+                    </form>
+                    {payment.checkoutUrl ? (
+                      <Button asChild className="rounded-full">
+                        <a
+                          href={payment.checkoutUrl}
+                          rel="noreferrer"
+                          target="_blank"
+                        >
+                          Abrir checkout
+                        </a>
+                      </Button>
+                    ) : null}
+                  </div>
+                  {payment.checkoutUrl ? (
+                    <div className="rounded-2xl border border-[#dfd2bf] bg-white/60 p-3 text-xs text-muted-foreground">
+                      <span className="font-semibold text-foreground">
+                        Checkout:
+                      </span>{" "}
+                      {payment.checkoutUrl}
+                    </div>
+                  ) : null}
                 </CardContent>
               </Card>
             ))
