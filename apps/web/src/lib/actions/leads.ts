@@ -6,6 +6,7 @@ import { z } from "zod";
 
 import {
   OperationMutationError,
+  prepareDirectLeadPayment,
   updateDirectLeadStatus,
 } from "@/lib/services/operations";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
@@ -69,4 +70,32 @@ export async function updateLeadStatusAction(formData: FormData) {
   revalidatePath("/reservations");
   revalidatePath("/dashboard");
   redirect("/leads?updated=1");
+}
+
+export async function prepareLeadPaymentAction(formData: FormData) {
+  const reservationId = idSchema.safeParse(
+    String(formData.get("reservationId") ?? ""),
+  );
+
+  if (!reservationId.success) {
+    redirectWithError("Lead no valido para preparar pago.");
+  }
+
+  const { supabase } = await requireLeadContext();
+
+  try {
+    await prepareDirectLeadPayment(supabase, reservationId.data);
+  } catch (error) {
+    if (error instanceof OperationMutationError) {
+      redirectWithError(error.message);
+    }
+
+    redirectWithError("No se ha podido preparar el pago.");
+  }
+
+  revalidatePath("/leads");
+  revalidatePath("/payments");
+  revalidatePath("/reservations");
+  revalidatePath("/dashboard");
+  redirect("/leads?payment=1");
 }

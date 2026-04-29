@@ -91,8 +91,11 @@ La pantalla combina datos de:
 - `guests`: nombre, email y telefono del contacto.
 - `properties`: activo solicitado.
 - `conversations`: hilo operativo para responder desde inbox.
+- `payments`: solicitud de pago pendiente cuando operaciones prepara el checkout directo.
 
-Convertir un lead a confirmado o cancelado actualiza `reservations.status` mediante Server Action/API. No procesa pagos ni sincroniza canales externos todavia; esas capas quedan para fases posteriores.
+Preparar pago crea o reutiliza un `payments` pendiente con `provider = direct_checkout`, vinculado a la reserva y al huesped. Si la solicitud estaba en `inquiry`, pasa a `pending` para indicar que falta confirmacion final. Tambien registra `channel_sync_events.payload.action = direct_payment_request_prepared`.
+
+Convertir un lead a confirmado o cancelado actualiza `reservations.status` mediante Server Action/API. El cobro online real y la captura via Stripe quedan para la siguiente iteracion, pero el dato de pago ya queda normalizado.
 
 ## Mensajes entrantes de canales
 

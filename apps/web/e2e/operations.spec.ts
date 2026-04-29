@@ -754,6 +754,28 @@ test.describe("operations flows with Supabase @critical @data", () => {
         .first(),
     ).toBeVisible();
 
+    const paymentRequestResponse = await page.request.post(
+      `/api/leads/${inquiryBody.data.reservationId}/payment-request`,
+    );
+    expect(paymentRequestResponse.status()).toBe(201);
+
+    const paymentRequestBody = (await paymentRequestResponse.json()) as {
+      data: { paymentId: string; status: string };
+    };
+    expect(paymentRequestBody.data.paymentId).toBeTruthy();
+    expect(paymentRequestBody.data.status).toBe("pending");
+
+    await page.goto("/leads");
+    await expect(
+      page
+        .locator('[data-slot="card-title"]')
+        .filter({ hasText: guestName })
+        .first(),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("button", { name: /pago preparado/i }).first(),
+    ).toBeVisible();
+
     const leadPatchResponse = await page.request.patch(
       `/api/leads/${inquiryBody.data.reservationId}/status`,
       { data: { status: "confirmed" } },

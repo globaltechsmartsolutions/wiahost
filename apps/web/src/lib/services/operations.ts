@@ -142,6 +142,99 @@ export async function updateDirectLeadStatus(
   return data;
 }
 
+export async function prepareDirectLeadPayment(
+  supabase: SupabaseServerClient,
+  reservationId: string,
+) {
+  const { data: reservation, error: reservationError } = await supabase
+    .from("reservations")
+    .select("id,property_id,guest_id,status,total_amount,currency")
+    .eq("id", reservationId)
+    .eq("channel", "direct")
+    .in("status", ["inquiry", "pending", "confirmed"])
+    .single();
+
+  if (reservationError || !reservation) {
+    mutationError(
+      "lead_payment_reservation_not_found",
+      "No se ha encontrado el lead directo para preparar el pago.",
+    );
+  }
+
+  const { data: existingPayment, error: existingPaymentError } = await supabase
+    .from("payments")
+    .select("id,status,amount")
+    .eq("reservation_id", reservationId)
+    .eq("provider", "direct_checkout")
+    .maybeSingle();
+
+  if (existingPaymentError) {
+    mutationError(
+      "lead_payment_lookup_failed",
+      "No se ha podido revisar si el pago ya estaba preparado.",
+    );
+  }
+
+  let payment = existingPayment;
+  let created = false;
+
+  if (!payment) {
+    const { data: newPayment, error: paymentError } = await supabase
+      .from("payments")
+      .insert({
+        amount: Number(reservation.total_amount ?? 0),
+        currency: reservation.currency ?? "EUR",
+        guest_id: reservation.guest_id,
+        metadata: {
+          mode: "manual_checkout_placeholder",
+          source: "direct_booking_payment_request",
+        },
+        provider: "direct_checkout",
+        reservation_id: reservationId,
+        status: "pending",
+      })
+      .select("id,status,amount")
+      .single();
+
+    if (paymentError || !newPayment) {
+      mutationError(
+        "lead_payment_create_failed",
+        "No se ha podido preparar el pago del lead.",
+      );
+    }
+
+    payment = newPayment;
+    created = true;
+  }
+
+  if (reservation.status === "inquiry") {
+    await supabase
+      .from("reservations")
+      .update({ status: "pending" })
+      .eq("id", reservationId);
+  }
+
+  await supabase.from("channel_sync_events").insert({
+    channel: "direct",
+    direction: "outbound",
+    payload: {
+      action: "direct_payment_request_prepared",
+      amount: Number(reservation.total_amount ?? 0),
+      paymentId: payment.id,
+      reservationId,
+      source: "direct_booking_pipeline",
+    },
+    property_id: reservation.property_id,
+    status: "pending",
+  });
+
+  return {
+    created,
+    paymentId: payment.id,
+    status: payment.status,
+  };
+}
+
 export async function updateManualReservation(
   supabase: SupabaseServerClient,
   reservationId: string,

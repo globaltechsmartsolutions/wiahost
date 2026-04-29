@@ -92,12 +92,12 @@
 - Implementado: modulo web de distribucion con publicaciones por canal sobre `property_listings`, alta, edicion, eliminacion, estado, URL, ID externo, slug de web directa, sync activo y API GET/POST/GET detail/PATCH/DELETE.
 - Implementado: registro de eventos de sincronizacion sobre `channel_sync_events`, con canal, direccion, estado, payload JSON, errores y API GET/POST.
 - Implementado: motor publico de reserva directa `/book/[slug]`, conectado a `property_listings.public_slug`, con formulario de solicitud, creacion segura de guest, reservation en estado `inquiry`, conversation, mensaje inbound y evento de sync directo.
-- Implementado: pipeline comercial `/leads` para revisar solicitudes directas, abrir el hilo de inbox, ver la reserva y convertir/cancelar leads mediante Server Action y API PATCH.
+- Implementado: pipeline comercial `/leads` para revisar solicitudes directas, abrir el hilo de inbox, ver la reserva, preparar pago pendiente `direct_checkout` y convertir/cancelar leads mediante Server Action/API.
 - Implementado: export iCal publico `/api/ical/[slug]` para disponibilidad de anuncios publicados, sin exponer datos personales de huespedes.
 - Implementado: import iCal basico `/api/ical/import` y formulario en `/distribution` para convertir VEVENT externos en bloqueos de calendario y registrar sync inbound.
 - Implementado: normalizacion de mensajes entrantes `/api/channels/messages` y formulario en `/inbox` para convertir mensajes de Airbnb/Booking/Vrbo/email/WhatsApp en contacto, conversacion, mensaje inbound y evento de sync.
 - Implementado: control inicial de precios `/pricing` sobre `pricing_observations`, con API GET/POST/GET detail/PATCH/DELETE para precio actual, sugerido, aprobado/final, ocupacion y conversion.
-- Pendiente: confirmacion/pago online, APIs oficiales por canal y sincronizacion automatica de precios con proveedores externos.
+- Pendiente: checkout online real con Stripe, APIs oficiales por canal y sincronizacion automatica de precios con proveedores externos.
 
 ## Fase 4 - App movil
 

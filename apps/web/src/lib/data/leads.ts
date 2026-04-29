@@ -21,6 +21,12 @@ type LeadRow = {
   }>;
   id: string;
   notes: string | null;
+  payments?: Relation<{
+    amount: number | string | null;
+    created_at: string;
+    provider: string;
+    status: string;
+  }>;
   properties?: Relation<{ name: string | null }>;
   status: string;
   total_amount: number | string | null;
@@ -36,6 +42,8 @@ export type DirectLeadItem = {
   guest: string;
   id: string;
   message: string;
+  payment: string;
+  paymentRequested: boolean;
   phone: string;
   property: string;
   status: string;
@@ -53,6 +61,8 @@ const fallbackLeads: DirectLeadItem[] = [
     guest: demoReservations[2]?.guest ?? "Marta Costa",
     id: "demo-direct-lead-1",
     message: "Solicitud directa pendiente de revision.",
+    payment: "Sin solicitud",
+    paymentRequested: false,
     phone: "+34 600 000 000",
     property: demoReservations[2]?.property ?? "Sea View Valencia",
     status: "Consulta",
@@ -70,6 +80,15 @@ const statusLabels: Record<string, string> = {
 const channelLabels: Record<string, string> = {
   direct: "Directo",
   manual: "Manual",
+};
+
+const paymentLabels: Record<string, string> = {
+  authorized: "Autorizado",
+  disputed: "Disputa",
+  failed: "Fallido",
+  paid: "Pagado",
+  pending: "Pendiente",
+  refunded: "Reembolsado",
 };
 
 function one<T>(relation: Relation<T>): T | null {
@@ -129,6 +148,15 @@ function waitingSince(value: string | null | undefined) {
 function mapLead(row: LeadRow): DirectLeadItem {
   const guest = one(row.guests);
   const conversation = one(row.conversations);
+  const payments = Array.isArray(row.payments)
+    ? row.payments
+    : row.payments
+      ? [row.payments]
+      : [];
+  const payment =
+    payments.find((item) => item.provider === "direct_checkout") ??
+    payments[0] ??
+    null;
 
   return {
     amount: money(row.total_amount),
@@ -140,6 +168,10 @@ function mapLead(row: LeadRow): DirectLeadItem {
     guest: guest?.full_name ?? "Contacto sin nombre",
     id: row.id,
     message: row.notes ?? "Solicitud directa sin mensaje adicional.",
+    payment: payment
+      ? (paymentLabels[payment.status] ?? payment.status)
+      : "Sin solicitud",
+    paymentRequested: Boolean(payment),
     phone: guest?.phone ?? "Sin telefono",
     property: one(row.properties)?.name ?? "Propiedad sin asignar",
     status: label(row.status),
@@ -157,7 +189,7 @@ export async function getDirectLeads(): Promise<DirectLeadItem[]> {
     const { data, error } = await supabase
       .from("reservations")
       .select(
-        "id,channel,status,check_in,check_out,total_amount,notes,created_at,properties(name),guests(full_name,email,phone),conversations(id,status,last_message_at)",
+        "id,channel,status,check_in,check_out,total_amount,notes,created_at,properties(name),guests(full_name,email,phone),conversations(id,status,last_message_at),payments(status,provider,amount,created_at)",
       )
       .eq("channel", "direct")
       .in("status", ["inquiry", "pending", "confirmed", "cancelled"])

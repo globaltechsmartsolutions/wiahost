@@ -1,7 +1,10 @@
 import Link from "next/link";
 import { ArrowRight, Inbox, Phone } from "lucide-react";
 
-import { updateLeadStatusAction } from "@/lib/actions/leads";
+import {
+  prepareLeadPaymentAction,
+  updateLeadStatusAction,
+} from "@/lib/actions/leads";
 import { getDirectLeads, type DirectLeadItem } from "@/lib/data/leads";
 import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader } from "@/components/page-header";
@@ -21,6 +24,7 @@ export const dynamic = "force-dynamic";
 type LeadsPageProps = {
   searchParams?: Promise<{
     error?: string;
+    payment?: string;
     updated?: string;
   }>;
 };
@@ -53,6 +57,11 @@ export default async function LeadsPage({ searchParams }: LeadsPageProps) {
       {params?.updated ? (
         <div className="rounded-3xl border border-emerald-200 bg-emerald-50 px-5 py-4 text-sm text-emerald-800">
           Lead actualizado correctamente.
+        </div>
+      ) : null}
+      {params?.payment ? (
+        <div className="rounded-3xl border border-emerald-200 bg-emerald-50 px-5 py-4 text-sm text-emerald-800">
+          Pago preparado correctamente. Ya queda trazado para checkout online.
         </div>
       ) : null}
 
@@ -122,10 +131,11 @@ function LeadCard({ lead }: { lead: DirectLeadItem }) {
         </div>
       </CardHeader>
       <CardContent className="grid gap-4">
-        <div className="grid gap-3 rounded-2xl border border-[#dfd2bf] bg-white/55 p-4 md:grid-cols-3">
+        <div className="grid gap-3 rounded-2xl border border-[#dfd2bf] bg-white/55 p-4 md:grid-cols-4">
           <MiniFact label="Canal" value={lead.channel} />
           <MiniFact label="Recibido" value={lead.createdAt} />
           <MiniFact label="SLA" value={lead.waiting} />
+          <MiniFact label="Pago" value={lead.payment} />
         </div>
 
         <div className="rounded-2xl border border-[#dfd2bf] bg-white/55 p-4">
@@ -160,6 +170,10 @@ function LeadCard({ lead }: { lead: DirectLeadItem }) {
           <Button asChild variant="outline" className="rounded-full">
             <Link href={`/reservations/${lead.id}`}>Ver reserva</Link>
           </Button>
+          <LeadPaymentButton
+            disabled={lead.paymentRequested}
+            reservationId={lead.id}
+          />
           <LeadStatusButton
             label="Confirmar"
             reservationId={lead.id}
@@ -174,6 +188,28 @@ function LeadCard({ lead }: { lead: DirectLeadItem }) {
         </div>
       </CardContent>
     </Card>
+  );
+}
+
+function LeadPaymentButton({
+  disabled,
+  reservationId,
+}: {
+  disabled: boolean;
+  reservationId: string;
+}) {
+  return (
+    <form action={prepareLeadPaymentAction}>
+      <input type="hidden" name="reservationId" value={reservationId} />
+      <Button
+        disabled={disabled}
+        type="submit"
+        variant="outline"
+        className="rounded-full"
+      >
+        {disabled ? "Pago preparado" : "Preparar pago"}
+      </Button>
+    </form>
   );
 }
 
