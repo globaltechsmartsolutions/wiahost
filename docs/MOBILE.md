@@ -11,6 +11,7 @@ WIAHost tiene app movil real con Expo React Native en `apps/mobile`. No es una W
 - Fichas moviles para activo, reserva, conversacion e incidencia.
 - Alta nativa de activos desde `/properties/new`.
 - Alta nativa de incidencias desde `/incidents/new`.
+- Respuesta outbound desde ficha de inbox movil.
 - Login y registro con Supabase Auth.
 - Persistencia de sesion con `@react-native-async-storage/async-storage`.
 - TanStack Query para cache y refresco de datos operativos.
@@ -84,7 +85,7 @@ pnpm --filter mobile typecheck
 
 - Edicion nativa de propiedades existentes.
 - Formularios nativos para reservas y tareas.
-- Envio de mensajes desde inbox movil.
+- Hilo completo de conversacion con historial real y estados.
 - Subida de fotos/evidencias desde camara o galeria.
 - Push notifications para check-in, SLA de inbox e incidencias.
 - Offline read-only basico para tareas del dia.
