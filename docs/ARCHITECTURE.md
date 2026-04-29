@@ -74,6 +74,7 @@ La UI combina datos demo con primeras integraciones reales:
 - Owners lee owner accounts, propiedades, reservas e incidencias desde Supabase con fallback demo.
 - Settings lee el perfil autenticado desde Supabase y permite actualizar nombre/telefono mediante Server Action.
 - Settings muestra readiness tecnico de URL publica, Supabase, service role, base de datos y Stripe sin exponer secretos. El mismo snapshot alimenta `/api/health`.
+- Search centraliza busqueda protegida en `/search` y reutiliza queries Supabase/fallback demo para localizar reservas, huespedes, propiedades, tareas, incidencias y conversaciones desde la topbar.
 - Guests lee huespedes, reservas y conversaciones desde Supabase; permite alta, ficha, edicion mediante Server Actions y API GET/POST/GET detail/PATCH.
 - Calendar reutiliza la matriz operativa real del dashboard, filtra propiedades archivadas y permite crear, editar y eliminar bloqueos manuales mediante Server Actions/API.
 - Automations gestiona reglas PMS con trigger, canal, plantilla, delay y estado mediante Server Actions y API REST preparada para mobile. Tambien permite ejecutar pruebas manuales que crean `automation_runs` y eventos de auditoria sin enviar mensajes reales.

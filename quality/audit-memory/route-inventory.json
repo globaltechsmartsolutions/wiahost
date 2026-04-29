@@ -139,6 +139,12 @@
       "tests": ["critical", "data", "a11y", "visual"]
     },
     {
+      "path": "/search",
+      "auth": "protected",
+      "primaryCheck": "Global search returns operational records across reservations, guests, properties, tasks, incidents and inbox",
+      "tests": ["critical", "data", "a11y", "visual"]
+    },
+    {
       "path": "/tasks",
       "auth": "protected",
       "primaryCheck": "Task create/update API flow works and filters preserve the updated record",

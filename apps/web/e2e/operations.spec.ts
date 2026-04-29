@@ -288,6 +288,21 @@ test.describe("operations flows with Supabase @critical @data", () => {
     });
   });
 
+  test("finds operational records from global search", async ({ page }) => {
+    await page.goto("/search?q=Sofia");
+    await expect(
+      page.getByRole("heading", { name: /encuentra cualquier operacion/i }),
+    ).toBeVisible();
+    await expect(page.getByText("Sofia", { exact: false }).first()).toBeVisible();
+    await expect(page.getByText("Reserva").first()).toBeVisible();
+
+    await page.goto("/search?q=Atico");
+    await expect(page.getByText("Propiedad").first()).toBeVisible();
+
+    await page.goto("/search?q=sin-resultados-e2e");
+    await expect(page.getByText("Sin resultados")).toBeVisible();
+  });
+
   test("normalizes inbound channel messages into the unified inbox", async ({
     page,
   }) => {

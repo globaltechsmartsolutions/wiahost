@@ -146,14 +146,15 @@ export async function AppShell({ children }: { children: React.ReactNode }) {
               </span>
               WIAHost
             </Link>
-            <div className="relative hidden flex-1 md:block">
+            <form action="/search" className="relative hidden flex-1 md:block">
               <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-[#75695b]" />
               <Input
                 aria-label="Buscar reserva, huésped, propiedad, canal o tarea"
                 className="h-9 rounded-full border-[#dfd2bf] bg-white/70 pl-9 text-sm shadow-sm"
+                name="q"
                 placeholder="Buscar reserva, huésped, propiedad, canal o tarea..."
               />
-            </div>
+            </form>
             <Button
               variant="outline"
               className="hidden rounded-full border-[#dfd2bf] bg-white/70 lg:inline-flex"

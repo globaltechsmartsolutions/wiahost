@@ -44,6 +44,7 @@ const routes: AccessibilityRoute[] = [
     path: `/reservations/${seedIds.reservationId}/edit`,
     requiresAuth: true,
   },
+  { name: "search", path: "/search", requiresAuth: true },
   { name: "inbox", path: "/inbox", requiresAuth: true },
   { name: "leads", path: "/leads", requiresAuth: true },
   { name: "notifications", path: "/notifications", requiresAuth: true },

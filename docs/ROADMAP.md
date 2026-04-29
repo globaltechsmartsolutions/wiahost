@@ -45,6 +45,7 @@
 - Implementado: calendario multi-propiedad conectado a la matriz real de reservas, excluyendo propiedades archivadas, con alta, edicion y eliminacion de bloqueos manuales por UI/API.
 - Implementado: feedback visual basico tras crear reservas/tareas/incidencias, enviar respuestas y actualizar estados.
 - Implementado: filtros operativos en reservas, tareas, incidencias e inbox por busqueda y estado/canal/prioridad/severidad segun modulo.
+- Implementado: busqueda global protegida desde topbar y `/search` sobre reservas, huespedes, propiedades, tareas, incidencias e inbox.
 - Implementado: priorizacion explicable de inbox por SLA, check-in cercano y senales operativas/acceso, con motivo visible para el equipo.
 - Implementado: actualizacion de estado de conversaciones desde inbox y API `PATCH /api/inbox/:conversationId` para resolver, reabrir o archivar hilos.
 - Implementado: eventos automaticos de auditoria para respuestas y cambios de estado de conversaciones.

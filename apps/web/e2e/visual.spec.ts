@@ -46,6 +46,15 @@ async function captureVisualArtifact(
   });
 }
 
+function routeArtifactName(route: string) {
+  return (
+    route
+      .replace(/[^a-z0-9]+/gi, "-")
+      .replace(/^-+|-+$/g, "")
+      .toLowerCase() || "route"
+  );
+}
+
 async function expectBottomAligned(
   page: Page,
   firstTestId: string,
@@ -376,7 +385,7 @@ test.describe("visual regression baseline @visual", () => {
       await captureVisualArtifact(
         page,
         testInfo,
-        `${route.replace("/", "")}-density.png`,
+        `${routeArtifactName(route)}-density.png`,
       );
     }
   });
@@ -417,7 +426,7 @@ test.describe("visual regression baseline @visual", () => {
       await captureVisualArtifact(
         page,
         testInfo,
-        `${route.replaceAll("/", "-").replace(":", "")}-density.png`,
+        `${routeArtifactName(route)}-density.png`,
       );
     }
   });
@@ -440,7 +449,7 @@ test.describe("visual regression baseline @visual", () => {
       await captureVisualArtifact(
         page,
         testInfo,
-        `${route.replaceAll("/", "-").replace(":", "")}-density.png`,
+        `${routeArtifactName(route)}-density.png`,
       );
     }
   });
@@ -460,6 +469,7 @@ test.describe("visual regression baseline @visual", () => {
       "/owners",
       "/payments",
       "/pricing",
+      "/search",
       "/settings",
       "/statements",
       "/workflows",
@@ -471,7 +481,7 @@ test.describe("visual regression baseline @visual", () => {
       await captureVisualArtifact(
         page,
         testInfo,
-        `${route.replace("/", "")}-density.png`,
+        `${routeArtifactName(route)}-density.png`,
       );
     }
   });
@@ -495,7 +505,7 @@ test.describe("visual regression baseline @visual", () => {
       await captureVisualArtifact(
         page,
         testInfo,
-        `${route.replace("/", "")}-density.png`,
+        `${routeArtifactName(route)}-density.png`,
       );
     }
   });
