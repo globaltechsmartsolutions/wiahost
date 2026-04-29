@@ -43,6 +43,12 @@
       "tests": ["critical", "data", "a11y", "visual"]
     },
     {
+      "path": "/audit/:eventId",
+      "auth": "protected",
+      "primaryCheck": "Audit event detail exposes context, linked IDs and metadata payload for investigation",
+      "tests": ["critical", "data"]
+    },
+    {
       "path": "/automations",
       "auth": "protected",
       "primaryCheck": "Automation rules can be created, edited, paused and deleted through API/UI",

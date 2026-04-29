@@ -1316,6 +1316,11 @@ test.describe("operations flows with Supabase @critical @data", () => {
     await page.goto(`/audit?q=${encodeURIComponent("sin coincidencias e2e")}`);
     await expect(page.getByText("Sin eventos para esos filtros")).toBeVisible();
 
+    await page.goto(`/audit/${eventBody.data.id}`);
+    await expect(page.getByText(eventName)).toBeVisible();
+    await expect(page.getByText("Metadata")).toBeVisible();
+    await expect(page.getByText(note)).toBeVisible();
+
     const eventDeleteResponse = await page.request.delete(
       `/api/audit-events/${eventBody.data.id}`,
     );

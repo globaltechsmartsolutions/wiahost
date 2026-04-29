@@ -70,6 +70,7 @@ export type AuditEventListItem = {
   context: string;
   entity: string;
   id: string;
+  metadata: Json;
   metadataSummary: string;
   occurredAt: string;
   raw: {
@@ -101,6 +102,9 @@ const fallbackEvents: AuditEventListItem[] = [
     context: "Reserva: Sofia Martin - Atico Gran Via Sky",
     entity: "reservation",
     id: "demo-audit-event-1",
+    metadata: {
+      note: "Evento demo para validar trazabilidad.",
+    },
     metadataSummary: "Evento demo para validar trazabilidad.",
     occurredAt: "Demo",
     raw: {
@@ -202,6 +206,7 @@ function mapEvent(row: OperationalEventRow): AuditEventListItem {
     context: buildContext(row),
     entity: row.entity_type,
     id: row.id,
+    metadata: row.metadata,
     metadataSummary: metadataSummary(row.metadata),
     occurredAt: shortDate(row.occurred_at),
     raw: {

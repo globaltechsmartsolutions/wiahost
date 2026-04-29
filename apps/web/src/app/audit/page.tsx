@@ -204,6 +204,15 @@ export default async function AuditPage({ searchParams }: AuditPageProps) {
                       {event.metadataSummary}
                     </p>
                   </div>
+                  <div className="flex justify-end">
+                    <Button
+                      asChild
+                      variant="outline"
+                      className="rounded-full"
+                    >
+                      <Link href={`/audit/${event.id}`}>Abrir detalle</Link>
+                    </Button>
+                  </div>
                 </CardContent>
               </Card>
             ))

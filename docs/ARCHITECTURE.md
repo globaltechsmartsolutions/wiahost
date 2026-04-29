@@ -98,6 +98,7 @@ La UI combina datos demo con primeras integraciones reales:
 - Respuestas y cambios de estado de inbox registran `operational_events` no bloqueantes para trazabilidad, soporte y datasets futuros.
 - Reservas, tareas, incidencias y leads directos tambien registran `operational_events` no bloqueantes al crearse, editarse o cambiar de estado, manteniendo actor, entidad, propiedad/reserva y metadata minima para auditoria.
 - `/audit` permite filtrar la memoria operativa por busqueda libre, fuente y entidad para que soporte y operaciones puedan investigar una reserva, tarea o incidencia sin revisar todo el timeline.
+- `/audit/:eventId` muestra contexto, actor, referencias tecnicas y metadata JSON del evento para depurar flujos y revisar payloads sin acceder directamente a base de datos.
 - El detalle de inbox permite guardar etiquetas humanas en `message_labels`; esta memoria revisada por personas alimentara reglas, evals y modelos futuros sin automatizar decisiones sensibles.
 - Pricing conecta `/pricing` y `/api/pricing/observations` con `pricing_observations`. Permite guardar recomendaciones manuales o importadas por canal y registrar un `price_update` outbound en `channel_sync_events` antes de conectar PriceLabs, Beyond, Wheelhouse o motores propios.
 
