@@ -11,6 +11,7 @@ type AccessibilityRoute = {
 
 const routes: AccessibilityRoute[] = [
   { name: "landing", path: "/" },
+  { name: "direct booking", path: "/book/loft-malaga-centro" },
   { name: "login", path: "/login" },
   { name: "register", path: "/register" },
   { name: "audit", path: "/audit", requiresAuth: true },

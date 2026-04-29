@@ -63,6 +63,20 @@ El modulo `/distribution` conecta dos tablas ya existentes:
 
 Esto no publica todavia en Airbnb/Booking/Vrbo de forma automatica. Deja preparado el modelo operativo para API oficiales, iCal, web directa y normalizacion de mensajes entrantes.
 
+## Motor de reserva directa
+
+La ruta publica `/book/[slug]` usa `property_listings.public_slug` como identificador del anuncio. Si el listing esta publicado, muestra los datos base de la propiedad y permite enviar una solicitud.
+
+Al enviar el formulario se crean registros conectados:
+
+- `guests`: contacto del huesped.
+- `reservations`: reserva en estado `inquiry`, canal `direct`, fechas, personas e importe estimado.
+- `conversations`: hilo operativo para seguimiento.
+- `conversation_messages`: primer mensaje inbound desde la web directa.
+- `channel_sync_events`: evento `direct_booking_inquiry` para auditoria de canal.
+
+La confirmacion no es automatica. Operaciones revisa disponibilidad, condiciones y precio final antes de aceptar.
+
 ## Auditoria operativa
 
 La tabla `operational_events` ya tiene modulo web en `/audit` y API REST en `/api/audit-events`. Permite registrar eventos manuales o de sistema con `event_name`, `entity_type`, entidad vinculada, fuente, actor y `metadata`.

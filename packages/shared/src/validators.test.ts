@@ -5,6 +5,7 @@ import {
   automationRuleSchema,
   calendarBlockSchema,
   channelSyncEventSchema,
+  directBookingInquirySchema,
   documentSchema,
   guestWorkflowSchema,
   incidentSchema,
@@ -259,6 +260,36 @@ describe("distribution validators", () => {
       direction: "inbound",
       payload: "{}",
       status: "pending",
+    });
+
+    expect(parsed.success).toBe(false);
+  });
+});
+
+describe("direct booking validators", () => {
+  it("accepts direct booking inquiries with consent", () => {
+    const parsed = directBookingInquirySchema.safeParse({
+      checkIn: "2026-05-10",
+      checkOut: "2026-05-13",
+      consent: "true",
+      guestEmail: "sofia@example.com",
+      guestFullName: "Sofia Martin",
+      guestPhone: "+34611111111",
+      guestsCount: "2",
+      message: "Nos gustaria confirmar disponibilidad.",
+    });
+
+    expect(parsed.success).toBe(true);
+  });
+
+  it("rejects direct booking inquiries without consent", () => {
+    const parsed = directBookingInquirySchema.safeParse({
+      checkIn: "2026-05-10",
+      checkOut: "2026-05-13",
+      consent: false,
+      guestEmail: "sofia@example.com",
+      guestFullName: "Sofia Martin",
+      guestsCount: 2,
     });
 
     expect(parsed.success).toBe(false);

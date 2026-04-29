@@ -188,6 +188,29 @@ test.describe("visual regression baseline @visual", () => {
     });
   });
 
+  test("direct booking route keeps responsive density without overflow", async ({
+    page,
+  }, testInfo) => {
+    for (const viewport of [
+      { height: 900, width: 390 },
+      { height: 768, width: 1366 },
+    ]) {
+      await page.setViewportSize(viewport);
+      await page.goto("/book/loft-malaga-centro");
+      await prepareVisualPage(page);
+      await expectNoHorizontalOverflow(page);
+      await expect(
+        page.getByRole("heading", { name: /loft malaga centro/i }),
+      ).toBeVisible();
+      await page.screenshot({
+        fullPage: false,
+        path: testInfo.outputPath(
+          `direct-booking-${viewport.width}-density.png`,
+        ),
+      });
+    }
+  });
+
   test("dashboard viewport has no desktop overflow", async ({
     page,
   }, testInfo) => {

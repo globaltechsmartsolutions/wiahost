@@ -25,6 +25,12 @@
       "tests": ["smoke", "visual", "a11y"]
     },
     {
+      "path": "/book/:slug",
+      "auth": "public",
+      "primaryCheck": "Public direct booking page loads by listing slug and creates inquiry requests",
+      "tests": ["smoke", "critical", "data", "a11y", "visual"]
+    },
+    {
       "path": "/audit",
       "auth": "protected",
       "primaryCheck": "Operational audit events can be created, listed and deleted through API/UI context",

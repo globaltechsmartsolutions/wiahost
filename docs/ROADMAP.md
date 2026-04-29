@@ -91,7 +91,8 @@
 
 - Implementado: modulo web de distribucion con publicaciones por canal sobre `property_listings`, alta, edicion, eliminacion, estado, URL, ID externo, slug de web directa, sync activo y API GET/POST/GET detail/PATCH/DELETE.
 - Implementado: registro de eventos de sincronizacion sobre `channel_sync_events`, con canal, direccion, estado, payload JSON, errores y API GET/POST.
-- Pendiente: motor publico de reserva directa, import/export iCal real, APIs oficiales por canal, normalizacion de mensajes entrantes y control de precios por canal.
+- Implementado: motor publico de reserva directa `/book/[slug]`, conectado a `property_listings.public_slug`, con formulario de solicitud, creacion segura de guest, reservation en estado `inquiry`, conversation, mensaje inbound y evento de sync directo.
+- Pendiente: confirmacion/pago online, import/export iCal real, APIs oficiales por canal, normalizacion de mensajes entrantes y control de precios por canal.
 
 ## Fase 4 - App movil
 

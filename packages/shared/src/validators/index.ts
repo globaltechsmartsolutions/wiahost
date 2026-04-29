@@ -4,6 +4,7 @@ export * from "./automation";
 export * from "./calendar";
 export * from "./document";
 export * from "./distribution";
+export * from "./direct-booking";
 export * from "./guest";
 export * from "./incident";
 export * from "./message";

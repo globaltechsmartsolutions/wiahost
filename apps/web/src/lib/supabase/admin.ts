@@ -1,6 +1,7 @@
 import { createClient } from "@supabase/supabase-js";
+import type { Database } from "@wiahost/database";
 
-let adminClient: ReturnType<typeof createClient> | null = null;
+let adminClient: ReturnType<typeof createClient<Database>> | null = null;
 
 export function getSupabaseAdminClient() {
   if (adminClient) {
@@ -14,7 +15,7 @@ export function getSupabaseAdminClient() {
     throw new Error("Supabase service role is not configured.");
   }
 
-  adminClient = createClient(url, serviceRoleKey, {
+  adminClient = createClient<Database>(url, serviceRoleKey, {
     auth: {
       autoRefreshToken: false,
       persistSession: false,

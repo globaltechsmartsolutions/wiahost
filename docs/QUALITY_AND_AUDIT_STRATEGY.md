@@ -21,8 +21,8 @@ Ya existe:
 - Test inicial de configuracion Supabase.
 - `playwright.config.ts` formal en `apps/web`.
 - Tests E2E versionados para smoke publico/auth, login demo, creacion/edicion de reserva UI/API, owners/settings, guest list/detail/edit, calendar blocks y mutaciones API completas de tareas, incidencias e inbox.
-- Auditoria de accesibilidad con `@axe-core/playwright` sobre rutas publicas, protegidas, audit, workflows, distribution, calendario, guests, documentos, detalle, edicion de operaciones, owners, statements y settings.
-- Baseline visual inicial para landing/auth y check de overflow/alineacion del dashboard, operaciones, editores, audit, workflows, distribution, calendar/guests, documentos, owners, statements y settings.
+- Auditoria de accesibilidad con `@axe-core/playwright` sobre rutas publicas, reserva directa, protegidas, audit, workflows, distribution, calendario, guests, documentos, detalle, edicion de operaciones, owners, statements y settings.
+- Baseline visual inicial para landing/auth y check de overflow/alineacion de reserva directa, dashboard, operaciones, editores, audit, workflows, distribution, calendar/guests, documentos, owners, statements y settings.
 - Memoria versionada en `quality/audit-memory`.
 - Lighthouse CI configurado para landing/login/register con budgets iniciales, reportes en filesystem y wrapper local para estabilizar Chrome en Windows.
 - CI inicial con typecheck, lint, unit tests y build web.
@@ -124,6 +124,7 @@ Objetivo:
 Rutas iniciales:
 
 - `/`
+- `/book/:slug`
 - `/login`
 - `/register`
 - `/dashboard`
@@ -351,6 +352,7 @@ Un cambio no deberia entrar si:
 
 - Hecho: crear `apps/web/e2e/visual.spec.ts`.
 - Hecho: baseline desktop/mobile para landing y pantallas auth.
+- Hecho: check visual artifact-only de `/book/:slug` en mobile y desktop portatil sin overflow.
 - Hecho: check de dashboard sin overflow horizontal y con calendario/cola prioritaria alineados.
 - Hecho: check visual de rutas operativas `/reservations`, `/tasks`, `/incidents` e `/inbox` sin overflow en desktop portatil y con filtros visibles.
 - Hecho: check visual de rutas detalle/edicion de reservas, tareas e incidencias sin overflow en desktop portatil.
