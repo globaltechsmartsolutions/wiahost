@@ -93,9 +93,9 @@ La pantalla combina datos de:
 - `conversations`: hilo operativo para responder desde inbox.
 - `payments`: solicitud de pago pendiente cuando operaciones prepara el checkout directo.
 
-Preparar pago crea o reutiliza un `payments` pendiente con `provider = direct_checkout`, vinculado a la reserva y al huesped. Tambien genera un enlace tokenizado en `payments.metadata.checkout`, expuesto como `/checkout/[paymentId]?token=...`, y deja `provider_payment_id` preparado para sustituir el demo por Stripe. Si la solicitud estaba en `inquiry`, pasa a `pending` para indicar que falta confirmacion final. Tambien registra `channel_sync_events.payload.action = direct_payment_request_prepared` y `direct_checkout_link_created`.
+Preparar pago crea o reutiliza un `payments` pendiente con `provider = direct_checkout`, vinculado a la reserva y al huesped. Tambien genera un enlace tokenizado en `payments.metadata.checkout`, expuesto como `/checkout/[paymentId]?token=...`, y deja `provider_payment_id`. Si hay `STRIPE_SECRET_KEY`, `provider` pasa a `stripe`, `provider_payment_id` guarda la Checkout Session y `metadata.checkout.url` apunta a Stripe. Si no hay Stripe, se mantiene checkout demo local. Si la solicitud estaba en `inquiry`, pasa a `pending` para indicar que falta confirmacion final. Tambien registra `channel_sync_events.payload.action = direct_payment_request_prepared` y `direct_checkout_link_created`.
 
-Convertir un lead a confirmado o cancelado actualiza `reservations.status` mediante Server Action/API. El checkout demo confirma pagos desde `/api/checkout/[paymentId]/confirm`, marca `payments.status = paid`, rellena `paid_at`, actualiza el metadata y confirma la reserva pendiente. Stripe real debe reemplazar la confirmacion demo con Checkout Session y webhook antes de produccion.
+Convertir un lead a confirmado o cancelado actualiza `reservations.status` mediante Server Action/API. El checkout demo confirma pagos desde `/api/checkout/[paymentId]/confirm`, marca `payments.status = paid`, rellena `paid_at`, actualiza el metadata y confirma la reserva pendiente. En produccion, Stripe confirma pagos desde `POST /api/stripe/webhook` tras verificar la firma del evento y comprobar `payment_status = paid`; los pagos diferidos quedan cubiertos por `checkout.session.async_payment_succeeded`.
 
 ## Mensajes entrantes de canales
 

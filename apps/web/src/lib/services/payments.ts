@@ -2,6 +2,7 @@ import type { PaymentInput } from "@wiahost/shared";
 import { randomUUID } from "node:crypto";
 import type { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getSupabaseAdminClient } from "@/lib/supabase/admin";
+import { getStripeClient, isStripeConfigured } from "@/lib/stripe/server";
 
 type SupabaseServerClient = Awaited<
   ReturnType<typeof createSupabaseServerClient>
@@ -62,6 +63,33 @@ function appUrl() {
 
 function createCheckoutToken() {
   return `checkout-token-${randomUUID()}-${randomUUID()}`;
+}
+
+function cents(amount: number | string | null, currency: string) {
+  const numericAmount = Number(amount ?? 0);
+  const zeroDecimalCurrencies = new Set([
+    "bif",
+    "clp",
+    "djf",
+    "gnf",
+    "jpy",
+    "kmf",
+    "krw",
+    "mga",
+    "pyg",
+    "rwf",
+    "ugx",
+    "vnd",
+    "vuv",
+    "xaf",
+    "xof",
+    "xpf",
+  ]);
+  const multiplier = zeroDecimalCurrencies.has(currency.toLowerCase())
+    ? 1
+    : 100;
+
+  return Math.max(0, Math.round(numericAmount * multiplier));
 }
 
 async function getReservationGuestId(
@@ -192,7 +220,7 @@ export async function createPaymentCheckoutLink(
   const { data: payment, error } = await supabase
     .from("payments")
     .select(
-      "id,reservation_id,status,amount,currency,provider_payment_id,metadata,reservations(property_id)",
+      "id,reservation_id,status,amount,currency,provider_payment_id,metadata,reservations(property_id,guests(full_name,email),properties(name))",
     )
     .eq("id", paymentId)
     .single();
@@ -204,10 +232,75 @@ export async function createPaymentCheckoutLink(
   const metadata = paymentMetadata(payment.metadata);
   const existingCheckout = metadata.checkout ?? {};
   const token = existingCheckout.token ?? createCheckoutToken();
-  const checkoutUrl = `${appUrl()}/checkout/${payment.id}?token=${encodeURIComponent(token)}`;
-  const providerPaymentId =
-    payment.provider_payment_id ?? `demo_checkout_${payment.id.slice(0, 8)}`;
+  const demoCheckoutUrl = `${appUrl()}/checkout/${payment.id}?token=${encodeURIComponent(token)}`;
   const checkoutStatus = payment.status === "paid" ? "paid" : "created";
+  const reservation = Array.isArray(payment.reservations)
+    ? payment.reservations[0]
+    : payment.reservations;
+  const property = Array.isArray(reservation?.properties)
+    ? reservation?.properties[0]
+    : reservation?.properties;
+  const guest = Array.isArray(reservation?.guests)
+    ? reservation?.guests[0]
+    : reservation?.guests;
+  let checkoutUrl = demoCheckoutUrl;
+  let provider = "direct_checkout";
+  let providerPaymentId =
+    payment.provider_payment_id ?? `demo_checkout_${payment.id.slice(0, 8)}`;
+  let checkoutMode = "demo_checkout";
+  let checkoutProvider = "stripe_ready";
+
+  if (isStripeConfigured() && Number(payment.amount ?? 0) > 0) {
+    const stripe = getStripeClient();
+    const session = await stripe.checkout.sessions.create({
+      cancel_url: demoCheckoutUrl,
+      client_reference_id: payment.id,
+      customer_email:
+        typeof guest?.email === "string" && guest.email.includes("@")
+          ? guest.email
+          : undefined,
+      line_items: [
+        {
+          price_data: {
+            currency: payment.currency.toLowerCase(),
+            product_data: {
+              description: `Reserva ${payment.reservation_id}`,
+              name: property?.name
+                ? `Reserva en ${property.name}`
+                : "Reserva WIAHost",
+            },
+            unit_amount: cents(payment.amount, payment.currency),
+          },
+          quantity: 1,
+        },
+      ],
+      metadata: {
+        paymentId: payment.id,
+        reservationId: payment.reservation_id,
+      },
+      mode: "payment",
+      payment_intent_data: {
+        metadata: {
+          paymentId: payment.id,
+          reservationId: payment.reservation_id,
+        },
+      },
+      success_url: `${appUrl()}/checkout/${payment.id}?token=${encodeURIComponent(token)}&paid=1&provider=stripe`,
+    });
+
+    if (!session.url) {
+      mutationError(
+        "stripe_checkout_session_failed",
+        "Stripe no ha devuelto una URL de checkout.",
+      );
+    }
+
+    checkoutUrl = session.url;
+    provider = "stripe";
+    providerPaymentId = session.id;
+    checkoutMode = "stripe_checkout";
+    checkoutProvider = "stripe";
+  }
 
   const { data, error: updateError } = await supabase
     .from("payments")
@@ -217,14 +310,15 @@ export async function createPaymentCheckoutLink(
         checkout: {
           ...existingCheckout,
           createdAt: existingCheckout.createdAt ?? new Date().toISOString(),
-          mode: "demo_checkout",
-          provider: "stripe_ready",
+          demoUrl: demoCheckoutUrl,
+          mode: checkoutMode,
+          provider: checkoutProvider,
           status: checkoutStatus,
           token,
           url: checkoutUrl,
         },
       },
-      provider: "direct_checkout",
+      provider,
       provider_payment_id: providerPaymentId,
     })
     .eq("id", payment.id)
@@ -238,12 +332,11 @@ export async function createPaymentCheckoutLink(
     );
   }
 
-  const reservation = Array.isArray(payment.reservations)
-    ? payment.reservations[0]
-    : payment.reservations;
-
   await createCheckoutSyncEvent(supabase, {
-    action: "direct_checkout_link_created",
+    action:
+      checkoutProvider === "stripe"
+        ? "stripe_checkout_session_created"
+        : "direct_checkout_link_created",
     amount: Number(payment.amount ?? 0),
     paymentId: payment.id,
     propertyId: reservation?.property_id ?? null,
@@ -254,6 +347,7 @@ export async function createPaymentCheckoutLink(
   return {
     checkoutUrl,
     paymentId: data.id,
+    provider,
     providerPaymentId: data.provider_payment_id,
     status: data.status,
   };
@@ -324,6 +418,77 @@ export async function confirmDemoCheckoutPayment(
 
   await createCheckoutSyncEvent(supabase as SupabaseServerClient, {
     action: "direct_checkout_paid",
+    amount: Number(payment.amount ?? 0),
+    paymentId: payment.id,
+    propertyId: reservation?.property_id ?? null,
+    reservationId: payment.reservation_id,
+    status: "synced",
+  });
+
+  return data;
+}
+
+export async function confirmStripeCheckoutPayment(
+  paymentId: string,
+  providerPaymentId: string,
+) {
+  const supabase = getSupabaseAdminClient();
+  const { data: payment, error } = await supabase
+    .from("payments")
+    .select(
+      "id,reservation_id,status,amount,metadata,reservations(property_id,status)",
+    )
+    .eq("id", paymentId)
+    .single();
+
+  if (error || !payment) {
+    mutationError("payment_not_found", "No se ha encontrado el pago.");
+  }
+
+  const metadata = paymentMetadata(payment.metadata);
+  const checkout = metadata.checkout ?? {};
+  const paidAt = new Date().toISOString();
+  const { data, error: updateError } = await supabase
+    .from("payments")
+    .update({
+      metadata: {
+        ...metadata,
+        checkout: {
+          ...checkout,
+          confirmedAt: checkout.confirmedAt ?? paidAt,
+          provider: "stripe",
+          providerPaymentId,
+          status: "paid",
+        },
+      },
+      paid_at: paidAt,
+      provider: "stripe",
+      provider_payment_id: providerPaymentId,
+      status: "paid",
+    })
+    .eq("id", payment.id)
+    .select("id,status")
+    .single();
+
+  if (updateError || !data) {
+    mutationError(
+      "stripe_checkout_confirm_failed",
+      "No se ha podido confirmar el pago de Stripe.",
+    );
+  }
+
+  await supabase
+    .from("reservations")
+    .update({ status: "confirmed" })
+    .eq("id", payment.reservation_id)
+    .in("status", ["inquiry", "pending"]);
+
+  const reservation = Array.isArray(payment.reservations)
+    ? payment.reservations[0]
+    : payment.reservations;
+
+  await createCheckoutSyncEvent(supabase as SupabaseServerClient, {
+    action: "stripe_checkout_paid",
     amount: Number(payment.amount ?? 0),
     paymentId: payment.id,
     propertyId: reservation?.property_id ?? null,

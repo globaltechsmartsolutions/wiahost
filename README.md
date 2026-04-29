@@ -114,4 +114,4 @@ El dashboard no debe tener huecos muertos entre modulos. Si dos cards comparten 
 
 ## Siguiente paso recomendado
 
-Sustituir el checkout demo tokenizado por Stripe Checkout con webhook real, continuar con conectores oficiales de canales y endurecer Lighthouse cuando tengamos historico estable.
+Probar Stripe Checkout con claves de test reales, continuar con conectores oficiales de canales y endurecer Lighthouse cuando tengamos historico estable.
