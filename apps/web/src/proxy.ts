@@ -76,7 +76,7 @@ export async function proxy(request: NextRequest) {
 
     const url = request.nextUrl.clone();
     url.pathname = "/login";
-    url.searchParams.set("next", pathname);
+    url.searchParams.set("next", `${pathname}${request.nextUrl.search}`);
     url.searchParams.set("error", "Supabase no esta configurado.");
 
     return NextResponse.redirect(url);
@@ -113,7 +113,7 @@ export async function proxy(request: NextRequest) {
   if (!user && isProtectedRoute) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
-    url.searchParams.set("next", pathname);
+    url.searchParams.set("next", `${pathname}${request.nextUrl.search}`);
 
     return withSyncedCookies(NextResponse.redirect(url), cookiesToSync);
   }
