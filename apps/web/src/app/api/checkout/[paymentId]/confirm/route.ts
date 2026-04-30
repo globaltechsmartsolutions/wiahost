@@ -4,6 +4,7 @@ import { z } from "zod";
 
 import { parseJsonBody } from "@/lib/api/context";
 import { apiError, validationError } from "@/lib/api/responses";
+import { checkRateLimit } from "@/lib/security/rate-limit";
 import {
   confirmDemoCheckoutPayment,
   PaymentMutationError,
@@ -25,6 +26,16 @@ export async function POST(request: Request, { params }: RouteContext) {
       "El identificador de pago no es valido.",
       422,
     );
+  }
+
+  const rateLimit = checkRateLimit(request, {
+    limit: 10,
+    namespace: `checkout_confirm:${validPaymentId.data}`,
+    windowMs: 60_000,
+  });
+
+  if (!rateLimit.ok) {
+    return rateLimit.response;
   }
 
   const json = await parseJsonBody(request);

@@ -3,6 +3,7 @@ import { directBookingInquirySchema } from "@wiahost/shared";
 
 import { parseJsonBody } from "@/lib/api/context";
 import { apiError, validationError } from "@/lib/api/responses";
+import { checkRateLimit } from "@/lib/security/rate-limit";
 import {
   createDirectBookingInquiry,
   DirectBookingMutationError,
@@ -14,6 +15,16 @@ type RouteContext = {
 
 export async function POST(request: Request, { params }: RouteContext) {
   const { slug } = await params;
+  const rateLimit = checkRateLimit(request, {
+    limit: 8,
+    namespace: `direct_booking_inquiry:${slug}`,
+    windowMs: 60_000,
+  });
+
+  if (!rateLimit.ok) {
+    return rateLimit.response;
+  }
+
   const json = await parseJsonBody(request);
 
   if (!json.ok) {

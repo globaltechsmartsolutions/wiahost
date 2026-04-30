@@ -11,6 +11,7 @@
 - Las cuentas externas de canales se documentan en `channel_accounts`, pero las credenciales reales deben vivir en variables seguras o vault del proveedor.
 - Los documentos usan buckets privados y URL firmadas temporales para subida/descarga. El navegador solo recibe un token temporal de Storage; no se deben publicar rutas de storage como enlaces permanentes.
 - Las push notifications usan tokens de dispositivo guardados con RLS. `EXPO_ACCESS_TOKEN`, si se activa en EAS, solo puede vivir en servidor.
+- Los endpoints publicos de reserva directa y confirmacion de checkout demo tienen rate limit defensivo por IP y contexto. Es una proteccion MVP en memoria; para produccion con varias regiones se debe migrar a Redis/Vercel KV/Upstash o un WAF gestionado.
 
 ## Auditor local
 
