@@ -163,10 +163,10 @@
 - Implementado: offline read-only basico en mobile para dashboard/listas principales con cache AsyncStorage, fallback a ultima operativa viva y banner visible.
 - Implementado: offline read-only en fichas mobile de activo, reserva, conversacion, tarea e incidencia con cache AsyncStorage y banner visible cuando se muestra informacion guardada.
 - Implementado: disparadores push automaticos y no bloqueantes desde operaciones web/API para mensajes entrantes, reservas relevantes, tareas prioritarias e incidencias, reutilizando `/api/notifications/push`, Expo Push Service y auditoria de entregas.
-- Implementado: estructura E2E mobile con Maestro, script `pnpm test:mobile:e2e` y primer smoke demo sobre navegacion principal.
+- Implementado: E2E mobile con Maestro separado en suite demo (`pnpm test:mobile:e2e`) y suite conectada (`pnpm test:mobile:e2e:connected`) para login, alta de activo e incidencia real con Supabase.
 - Implementado: fallback demo para poder revisar la experiencia movil aunque no esten copiadas las variables.
 - Implementado: typecheck movil limpio.
-- Pendiente inmediato: instalar y validar el APK preview en dispositivo real, extender offline a documentos/evidencias recientes y ampliar Maestro con flujos conectados.
+- Pendiente inmediato: instalar y validar el APK preview en dispositivo real, extender offline a documentos/evidencias recientes y ampliar Maestro con evidencia, push y cambios de estado reales.
 
 ## Fase 5 - IA y automatizacion avanzada
 

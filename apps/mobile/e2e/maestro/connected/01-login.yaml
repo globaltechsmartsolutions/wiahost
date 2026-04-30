@@ -1,0 +1,19 @@
+appId: com.globaltech.wiahost
+name: WIAHost mobile connected login
+tags:
+  - connected
+  - auth
+---
+- launchApp:
+    clearState: true
+- assertVisible: "Entrar"
+- tapOn:
+    id: "login-email"
+- inputText: "${WIAHOST_EMAIL}"
+- tapOn:
+    id: "login-password"
+- inputText: "${WIAHOST_PASSWORD}"
+- hideKeyboard
+- tapOn: "Entrar en WIAHost"
+- assertVisible: "Centro de mando movil"
+- assertVisible: "Reservas activas"

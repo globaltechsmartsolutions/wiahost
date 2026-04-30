@@ -24,10 +24,31 @@ Desde `apps/mobile`:
 pnpm test:e2e
 ```
 
+La suite por defecto ejecuta solo flujos demo contra un APK sin variables Supabase, ideal para validar que la app abre, navega y no rompe la experiencia base.
+
+Para flujos conectados a Supabase:
+
+```bash
+$env:WIAHOST_EMAIL="operaciones@wiahost.local"
+$env:WIAHOST_PASSWORD="Password123!"
+pnpm test:mobile:e2e:connected
+```
+
+En bash/zsh:
+
+```bash
+WIAHOST_EMAIL=operaciones@wiahost.local WIAHOST_PASSWORD='Password123!' pnpm test:mobile:e2e:connected
+```
+
 ## Flujos actuales
 
-- `maestro/smoke-demo.yaml`: valida que la app demo abre, muestra dashboard y permite cambiar entre Reservas, Riesgo y Ajustes.
+- `maestro/demo/01-smoke-demo.yaml`: valida que la app demo abre, muestra dashboard y permite cambiar entre Reservas, Riesgo y Ajustes.
+- `maestro/demo/02-detail-navigation.yaml`: recorre detalles demo de activo, reserva, inbox, tarea e incidencia.
+- `maestro/demo/03-readonly-create-screens.yaml`: confirma que las altas protegidas muestran estado read-only cuando Supabase no esta configurado.
+- `maestro/connected/01-login.yaml`: valida login real con Supabase.
+- `maestro/connected/02-create-property.yaml`: crea un activo real desde mobile.
+- `maestro/connected/03-create-incident.yaml`: crea un activo auxiliar y una incidencia real desde mobile.
 
 ## Siguiente paso
 
-Cuando exista build preview EAS instalada, anadir flujos conectados a Supabase para login demo, alta de activo, alta de incidencia, subida de evidencia y registro push.
+Ampliar flujos conectados con subida de evidencia, registro push y cambios de estado sobre reserva/tarea/incidencia reales.

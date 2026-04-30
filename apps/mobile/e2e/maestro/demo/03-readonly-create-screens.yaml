@@ -1,0 +1,23 @@
+appId: com.globaltech.wiahost
+name: WIAHost mobile demo readonly create screens
+tags:
+  - demo
+  - forms
+---
+- launchApp:
+    clearState: true
+- tapOn: "Activos"
+- tapOn: "Nuevo"
+- assertVisible: "Nuevo activo"
+- assertVisible: "Crear activo"
+- back
+- tapOn: "Reservas"
+- tapOn: "Nueva"
+- assertVisible: "Conecta Supabase"
+- back
+- tapOn: "Riesgo"
+- tapOn: "Nueva"
+- assertVisible: "Conecta Supabase"
+- back
+- tapOn: "Nueva tarea"
+- assertVisible: "Conecta Supabase"

@@ -68,6 +68,7 @@ export default function LoginScreen() {
               onBlur={field.onBlur}
               onChangeText={field.onChange}
               placeholder="operaciones@wiahost.local"
+              testID="login-email"
               value={field.value}
             />
           )}
@@ -83,6 +84,7 @@ export default function LoginScreen() {
               onChangeText={field.onChange}
               placeholder="Password123!"
               secureTextEntry
+              testID="login-password"
               value={field.value}
             />
           )}

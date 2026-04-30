@@ -71,6 +71,7 @@ export function PropertyForm({
               onBlur={field.onBlur}
               onChangeText={field.onChange}
               placeholder="Atico Gran Via Sky"
+              testID="property-name"
               value={field.value}
             />
           )}
@@ -86,6 +87,7 @@ export function PropertyForm({
               onBlur={field.onBlur}
               onChangeText={field.onChange}
               placeholder="MAD-GV-01"
+              testID="property-internal-name"
               value={field.value}
             />
           )}
@@ -100,6 +102,7 @@ export function PropertyForm({
               onBlur={field.onBlur}
               onChangeText={field.onChange}
               placeholder="Calle, numero, piso"
+              testID="property-address"
               value={field.value}
             />
           )}
@@ -116,6 +119,7 @@ export function PropertyForm({
                 onBlur={field.onBlur}
                 onChangeText={field.onChange}
                 placeholder="Madrid"
+                testID="property-city"
                 value={field.value}
               />
             )}
@@ -131,6 +135,7 @@ export function PropertyForm({
                 onBlur={field.onBlur}
                 onChangeText={field.onChange}
                 placeholder="Madrid"
+                testID="property-province"
                 value={field.value}
               />
             )}

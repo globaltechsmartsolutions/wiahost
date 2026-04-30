@@ -30,7 +30,7 @@ WIAHost tiene app movil real con Expo React Native en `apps/mobile`. No es una W
 - Fallback demo si no hay variables `EXPO_PUBLIC_*`, para poder revisar la experiencia sin romper el arranque.
 - NativeWind preparado para evolucionar UI movil sin bloquear el MVP actual. La UI actual usa `StyleSheet`; `withNativeWind` en Metro queda para una pasada especifica porque en Windows/Node 24 rompia `expo export`.
 - TypeScript strict y scripts `typecheck`, `lint`, `build` y `test`.
-- Estructura E2E mobile con Maestro en `apps/mobile/e2e`, preparada para smoke demo y futuros flujos con build preview.
+- E2E mobile con Maestro en `apps/mobile/e2e`: suite demo por defecto y suite conectada para login, alta de activo e incidencia con Supabase.
 
 ## Arquitectura
 
@@ -97,6 +97,7 @@ pnpm --filter mobile web
 pnpm --filter mobile typecheck
 pnpm --filter mobile exec expo export --platform web
 pnpm test:mobile:e2e
+pnpm test:mobile:e2e:connected
 ```
 
 CI ejecuta `pnpm build:mobile` y `expo export --platform web` como guardarrail ligero hasta que se configure EAS Build.
@@ -113,12 +114,14 @@ pnpm eas:submit:android:internal
 
 La guia operativa completa esta en `docs/EAS_BUILD.md`.
 
-`pnpm test:mobile:e2e` requiere Maestro CLI y un dispositivo/emulador con la app instalada. No se ejecuta en CI inicial hasta tener build preview estable.
+`pnpm test:mobile:e2e` requiere Maestro CLI y un dispositivo/emulador con la app instalada. Ejecuta la suite demo contra un APK sin variables Supabase.
+
+`pnpm test:mobile:e2e:connected` requiere un APK/dev build apuntando a Supabase y las variables `WIAHOST_EMAIL` y `WIAHOST_PASSWORD` en el entorno local. Esta suite crea datos reales de QA.
 
 ## Funciones prioritarias siguientes
 
 - Extender offline read-only a cola de tareas del dia y documentos/evidencias recientes.
-- Anadir flujos Maestro conectados a Supabase: login demo, alta de activo, incidencia, evidencia y push.
+- Anadir flujos Maestro conectados para subida de evidencia, registro push y cambios de estado reales.
 
 ## Push notifications
 

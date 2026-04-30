@@ -1,0 +1,29 @@
+appId: com.globaltech.wiahost
+name: WIAHost mobile demo detail navigation
+tags:
+  - demo
+  - detail
+---
+- launchApp:
+    clearState: true
+- tapOn: "Activos"
+- tapOn: "Atico Gran Via Sky"
+- assertVisible: "Operativa"
+- assertVisible: "Precio base"
+- back
+- tapOn: "Reservas"
+- tapOn: "Sofia Martin"
+- assertVisible: "Estado de la reserva"
+- assertVisible: "Importe"
+- back
+- tapOn: "Inbox"
+- tapOn: "Sofia Martin"
+- assertVisible: "Historial"
+- assertVisible: "Responder"
+- back
+- tapOn: "Riesgo"
+- tapOn: "Preparar Atico Gran Via"
+- assertVisible: "Estado de la tarea"
+- back
+- tapOn: "Ruido en aire acondicionado"
+- assertVisible: "Estado de la incidencia"

@@ -21,6 +21,7 @@
     "test": "turbo test",
     "test:e2e": "pnpm --filter web test:e2e",
     "test:mobile:e2e": "pnpm --filter mobile test:e2e",
+    "test:mobile:e2e:connected": "pnpm --filter mobile test:e2e:connected",
     "test:a11y": "pnpm --filter web test:a11y",
     "test:visual": "pnpm --filter web test:visual",
     "test:visual:update": "pnpm --filter web test:visual:update",

@@ -4,13 +4,14 @@ tags:
   - smoke
   - demo
 ---
-- launchApp
+- launchApp:
+    clearState: true
 - assertVisible: "WIAHost mobile"
 - assertVisible: "Centro de mando movil"
 - assertVisible: "Reservas activas"
 - tapOn: "Reservas"
-- assertVisible: "Reservas"
+- assertVisible: "Movimiento de reservas"
 - tapOn: "Riesgo"
-- assertVisible: "Riesgo"
+- assertVisible: "Tareas criticas"
 - tapOn: "Ajustes"
-- assertVisible: "Ajustes"
+- assertVisible: "Notificaciones push"

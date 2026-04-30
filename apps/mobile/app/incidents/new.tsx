@@ -28,7 +28,9 @@ const severityLabels: Record<Severity, string> = {
 
 async function createIncident(input: IncidentInput) {
   if (!isSupabaseConfigured()) {
-    throw new Error("Configura Supabase en apps/mobile/.env para crear incidencias.");
+    throw new Error(
+      "Configura Supabase en apps/mobile/.env para crear incidencias.",
+    );
   }
 
   const {
@@ -117,7 +119,8 @@ export default function NewIncidentScreen() {
     >
       {!isSupabaseConfigured() ? (
         <EmptyState title="Conecta Supabase">
-          La creacion real de incidencias necesita `apps/mobile/.env`. En modo demo solo mostramos datos.
+          La creacion real de incidencias necesita `apps/mobile/.env`. En modo
+          demo solo mostramos datos.
         </EmptyState>
       ) : (
         <>
@@ -128,23 +131,24 @@ export default function NewIncidentScreen() {
             {propertyOptions.length ? (
               <View style={styles.pillGrid}>
                 {propertyOptions.map((property) => (
-                <SelectPill
-                  active={selectedPropertyId === property.id}
-                  key={property.id}
-                  onPress={() =>
-                    setValue("propertyId", property.id, {
-                      shouldDirty: true,
-                      shouldValidate: true,
-                    })
-                  }
-                >
-                  {property.name}
-                </SelectPill>
+                  <SelectPill
+                    active={selectedPropertyId === property.id}
+                    key={property.id}
+                    onPress={() =>
+                      setValue("propertyId", property.id, {
+                        shouldDirty: true,
+                        shouldValidate: true,
+                      })
+                    }
+                  >
+                    {property.name}
+                  </SelectPill>
                 ))}
               </View>
             ) : (
               <Text style={styles.meta}>
-                No hay activos reales disponibles para seleccionar. Crea uno desde Activos.
+                No hay activos reales disponibles para seleccionar. Crea uno
+                desde Activos.
               </Text>
             )}
             {errors.propertyId?.message ? (
@@ -166,6 +170,7 @@ export default function NewIncidentScreen() {
                   onBlur={field.onBlur}
                   onChangeText={field.onChange}
                   placeholder="Caldera con presion irregular"
+                  testID="incident-title"
                   value={field.value}
                 />
               )}
@@ -183,6 +188,7 @@ export default function NewIncidentScreen() {
                   onChangeText={field.onChange}
                   placeholder="Describe que pasa, donde y si bloquea la operacion."
                   style={styles.textarea}
+                  testID="incident-description"
                   value={field.value}
                 />
               )}

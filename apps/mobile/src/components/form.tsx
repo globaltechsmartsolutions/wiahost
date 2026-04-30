@@ -11,6 +11,7 @@ import {
 import { colors } from "@/src/lib/theme";
 
 export function Field({
+  accessibilityLabel,
   error,
   label,
   style,
@@ -23,6 +24,7 @@ export function Field({
     <View style={styles.field}>
       <Text style={styles.label}>{label}</Text>
       <TextInput
+        accessibilityLabel={accessibilityLabel ?? label}
         autoCapitalize="none"
         placeholderTextColor="#9b8f80"
         style={[styles.input, error && styles.inputError, style]}
@@ -46,6 +48,7 @@ export function PrimaryButton({
 }) {
   return (
     <Pressable
+      accessibilityRole="button"
       disabled={disabled}
       onPress={onPress}
       style={[
@@ -77,6 +80,7 @@ export function SelectPill({
 }) {
   return (
     <Pressable
+      accessibilityRole="button"
       onPress={onPress}
       style={[styles.pill, active && styles.activePill]}
     >
