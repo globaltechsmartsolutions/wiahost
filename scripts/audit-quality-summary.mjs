@@ -39,6 +39,10 @@ const databaseSecurityPath = resolve(
   "quality/reports/database-security.json",
 );
 const releaseCheckPath = resolve(root, "quality/reports/release-check.json");
+const deploymentHealthPath = resolve(
+  root,
+  "quality/reports/deployment-health.json",
+);
 const lighthouseConfigPath = resolve(root, ".lighthouserc.cjs");
 const packageJsonPath = resolve(root, "package.json");
 const reportPath = resolve(root, "quality/reports/quality-summary.json");
@@ -191,6 +195,7 @@ const missingScripts = [
   "quality:staging",
   "quality:ci",
   "release:check",
+  "check:deployment",
   "build:web",
 ].filter((scriptName) => !rootPackage.scripts?.[scriptName]);
 
@@ -285,6 +290,12 @@ const report = {
         note: "No release check report detected yet. Run pnpm release:check to generate it.",
         status: "not_run",
       },
+  deploymentHealth: existsSync(deploymentHealthPath)
+    ? readJson(deploymentHealthPath)
+    : {
+        note: "No deployment health report detected yet. Run pnpm check:deployment -- --url <url> after a deploy.",
+        status: "not_run",
+      },
   qualityScripts: {
     build: rootPackage.scripts?.["build:web"],
     e2e: rootPackage.scripts?.["test:e2e"],
@@ -294,6 +305,7 @@ const report = {
     productionReadiness: rootPackage.scripts?.["quality:prod"],
     stagingReadiness: rootPackage.scripts?.["quality:staging"],
     release: rootPackage.scripts?.["release:check"],
+    deploymentHealth: rootPackage.scripts?.["check:deployment"],
     ci: rootPackage.scripts?.["quality:ci"],
     typecheck: rootPackage.scripts?.typecheck,
     unit: rootPackage.scripts?.test,

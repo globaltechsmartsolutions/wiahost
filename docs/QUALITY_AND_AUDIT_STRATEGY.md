@@ -32,11 +32,13 @@ Ya existe:
 - Auditor de staging `pnpm quality:staging` que revisa guia de deployment, workflow manual de Vercel, variables documentadas y secretos GitHub requeridos sin imprimir valores.
 - Auditor de base de datos `pnpm quality:db` que revisa migraciones Supabase para bloquear tablas publicas sin RLS/politicas y buckets Storage sin politica.
 - Gate de release `pnpm release:check` que agrupa las validaciones automatizables y genera `quality/reports/release-check.json` con checks manuales pendientes.
+- Smoke de despliegue `pnpm check:deployment -- --url <url>` que valida `/api/health` online y genera `quality/reports/deployment-health.json`.
 - Lighthouse CI configurado para landing/login/register con budgets iniciales, reportes en filesystem y wrapper local para estabilizar Chrome en Windows.
 - CI inicial con typecheck, lint, unit tests y build web.
 - CI ejecuta `pnpm quality:ci` y sube reportes JSON de calidad como artefacto para poder revisar estado de rutas, readiness y resumen global.
 - Workflow manual `Release Check` ejecuta `pnpm release:check` y sube reportes JSON antes de demos/builds.
 - Workflow manual `Web Deploy to Vercel` ejecuta `pnpm release:check`, construye con Vercel CLI y despliega artefactos prebuilt a preview o production cuando existan secretos `VERCEL_*`.
+- Ese workflow ejecuta un smoke check post-deploy contra `/api/health` antes de considerar lista la URL.
 
 Falta:
 
@@ -401,6 +403,7 @@ Un cambio no deberia entrar si:
 - Hecho: crear `pnpm quality:prod` y `pnpm quality:prod:production` para auditar readiness de entorno, ejemplos, Stripe webhook y uso server-only de secretos.
 - Hecho: crear `pnpm quality:db` y sumarlo a `pnpm quality:ci` para auditar RLS/politicas de migraciones antes de build.
 - Hecho: crear `pnpm quality:staging` y sumarlo a `pnpm quality:ci` para auditar deployment docs, workflow Vercel y variables de staging antes de conectar cuentas reales.
+- Hecho: crear `pnpm check:deployment` y conectarlo al workflow Vercel para validar `/api/health` despues del deploy.
 
 ### Paso 6
 

@@ -12,6 +12,7 @@ const requiredFiles = [
 ];
 
 const requiredScripts = [
+  "check:deployment",
   "release:check",
   "quality:prod:production",
   "quality:summary",
@@ -137,6 +138,7 @@ if (existsSync(resolve(root, ".github/workflows/vercel-web-deploy.yml"))) {
     "vercel pull",
     "vercel build",
     "vercel deploy --prebuilt",
+    "check-deployment-health.mjs",
     "VERCEL_TOKEN",
   ];
   const missingTerms = hasAllTerms(deployWorkflow, workflowTerms);

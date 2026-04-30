@@ -93,6 +93,7 @@ Usa:
 - `vercel pull`;
 - `vercel build`;
 - `vercel deploy --prebuilt`.
+- `node scripts/check-deployment-health.mjs` contra la URL desplegada.
 
 Secretos necesarios en GitHub:
 
@@ -136,16 +137,18 @@ pnpm quality:prod:production
 Cuando exista URL:
 
 ```bash
-curl https://staging.wiahost.com/api/health
+pnpm check:deployment -- --url https://staging.wiahost.com
 ```
 
-Debe devolver:
+Tambien se puede comprobar manualmente con `curl https://staging.wiahost.com/api/health`. Debe devolver:
 
 - `status: "ok"` o `degraded` si falta una integracion opcional;
 - `runtime.environment`;
 - `runtime.provider`;
 - `runtime.commit`;
 - checks sin valores secretos.
+
+El script genera `quality/reports/deployment-health.json`, falla si `/api/health` devuelve errores y no imprime secretos.
 
 Luego validar manualmente:
 

@@ -80,6 +80,10 @@ jobs:
           echo "### Preview deploy" >> "$GITHUB_STEP_SUMMARY"
           echo "$url" >> "$GITHUB_STEP_SUMMARY"
 
+      - name: Check preview health
+        if: ${{ inputs.target == 'preview' }}
+        run: node scripts/check-deployment-health.mjs --url="${{ steps.deploy_preview.outputs.url }}"
+
       - name: Deploy production artifact
         if: ${{ inputs.target == 'production' }}
         id: deploy_production
@@ -88,6 +92,10 @@ jobs:
           echo "url=$url" >> "$GITHUB_OUTPUT"
           echo "### Production deploy" >> "$GITHUB_STEP_SUMMARY"
           echo "$url" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Check production health
+        if: ${{ inputs.target == 'production' }}
+        run: node scripts/check-deployment-health.mjs --url="${{ steps.deploy_production.outputs.url }}"
 
       - name: Upload release reports
         if: always()
