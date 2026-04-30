@@ -32,7 +32,14 @@
     },
     "plugins": [
       "expo-router",
-      "expo-secure-store"
+      "expo-secure-store",
+      [
+        "expo-image-picker",
+        {
+          "cameraPermission": "WIAHost necesita la camara para adjuntar evidencias operativas.",
+          "photosPermission": "WIAHost necesita acceder a tus fotos para adjuntar evidencias operativas."
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true

@@ -8,6 +8,7 @@ import { useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 
 import { Card, EmptyState, SectionTitle, StatusBadge } from "@/src/components/cards";
+import { EvidenceUploader } from "@/src/components/evidence-uploader";
 import { Screen } from "@/src/components/screen";
 import {
   StatusActionGroup,
@@ -145,6 +146,14 @@ export default function IncidentDetailScreen() {
             />
             {statusError ? <Text style={styles.error}>{statusError}</Text> : null}
           </Card>
+          <EvidenceUploader
+            context={{
+              incidentId: incident.id,
+              label: incident.title,
+              type: "incident",
+            }}
+            disabled={!canMutateIncident}
+          />
         </>
       ) : (
         <EmptyState title="Incidencia no encontrada">

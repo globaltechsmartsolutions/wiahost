@@ -2,6 +2,7 @@ import { router, useLocalSearchParams } from "expo-router";
 import { StyleSheet, Text, View } from "react-native";
 
 import { Card, EmptyState, SectionTitle, StatusBadge } from "@/src/components/cards";
+import { EvidenceUploader } from "@/src/components/evidence-uploader";
 import { PrimaryButton } from "@/src/components/form";
 import { Screen } from "@/src/components/screen";
 import { usePropertyDetail } from "@/src/hooks/use-property-detail";
@@ -77,6 +78,14 @@ export default function PropertyDetailScreen() {
               </Text>
             ) : null}
           </Card>
+          <EvidenceUploader
+            context={{
+              label: property.name,
+              propertyId: property.id,
+              type: "property",
+            }}
+            disabled={!canEditProperty}
+          />
         </>
       ) : (
         <EmptyState title="Activo no encontrado">

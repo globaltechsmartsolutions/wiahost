@@ -11,6 +11,8 @@ export type MobileTaskDetail = {
   id: string;
   priority: string;
   property: string;
+  propertyId: string | null;
+  reservationId: string | null;
   status: string;
   statusValue: string;
   title: string;
@@ -83,6 +85,8 @@ function fallbackTask(taskId: string): MobileTaskDetail | null {
     id: task.id,
     priority: task.priority,
     property: task.meta,
+    propertyId: null,
+    reservationId: null,
     status: "Abierta",
     statusValue: "open",
     title: task.label,
@@ -98,7 +102,7 @@ async function loadTaskDetail(taskId: string): Promise<MobileTaskDetail | null> 
   try {
     const { data, error } = await supabase
       .from("tasks")
-      .select("id,title,type,status,priority,due_at,description,properties(name)")
+      .select("id,title,type,status,priority,due_at,description,property_id,reservation_id,properties(name)")
       .eq("id", taskId)
       .single();
 
@@ -111,7 +115,9 @@ async function loadTaskDetail(taskId: string): Promise<MobileTaskDetail | null> 
       due_at: string | null;
       id: string;
       priority: string | null;
+      property_id: string | null;
       properties?: Relation<{ name: string | null }>;
+      reservation_id: string | null;
       status: string | null;
       title: string;
       type: string | null;
@@ -123,6 +129,8 @@ async function loadTaskDetail(taskId: string): Promise<MobileTaskDetail | null> 
       id: task.id,
       priority: label(task.priority),
       property: one(task.properties)?.name ?? "Propiedad sin asignar",
+      propertyId: task.property_id,
+      reservationId: task.reservation_id,
       status: label(task.status),
       statusValue: task.status ?? "open",
       title: task.title,
