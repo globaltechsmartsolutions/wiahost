@@ -14,6 +14,7 @@
 - Los endpoints publicos de reserva directa y confirmacion de checkout demo tienen rate limit defensivo por IP y contexto. Es una proteccion MVP en memoria; para produccion con varias regiones se debe migrar a Redis/Vercel KV/Upstash o un WAF gestionado.
 - La web aplica cabeceras HTTP de seguridad desde `apps/web/security-headers.ts`: anti-clickjacking, `nosniff`, referrer policy, permissions policy, HSTS y CSP report-only. CSP queda report-only hasta validar Supabase, Stripe, Storage y scripts de Next en staging.
 - Los errores API devuelven `error.requestId` y cabecera `X-Request-Id` para cruzar incidencias con logs de staging/produccion sin exponer datos sensibles.
+- Los errores API 5xx emiten logs estructurados JSON con `requestId`, `code`, `status`, entorno y servicio. No se registran cuerpos de request, tokens, payloads ni datos personales.
 
 ## Auditor local
 

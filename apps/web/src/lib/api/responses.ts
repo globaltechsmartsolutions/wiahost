@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { ZodError } from "zod";
 
+import { logApiError } from "../observability/logger";
+
 function createRequestId() {
   return globalThis.crypto?.randomUUID?.() ?? `req_${Date.now().toString(36)}`;
 }
@@ -11,6 +13,8 @@ export function apiError(
   status = 400,
   requestId = createRequestId(),
 ) {
+  logApiError({ code, requestId, status });
+
   return NextResponse.json(
     { error: { code, message, requestId } },
     {
