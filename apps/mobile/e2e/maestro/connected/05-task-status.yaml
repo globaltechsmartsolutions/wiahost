@@ -1,0 +1,63 @@
+appId: com.globaltech.wiahost
+name: WIAHost mobile connected task status
+tags:
+  - connected
+  - task
+  - status
+---
+- launchApp:
+    clearState: true
+- assertVisible: "Entrar"
+- tapOn:
+    id: "login-email"
+- inputText: "${WIAHOST_EMAIL}"
+- tapOn:
+    id: "login-password"
+- inputText: "${WIAHOST_PASSWORD}"
+- hideKeyboard
+- tapOn: "Entrar en WIAHost"
+- assertVisible: "Centro de mando movil"
+- tapOn: "Activos"
+- tapOn: "Nuevo"
+- assertVisible: "Nuevo activo"
+- tapOn:
+    id: "property-name"
+- inputText: "QA Task Home"
+- tapOn:
+    id: "property-internal-name"
+- inputText: "QA-TASK-01"
+- tapOn:
+    id: "property-address"
+- inputText: "Calle Tarea 1"
+- tapOn:
+    id: "property-city"
+- inputText: "Madrid"
+- tapOn:
+    id: "property-province"
+- inputText: "Madrid"
+- scrollUntilVisible:
+    element: "Crear activo"
+    direction: DOWN
+- tapOn: "Activo"
+- tapOn: "Crear activo"
+- assertVisible: "Activos"
+- tapOn: "Riesgo"
+- tapOn: "Nueva tarea"
+- assertVisible: "Nueva tarea"
+- tapOn: "QA Task Home"
+- tapOn:
+    id: "task-title"
+- inputText: "QA tarea estado mobile"
+- tapOn:
+    id: "task-description"
+- inputText: "Tarea creada para validar cambio de estado desde mobile."
+- hideKeyboard
+- scrollUntilVisible:
+    element: "Crear tarea"
+    direction: DOWN
+- tapOn: "Crear tarea"
+- assertVisible: "Riesgo"
+- tapOn: "QA tarea estado mobile"
+- assertVisible: "Estado de la tarea"
+- tapOn: "En curso"
+- assertVisible: "En curso"

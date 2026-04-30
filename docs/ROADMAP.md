@@ -167,8 +167,8 @@
 - Implementado: fallback demo para poder revisar la experiencia movil aunque no esten copiadas las variables.
 - Implementado: typecheck movil limpio.
 - Implementado: cache offline read-only para evidencias/documentos recientes en fichas mobile de activos, tareas e incidencias, con aviso visible cuando se muestran datos guardados.
-- Implementado: Maestro demo valida que las fichas mobile exponen evidencias, y suite conectada anade flujo de cambio de estado de incidencia real.
-- Pendiente inmediato: instalar y validar el APK preview en dispositivo real, ampliar Maestro con subida de evidencia, push y cambios de estado reales de reservas/tareas.
+- Implementado: Maestro demo valida que las fichas mobile exponen evidencias, y suite conectada anade flujos de cambio de estado real para incidencia, tarea y reserva.
+- Pendiente inmediato: instalar y validar el APK preview en dispositivo real, ampliar Maestro con subida de evidencia y registro push reales.
 
 ## Fase 5 - IA y automatizacion avanzada
 

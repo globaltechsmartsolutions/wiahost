@@ -44,7 +44,9 @@ function nightsBetween(checkIn: string, checkOut: string) {
 
 async function createReservation(input: ManualReservationInput) {
   if (!isSupabaseConfigured()) {
-    throw new Error("Configura Supabase en apps/mobile/.env para crear reservas.");
+    throw new Error(
+      "Configura Supabase en apps/mobile/.env para crear reservas.",
+    );
   }
 
   const { data: guest, error: guestError } = await supabase
@@ -122,7 +124,9 @@ export default function NewReservationScreen() {
       status: "confirmed",
       taxesAmount: 0,
     },
-    resolver: zodResolver(manualReservationSchema) as Resolver<ManualReservationInput>,
+    resolver: zodResolver(
+      manualReservationSchema,
+    ) as Resolver<ManualReservationInput>,
   });
   const selectedChannel = watch("channel");
   const selectedPropertyId = watch("propertyId");
@@ -154,7 +158,9 @@ export default function NewReservationScreen() {
       await mutation.mutateAsync(values);
     } catch (error) {
       setFormError(
-        error instanceof Error ? error.message : "No hemos podido crear la reserva.",
+        error instanceof Error
+          ? error.message
+          : "No hemos podido crear la reserva.",
       );
     }
   });
@@ -166,7 +172,8 @@ export default function NewReservationScreen() {
     >
       {!isSupabaseConfigured() ? (
         <EmptyState title="Conecta Supabase">
-          La creacion real de reservas necesita `apps/mobile/.env`. En modo demo solo mostramos datos.
+          La creacion real de reservas necesita `apps/mobile/.env`. En modo demo
+          solo mostramos datos.
         </EmptyState>
       ) : (
         <>
@@ -177,23 +184,24 @@ export default function NewReservationScreen() {
             {propertyOptions.length ? (
               <View style={styles.pillGrid}>
                 {propertyOptions.map((property) => (
-                <SelectPill
-                  active={selectedPropertyId === property.id}
-                  key={property.id}
-                  onPress={() =>
-                    setValue("propertyId", property.id, {
-                      shouldDirty: true,
-                      shouldValidate: true,
-                    })
-                  }
-                >
-                  {property.name}
-                </SelectPill>
+                  <SelectPill
+                    active={selectedPropertyId === property.id}
+                    key={property.id}
+                    onPress={() =>
+                      setValue("propertyId", property.id, {
+                        shouldDirty: true,
+                        shouldValidate: true,
+                      })
+                    }
+                  >
+                    {property.name}
+                  </SelectPill>
                 ))}
               </View>
             ) : (
               <Text style={styles.meta}>
-                No hay activos reales disponibles para seleccionar. Crea uno desde Activos.
+                No hay activos reales disponibles para seleccionar. Crea uno
+                desde Activos.
               </Text>
             )}
             {errors.propertyId?.message ? (
@@ -216,6 +224,7 @@ export default function NewReservationScreen() {
                   onBlur={field.onBlur}
                   onChangeText={field.onChange}
                   placeholder="Sofia Martin"
+                  testID="reservation-guest-name"
                   value={field.value}
                 />
               )}
@@ -231,6 +240,7 @@ export default function NewReservationScreen() {
                   onBlur={field.onBlur}
                   onChangeText={field.onChange}
                   placeholder="sofia@email.com"
+                  testID="reservation-guest-email"
                   value={field.value}
                 />
               )}
@@ -246,6 +256,7 @@ export default function NewReservationScreen() {
                   onBlur={field.onBlur}
                   onChangeText={field.onChange}
                   placeholder="+34 600 000 000"
+                  testID="reservation-guest-phone"
                   value={field.value}
                 />
               )}
@@ -257,17 +268,52 @@ export default function NewReservationScreen() {
               Estancia
             </SectionTitle>
             <View style={styles.row}>
-              <DateField control={control} error={errors.checkIn?.message} label="Entrada" name="checkIn" />
-              <DateField control={control} error={errors.checkOut?.message} label="Salida" name="checkOut" />
+              <DateField
+                control={control}
+                error={errors.checkIn?.message}
+                label="Entrada"
+                name="checkIn"
+              />
+              <DateField
+                control={control}
+                error={errors.checkOut?.message}
+                label="Salida"
+                name="checkOut"
+              />
             </View>
             <View style={styles.row}>
-              <NumberField control={control} error={errors.guestsCount?.message} label="Huesp." name="guestsCount" />
-              <NumberField control={control} error={errors.nightlyRate?.message} label="Noche" name="nightlyRate" />
-              <NumberField control={control} error={errors.cleaningFee?.message} label="Limpieza" name="cleaningFee" />
+              <NumberField
+                control={control}
+                error={errors.guestsCount?.message}
+                label="Huesp."
+                name="guestsCount"
+              />
+              <NumberField
+                control={control}
+                error={errors.nightlyRate?.message}
+                label="Noche"
+                name="nightlyRate"
+              />
+              <NumberField
+                control={control}
+                error={errors.cleaningFee?.message}
+                label="Limpieza"
+                name="cleaningFee"
+              />
             </View>
             <View style={styles.row}>
-              <NumberField control={control} error={errors.taxesAmount?.message} label="Tasas" name="taxesAmount" />
-              <NumberField control={control} error={errors.securityDeposit?.message} label="Deposito" name="securityDeposit" />
+              <NumberField
+                control={control}
+                error={errors.taxesAmount?.message}
+                label="Tasas"
+                name="taxesAmount"
+              />
+              <NumberField
+                control={control}
+                error={errors.securityDeposit?.message}
+                label="Deposito"
+                name="securityDeposit"
+              />
             </View>
             <View style={styles.statusBlock}>
               <SectionTitle helper="Origen de la reserva.">Canal</SectionTitle>
@@ -318,7 +364,11 @@ export default function NewReservationScreen() {
 
 type ReservationNumberFieldName = keyof Pick<
   ManualReservationInput,
-  "cleaningFee" | "guestsCount" | "nightlyRate" | "securityDeposit" | "taxesAmount"
+  | "cleaningFee"
+  | "guestsCount"
+  | "nightlyRate"
+  | "securityDeposit"
+  | "taxesAmount"
 >;
 
 function NumberField({

@@ -51,7 +51,9 @@ function defaultDueAt() {
 
 async function createTask(input: TaskInput) {
   if (!isSupabaseConfigured()) {
-    throw new Error("Configura Supabase en apps/mobile/.env para crear tareas.");
+    throw new Error(
+      "Configura Supabase en apps/mobile/.env para crear tareas.",
+    );
   }
 
   const { error } = await supabase.from("tasks").insert({
@@ -125,7 +127,9 @@ export default function NewTaskScreen() {
       await mutation.mutateAsync(values);
     } catch (error) {
       setFormError(
-        error instanceof Error ? error.message : "No hemos podido crear la tarea.",
+        error instanceof Error
+          ? error.message
+          : "No hemos podido crear la tarea.",
       );
     }
   });
@@ -137,7 +141,8 @@ export default function NewTaskScreen() {
     >
       {!isSupabaseConfigured() ? (
         <EmptyState title="Conecta Supabase">
-          La creacion real de tareas necesita `apps/mobile/.env`. En modo demo solo mostramos datos.
+          La creacion real de tareas necesita `apps/mobile/.env`. En modo demo
+          solo mostramos datos.
         </EmptyState>
       ) : (
         <>
@@ -148,23 +153,24 @@ export default function NewTaskScreen() {
             {propertyOptions.length ? (
               <View style={styles.pillGrid}>
                 {propertyOptions.map((property) => (
-                <SelectPill
-                  active={selectedPropertyId === property.id}
-                  key={property.id}
-                  onPress={() =>
-                    setValue("propertyId", property.id, {
-                      shouldDirty: true,
-                      shouldValidate: true,
-                    })
-                  }
-                >
-                  {property.name}
-                </SelectPill>
+                  <SelectPill
+                    active={selectedPropertyId === property.id}
+                    key={property.id}
+                    onPress={() =>
+                      setValue("propertyId", property.id, {
+                        shouldDirty: true,
+                        shouldValidate: true,
+                      })
+                    }
+                  >
+                    {property.name}
+                  </SelectPill>
                 ))}
               </View>
             ) : (
               <Text style={styles.meta}>
-                No hay activos reales disponibles para seleccionar. Crea uno desde Activos.
+                No hay activos reales disponibles para seleccionar. Crea uno
+                desde Activos.
               </Text>
             )}
             {errors.propertyId?.message ? (
@@ -186,6 +192,7 @@ export default function NewTaskScreen() {
                   onBlur={field.onBlur}
                   onChangeText={field.onChange}
                   placeholder="Preparar Atico Gran Via"
+                  testID="task-title"
                   value={field.value}
                 />
               )}
@@ -203,6 +210,7 @@ export default function NewTaskScreen() {
                   onChangeText={field.onChange}
                   placeholder="Checklist, contexto y notas para el equipo."
                   style={styles.textarea}
+                  testID="task-description"
                   value={field.value}
                 />
               )}

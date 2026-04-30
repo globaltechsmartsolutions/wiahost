@@ -30,7 +30,7 @@ WIAHost tiene app movil real con Expo React Native en `apps/mobile`. No es una W
 - Fallback demo si no hay variables `EXPO_PUBLIC_*`, para poder revisar la experiencia sin romper el arranque.
 - NativeWind preparado para evolucionar UI movil sin bloquear el MVP actual. La UI actual usa `StyleSheet`; `withNativeWind` en Metro queda para una pasada especifica porque en Windows/Node 24 rompia `expo export`.
 - TypeScript strict y scripts `typecheck`, `lint`, `build` y `test`.
-- E2E mobile con Maestro en `apps/mobile/e2e`: suite demo por defecto y suite conectada para login, alta de activo e incidencia con Supabase.
+- E2E mobile con Maestro en `apps/mobile/e2e`: suite demo por defecto y suite conectada para login, alta de activo/incidencia y cambios de estado reales en incidencia, tarea y reserva con Supabase.
 - EAS preparado para Android e iOS. Android genera APK/AAB; iOS genera build de simulador o `.ipa` firmado para TestFlight/App Store, nunca APK.
 - Las fichas de activo, tarea e incidencia conservan evidencias/documentos recientes en cache offline read-only para que el equipo pueda revisar contexto aunque se caiga la conexion.
 

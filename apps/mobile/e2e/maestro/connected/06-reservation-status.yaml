@@ -1,0 +1,63 @@
+appId: com.globaltech.wiahost
+name: WIAHost mobile connected reservation status
+tags:
+  - connected
+  - reservation
+  - status
+---
+- launchApp:
+    clearState: true
+- assertVisible: "Entrar"
+- tapOn:
+    id: "login-email"
+- inputText: "${WIAHOST_EMAIL}"
+- tapOn:
+    id: "login-password"
+- inputText: "${WIAHOST_PASSWORD}"
+- hideKeyboard
+- tapOn: "Entrar en WIAHost"
+- assertVisible: "Centro de mando movil"
+- tapOn: "Activos"
+- tapOn: "Nuevo"
+- assertVisible: "Nuevo activo"
+- tapOn:
+    id: "property-name"
+- inputText: "QA Reservation Home"
+- tapOn:
+    id: "property-internal-name"
+- inputText: "QA-RES-01"
+- tapOn:
+    id: "property-address"
+- inputText: "Calle Reserva 1"
+- tapOn:
+    id: "property-city"
+- inputText: "Madrid"
+- tapOn:
+    id: "property-province"
+- inputText: "Madrid"
+- scrollUntilVisible:
+    element: "Crear activo"
+    direction: DOWN
+- tapOn: "Activo"
+- tapOn: "Crear activo"
+- assertVisible: "Activos"
+- tapOn: "Reservas"
+- tapOn: "Nueva"
+- assertVisible: "Nueva reserva"
+- tapOn: "QA Reservation Home"
+- tapOn:
+    id: "reservation-guest-name"
+- inputText: "QA Guest Estado"
+- tapOn:
+    id: "reservation-guest-email"
+- inputText: "qa.estado@wiahost.local"
+- hideKeyboard
+- scrollUntilVisible:
+    element: "Crear reserva"
+    direction: DOWN
+- tapOn: "Crear reserva"
+- assertVisible: "Reservas"
+- tapOn: "QA Guest Estado"
+- assertVisible: "Estado de la reserva"
+- tapOn: "Check-out"
+- assertVisible: "Check-out"
