@@ -224,4 +224,4 @@
 - Implementado: smoke test real de preview con `pnpm check:deployment` contra `https://wiahost-fqdqh89js-globaltechsmartsolutions-projects.vercel.app`.
 - Implementado: verificacion visual rapida de preview publico con Playwright: status 200, titulo/H1 correctos y sin errores de consola.
 - Implementado: plantilla `.env.staging.example`, script `pnpm staging:supabase` para link/dry-run/apply de migraciones Supabase hosted y script `pnpm vercel:env:sync` para sincronizar variables en Vercel sin imprimir secretos.
-- Pendiente: crear o hacer visible un proyecto Supabase hosted para el token actual, configurar variables runtime reales en Vercel, configurar secretos `VERCEL_*` en GitHub Actions, backups Supabase hosted, observabilidad externa y cuentas de stores.
+- Pendiente: crear organizacion/proyecto Supabase hosted visible para el token actual (`supabase orgs list` devuelve `[]`), configurar variables runtime reales en Vercel, configurar secretos `VERCEL_*` en GitHub Actions, backups Supabase hosted, observabilidad externa y cuentas de stores.

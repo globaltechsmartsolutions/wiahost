@@ -79,6 +79,7 @@ Pendiente actual para convertir el preview en staging conectado:
 
 - Crear o elegir proyecto Supabase hosted de staging.
 - Autenticar Supabase CLI con `SUPABASE_ACCESS_TOKEN` o login interactivo fuera de Codex.
+- Si `pnpm exec supabase orgs list --output json` devuelve `[]`, crear primero una organizacion en Supabase Dashboard y despues un proyecto staging.
 - Comprobar que `pnpm accounts:check` detecta al menos un proyecto hosted visible para el token.
 - Copiar `.env.staging.example` a `.env.staging.local` y completar `SUPABASE_PROJECT_REF`, `SUPABASE_DB_PASSWORD`, claves Supabase hosted y URL de preview/staging.
 - Ejecutar `pnpm staging:supabase` para enlazar Supabase hosted y ver el dry-run de migraciones.
