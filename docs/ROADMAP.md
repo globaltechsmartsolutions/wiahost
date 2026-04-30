@@ -220,4 +220,7 @@
 - Implementado: preflight `pnpm accounts:check` para revisar Git remoto, Supabase CLI/login, Vercel CLI/login, EAS login, Stripe CLI opcional y `.env` locales sin imprimir secretos.
 - Implementado: documento `docs/OBSERVABILITY.md` y auditor `pnpm quality:observability` integrado en `quality:ci`.
 - Implementado: runbook `docs/INCIDENT_RESPONSE.md` para severidades, diagnostico, rollback, comunicacion y cierre de incidentes.
-- Pendiente: conectar cuentas reales de Vercel/Supabase hosted, configurar secretos `VERCEL_*`, backups Supabase hosted, observabilidad externa y cuentas de stores.
+- Implementado: proyecto Vercel real `wiahost` enlazado, Root Directory `apps/web`, Node.js `22.x`, `.vercelignore` de monorepo y preview web desplegado.
+- Implementado: smoke test real de preview con `pnpm check:deployment` contra `https://wiahost-fqdqh89js-globaltechsmartsolutions-projects.vercel.app`.
+- Implementado: verificacion visual rapida de preview publico con Playwright: status 200, titulo/H1 correctos y sin errores de consola.
+- Pendiente: conectar Supabase hosted, configurar variables runtime reales en Vercel, configurar secretos `VERCEL_*` en GitHub Actions, backups Supabase hosted, observabilidad externa y cuentas de stores.

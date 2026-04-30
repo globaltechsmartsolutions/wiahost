@@ -65,6 +65,16 @@ pnpm db:types
 
 ## Vercel staging
 
+Estado actual:
+
+- Proyecto Vercel `wiahost` creado en la cuenta `globaltechsmartsolutions`.
+- Root Directory configurado en `apps/web`.
+- Node.js configurado en `22.x`, alineado con GitHub Actions.
+- Deployment protection SSO desactivado para que las demos internas y `/api/health` sean accesibles.
+- Preview verificado: `https://wiahost-fqdqh89js-globaltechsmartsolutions-projects.vercel.app`.
+- Health check verificado con `pnpm check:deployment`.
+- `.vercelignore` reduce el upload del monorepo y mantiene fuera mobile, reports, artefactos, `.env` y migraciones raíz.
+
 Hay dos caminos validos.
 
 ### Opcion A: Git integration
@@ -77,7 +87,9 @@ Crear un proyecto Vercel conectado al repo y configurarlo como monorepo:
 - Build Command: `pnpm build`.
 - Output: automatico de Next.js.
 
-Vercel soporta monorepos con workspaces. Si el root `apps/web` no resolviera paquetes workspace en algun despliegue, usar la opcion B con CI prebuilt.
+Vercel soporta monorepos con workspaces. El proyecto remoto debe mantener `Root Directory = apps/web`; el repositorio local puede estar enlazado desde la raiz con `.vercel/project.json` ignorado por Git.
+
+En Windows, `vercel build` local puede fallar por permisos de symlink (`EPERM`) al generar el output prebuilt. No es un fallo de la app: en Linux/GitHub Actions o con deploy remoto de Vercel el build pasa correctamente.
 
 ### Opcion B: GitHub Actions con deploy prebuilt
 

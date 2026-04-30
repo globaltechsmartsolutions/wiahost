@@ -7,6 +7,7 @@ const reportPath = resolve(root, "quality/reports/staging-readiness.json");
 const requiredFiles = [
   "docs/DEPLOYMENT.md",
   "docs/RELEASE.md",
+  ".vercelignore",
   ".github/workflows/release-check.yml",
   ".github/workflows/vercel-web-deploy.yml",
 ];
@@ -40,6 +41,8 @@ const requiredDeploymentDocTerms = [
   "VERCEL_TOKEN",
   "VERCEL_ORG_ID",
   "VERCEL_PROJECT_ID",
+  "Root Directory",
+  ".vercelignore",
 ];
 
 function readText(path) {

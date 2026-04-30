@@ -169,15 +169,21 @@ function checkSupabase() {
 }
 
 function checkVercel() {
+  const linkedProjectPaths = [
+    resolve(root, ".vercel/project.json"),
+    resolve(root, "apps/web/.vercel/project.json"),
+  ];
+  const isProjectLinked = linkedProjectPaths.some((path) => existsSync(path));
   const hasVercel = commandExists("vercel");
 
   if (!hasVercel) {
     return {
       name: "Vercel CLI",
       requiredFor: "manual_local_deploys",
-      status: "optional_missing",
-      summary:
-        "Vercel CLI is not installed globally. The GitHub workflow installs a pinned CLI automatically.",
+      status: isProjectLinked ? "ready" : "optional_missing",
+      summary: isProjectLinked
+        ? "Vercel project is linked. The GitHub workflow installs a pinned CLI automatically."
+        : "Vercel CLI is not installed globally. The GitHub workflow installs a pinned CLI automatically.",
     };
   }
 
@@ -186,10 +192,12 @@ function checkVercel() {
   return {
     name: "Vercel CLI",
     requiredFor: "manual_local_deploys",
-    status: whoami.ok ? "ready" : "login_required",
+    status: whoami.ok || isProjectLinked ? "ready" : "login_required",
     summary: whoami.ok
       ? `Logged in as ${redact(whoami.output)}.`
-      : "Vercel CLI is installed but not logged in.",
+      : isProjectLinked
+        ? "Vercel project is linked. Login may still be needed for manual local deploys."
+        : "Vercel CLI is installed but not logged in.",
   };
 }
 

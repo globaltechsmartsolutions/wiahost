@@ -1,0 +1,30 @@
+# Keep Vercel uploads focused on the web app and shared packages.
+.git
+.vercel
+node_modules
+**/node_modules
+.pnpm-store
+
+# Build and test artifacts
+.next
+**/.next
+.turbo
+**/.turbo
+dist
+build
+coverage
+quality
+playwright-report
+test-results
+*.log
+
+# Local env files are managed by Vercel project settings.
+.env
+.env.*
+apps/web/.env.local
+apps/mobile/.env
+
+# Not needed for the web deployment artifact.
+apps/mobile
+docs
+/supabase

@@ -40,3 +40,6 @@ Thumbs.db
 # Supabase
 supabase/.branches
 supabase/.temp
+
+# Vercel local link and pulled environment files
+.vercel
