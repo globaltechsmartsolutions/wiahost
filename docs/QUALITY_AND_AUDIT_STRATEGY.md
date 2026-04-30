@@ -33,6 +33,7 @@ Ya existe:
 - Auditor de base de datos `pnpm quality:db` que revisa migraciones Supabase para bloquear tablas publicas sin RLS/politicas y buckets Storage sin politica.
 - Gate de release `pnpm release:check` que agrupa las validaciones automatizables y genera `quality/reports/release-check.json` con checks manuales pendientes.
 - Smoke de despliegue `pnpm check:deployment -- --url <url>` que valida `/api/health` online y genera `quality/reports/deployment-health.json`.
+- Preflight de cuentas externas `pnpm accounts:check` que revisa CLI/login/env para GitHub, Supabase, Vercel, EAS y Stripe sin exponer secretos.
 - Lighthouse CI configurado para landing/login/register con budgets iniciales, reportes en filesystem y wrapper local para estabilizar Chrome en Windows.
 - CI inicial con typecheck, lint, unit tests y build web.
 - CI ejecuta `pnpm quality:ci` y sube reportes JSON de calidad como artefacto para poder revisar estado de rutas, readiness y resumen global.
@@ -404,6 +405,7 @@ Un cambio no deberia entrar si:
 - Hecho: crear `pnpm quality:db` y sumarlo a `pnpm quality:ci` para auditar RLS/politicas de migraciones antes de build.
 - Hecho: crear `pnpm quality:staging` y sumarlo a `pnpm quality:ci` para auditar deployment docs, workflow Vercel y variables de staging antes de conectar cuentas reales.
 - Hecho: crear `pnpm check:deployment` y conectarlo al workflow Vercel para validar `/api/health` despues del deploy.
+- Hecho: crear `pnpm accounts:check` para saber que cuentas/logins/env faltan antes de staging real.
 
 ### Paso 6
 

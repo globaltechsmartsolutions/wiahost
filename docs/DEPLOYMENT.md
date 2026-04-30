@@ -123,10 +123,13 @@ RESEND_API_KEY
 
 ```bash
 pnpm install
+pnpm accounts:check
 pnpm quality:staging
 pnpm release:check
 pnpm quality:prod:production
 ```
+
+`accounts:check` revisa sin imprimir secretos el remoto Git, Supabase CLI/login, Vercel CLI/login si existe, EAS login, Stripe CLI opcional y archivos `.env` locales. Genera `quality/reports/external-accounts.json`.
 
 `quality:staging` comprueba que este documento, el workflow manual de Vercel, los scripts de release y las variables de entorno documentadas siguen presentes antes de tocar cuentas reales.
 

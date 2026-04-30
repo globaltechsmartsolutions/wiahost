@@ -103,6 +103,7 @@ pnpm quality:ci
 pnpm quality:summary
 pnpm release:check
 pnpm check:deployment -- --url https://tu-preview.vercel.app
+pnpm accounts:check
 pnpm audit:web
 pnpm audit:lighthouse
 pnpm supabase:start

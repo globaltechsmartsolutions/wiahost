@@ -70,6 +70,7 @@ pnpm quality:staging
 pnpm quality:ci
 pnpm release:check
 pnpm check:deployment -- --url https://tu-preview.vercel.app
+pnpm accounts:check
 pnpm audit:web
 pnpm audit:lighthouse
 pnpm build:web
@@ -82,6 +83,7 @@ pnpm build:web
 `pnpm quality:ci` agrupa route coverage, readiness y resumen global para reproducir el gate ligero de CI.
 `pnpm release:check` ejecuta el gate completo automatizable sin dispositivo fisico: typecheck, lint, tests, auditorias, build web y bundles Android/iOS. Las pruebas de APK, push y camara quedan documentadas en `docs/RELEASE.md`.
 `pnpm check:deployment -- --url <url>` valida `/api/health` de un despliegue staging/production y genera `quality/reports/deployment-health.json`.
+`pnpm accounts:check` hace un preflight de cuentas externas y entorno local sin imprimir secretos para saber si GitHub, Supabase, Vercel, EAS, Stripe CLI y `.env` estan listos.
 `pnpm test:visual -- --update-snapshots` actualiza capturas base cuando un cambio visual ha sido revisado y aceptado.
 `pnpm audit:lighthouse` construye la web, arranca `next start` en el puerto `3010`, usa un perfil Chrome temporal controlado para evitar bloqueos de Windows y guarda reportes locales en `quality/reports/lighthouse`.
 

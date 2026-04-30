@@ -213,4 +213,5 @@
 - Implementado: workflow manual `Web Deploy to Vercel` para preview/production con `pnpm release:check`, `vercel pull`, `vercel build` y deploy prebuilt.
 - Implementado: auditor `pnpm quality:staging`, integrado en `pnpm quality:ci`, para validar deployment docs, workflow Vercel y variables/secrets documentadas.
 - Implementado: smoke post-deploy `pnpm check:deployment -- --url <url>` conectado al workflow Vercel para validar `/api/health` y generar `deployment-health.json`.
+- Implementado: preflight `pnpm accounts:check` para revisar Git remoto, Supabase CLI/login, Vercel CLI/login, EAS login, Stripe CLI opcional y `.env` locales sin imprimir secretos.
 - Pendiente: conectar cuentas reales de Vercel/Supabase hosted, configurar secretos `VERCEL_*`, backups Supabase hosted, observabilidad externa y cuentas de stores.

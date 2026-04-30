@@ -43,6 +43,10 @@ const deploymentHealthPath = resolve(
   root,
   "quality/reports/deployment-health.json",
 );
+const externalAccountsPath = resolve(
+  root,
+  "quality/reports/external-accounts.json",
+);
 const lighthouseConfigPath = resolve(root, ".lighthouserc.cjs");
 const packageJsonPath = resolve(root, "package.json");
 const reportPath = resolve(root, "quality/reports/quality-summary.json");
@@ -196,6 +200,7 @@ const missingScripts = [
   "quality:ci",
   "release:check",
   "check:deployment",
+  "accounts:check",
   "build:web",
 ].filter((scriptName) => !rootPackage.scripts?.[scriptName]);
 
@@ -296,6 +301,12 @@ const report = {
         note: "No deployment health report detected yet. Run pnpm check:deployment -- --url <url> after a deploy.",
         status: "not_run",
       },
+  externalAccounts: existsSync(externalAccountsPath)
+    ? readJson(externalAccountsPath)
+    : {
+        note: "No external account preflight detected yet. Run pnpm accounts:check before real staging setup.",
+        status: "not_run",
+      },
   qualityScripts: {
     build: rootPackage.scripts?.["build:web"],
     e2e: rootPackage.scripts?.["test:e2e"],
@@ -306,6 +317,7 @@ const report = {
     stagingReadiness: rootPackage.scripts?.["quality:staging"],
     release: rootPackage.scripts?.["release:check"],
     deploymentHealth: rootPackage.scripts?.["check:deployment"],
+    externalAccounts: rootPackage.scripts?.["accounts:check"],
     ci: rootPackage.scripts?.["quality:ci"],
     typecheck: rootPackage.scripts?.typecheck,
     unit: rootPackage.scripts?.test,

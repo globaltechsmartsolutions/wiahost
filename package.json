@@ -38,6 +38,7 @@
     "quality:ci": "pnpm quality:routes && pnpm quality:db && pnpm quality:prod && pnpm quality:staging && pnpm quality:summary",
     "release:check": "node scripts/run-release-check.mjs",
     "check:deployment": "node scripts/check-deployment-health.mjs",
+    "accounts:check": "node scripts/check-external-accounts.mjs",
     "audit:web": "pnpm --filter web audit:web && pnpm test:visual",
     "audit:visual": "pnpm test:visual",
     "audit:lighthouse": "pnpm build:web && pnpm lighthouse",
