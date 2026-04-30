@@ -9,6 +9,7 @@ El objetivo es centralizar propiedades, reservas, calendario multi-canal, mensaj
 - Monorepo con pnpm workspaces y Turborepo.
 - Web app con Next.js App Router en `apps/web`.
 - Mobile app con Expo React Native y Expo Router en `apps/mobile`.
+- Push notifications moviles con registro de dispositivo, envio servidor y auditoria por entrega.
 - UI profesional tipo hospitality command center.
 - Dashboard navegable con datos Supabase y fallback demo.
 - Rutas web actuales: landing, dashboard, properties, reservations, calendar, guests, inbox, leads, notifications, tasks, incidents, owners, statements, payments, pricing, distribution, documents, audit, workflows, automations, settings, login y register.
@@ -85,6 +86,7 @@ pnpm dev:web
 pnpm dev:mobile
 pnpm build:web
 pnpm build:mobile
+pnpm eas:configure
 pnpm eas:build:android:preview
 pnpm typecheck
 pnpm lint

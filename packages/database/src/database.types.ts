@@ -986,6 +986,76 @@ export type Database = {
           },
         ]
       }
+      push_notification_deliveries: {
+        Row: {
+          created_at: string
+          error_code: string | null
+          error_message: string | null
+          expo_push_token: string
+          expo_ticket_id: string | null
+          id: string
+          notification_id: string | null
+          payload: Json
+          profile_id: string
+          sent_at: string
+          status: string
+          token_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          error_code?: string | null
+          error_message?: string | null
+          expo_push_token: string
+          expo_ticket_id?: string | null
+          id?: string
+          notification_id?: string | null
+          payload?: Json
+          profile_id: string
+          sent_at?: string
+          status?: string
+          token_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          error_code?: string | null
+          error_message?: string | null
+          expo_push_token?: string
+          expo_ticket_id?: string | null
+          id?: string
+          notification_id?: string | null
+          payload?: Json
+          profile_id?: string
+          sent_at?: string
+          status?: string
+          token_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "push_notification_deliveries_notification_id_fkey"
+            columns: ["notification_id"]
+            isOneToOne: false
+            referencedRelation: "notifications"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "push_notification_deliveries_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "push_notification_deliveries_token_id_fkey"
+            columns: ["token_id"]
+            isOneToOne: false
+            referencedRelation: "mobile_push_tokens"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       notifications: {
         Row: {
           body: string | null

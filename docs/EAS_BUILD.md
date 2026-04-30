@@ -33,6 +33,8 @@ EXPO_PUBLIC_SUPABASE_ANON_KEY=tu_anon_key
 
 Para desarrollo local con Expo Go se puede seguir usando `apps/mobile/.env`.
 
+Si se activa seguridad reforzada de Expo Push Service, configura tambien `EXPO_ACCESS_TOKEN` en el entorno server-side de la web. No es una variable publica y no debe llegar a la app movil.
+
 ## Build production Android
 
 Cuando preview este validado:
@@ -65,6 +67,7 @@ El perfil `submit.production.android.track` apunta a `internal`.
 - Subir evidencia desde camara o galeria.
 - Activar push notifications en Ajustes.
 - Validar que `mobile_push_tokens` recibe el token tras build EAS.
+- Enviar una prueba desde `POST /api/notifications/push` y confirmar auditoria en `push_notification_deliveries`.
 
 ## Notas
 

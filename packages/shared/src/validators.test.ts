@@ -18,6 +18,7 @@ import {
   manualReservationSchema,
   messageLabelSchema,
   modelPredictionSchema,
+  notificationPushSchema,
   notificationSchema,
   operationalEventSchema,
   ownerStatementSchema,
@@ -390,6 +391,30 @@ describe("notification validators", () => {
   it("rejects empty notification titles", () => {
     const parsed = notificationSchema.safeParse({
       title: "",
+    });
+
+    expect(parsed.success).toBe(false);
+  });
+
+  it("accepts mobile push payloads with operational context", () => {
+    const parsed = notificationPushSchema.safeParse({
+      body: "Sofia Martin espera respuesta en Inbox.",
+      data: {
+        conversationId: uuid,
+        route: "/inbox/11111111-1111-4111-8111-111111111111",
+      },
+      priority: "high",
+      title: "Inbox urgente",
+      type: "inbox_sla",
+      userId: uuid,
+    });
+
+    expect(parsed.success).toBe(true);
+  });
+
+  it("rejects push payloads without a target user", () => {
+    const parsed = notificationPushSchema.safeParse({
+      title: "Inbox urgente",
     });
 
     expect(parsed.success).toBe(false);

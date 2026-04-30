@@ -19,6 +19,7 @@ WIAHost tiene app movil real con Expo React Native en `apps/mobile`. No es una W
 - Cambio de estado desde mobile para conversaciones, reservas, tareas e incidencias.
 - Subida de evidencias/fotos desde camara o galeria en activos, incidencias y tareas, usando Supabase Storage y registros en `documents`.
 - Registro de dispositivo para push notifications desde Ajustes, con permisos nativos, canal Android `operations` y guardado en `mobile_push_tokens`.
+- Envio servidor de push notifications mediante `/api/notifications/push`, con auditoria en `push_notification_deliveries`.
 - Login y registro con Supabase Auth.
 - Persistencia de sesion con `@react-native-async-storage/async-storage`.
 - TanStack Query para cache y refresco de datos operativos.
@@ -109,7 +110,7 @@ La guia operativa completa esta en `docs/EAS_BUILD.md`.
 
 ## Funciones prioritarias siguientes
 
-- Envio servidor de push notifications para check-in, SLA de inbox e incidencias cuando este configurado EAS projectId y credenciales Expo.
+- Automatizar disparadores push para check-in, SLA de inbox e incidencias usando el endpoint servidor ya preparado.
 - Previsualizacion enriquecida de evidencias y subida de PDF/documentos.
 - Offline read-only basico para tareas del dia.
 - Tests e2e mobile con Maestro o Detox cuando el flujo nativo se estabilice.
@@ -123,7 +124,11 @@ La app movil usa `expo-notifications` y `expo-device`. Desde `/settings`, el usu
 - obtiene `ExpoPushToken` si existe `EAS projectId`;
 - guarda el token en `mobile_push_tokens` con RLS por usuario.
 
-En Expo Go o sin `EAS projectId`, la app no rompe: muestra que el permiso esta listo pero falta configurar EAS. El envio remoto se conectara desde backend/Edge Function cuando tengamos proyecto Expo/EAS definitivo.
+En Expo Go o sin `EAS projectId`, la app no rompe: muestra que el permiso esta listo pero falta configurar EAS.
+
+El backend web ya expone `POST /api/notifications/push` para que operadores/admins creen una notificacion interna y la envien al dispositivo movil del usuario destino. El endpoint valida sesion, rol, payload Zod, lee `mobile_push_tokens`, envia a Expo Push Service y deja trazabilidad por dispositivo en `push_notification_deliveries`.
+
+Si se activa seguridad reforzada de Expo Push Service en EAS, configurar `EXPO_ACCESS_TOKEN` solo en servidor (`apps/web/.env.local` o variables de Vercel). Nunca va en `apps/mobile/.env`.
 
 ## Play Store
 

@@ -10,6 +10,7 @@ supabase/migrations/
   0004_ai_foundation.sql
   0005_channel_accounts.sql
   0006_mobile_push_tokens.sql
+  0007_push_notification_deliveries.sql
 ```
 
 ## Tablas principales
@@ -35,6 +36,7 @@ supabase/migrations/
 - `documents`: documentos, evidencias y adjuntos.
 - `notifications`: notificaciones internas.
 - `mobile_push_tokens`: dispositivos moviles registrados para push notifications.
+- `push_notification_deliveries`: auditoria de envios push a Expo, tickets y errores por dispositivo.
 
 ## Tablas preparadas para IA
 
@@ -151,7 +153,9 @@ La fase posterior puede generar PDFs, notificaciones al propietario y pago autom
 
 La tabla `notifications` ya esta conectada desde `/notifications`, la campana del shell y `/api/notifications`. En el MVP permite crear avisos internos para el usuario autenticado y marcar uno o todos como leidos. Sirve como base para eventos de mensajes, pagos, incidencias, owner statements y automatizaciones.
 
-La tabla `mobile_push_tokens` guarda los `ExpoPushToken` registrados desde la app movil. Cada usuario solo puede gestionar sus propios dispositivos mediante RLS; operadores pueden leerlos para futuros envios desde backend. No se guardan secretos de Expo ni credenciales de proveedores en cliente.
+La tabla `mobile_push_tokens` guarda los `ExpoPushToken` registrados desde la app movil. Cada usuario solo puede gestionar sus propios dispositivos mediante RLS; operadores pueden leerlos para envios desde backend. No se guardan secretos de Expo ni credenciales de proveedores en cliente.
+
+La tabla `push_notification_deliveries` registra cada intento de envio a Expo Push Service: usuario, dispositivo, payload operativo, ticket de Expo, estado y error si lo hay. Esto permite depurar credenciales, tokens caducados o fallos de proveedor sin depender solo de logs temporales.
 
 ## Storage
 

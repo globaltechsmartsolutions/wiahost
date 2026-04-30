@@ -28,6 +28,7 @@ export async function createNotification(
     .insert({
       body: input.body?.trim() || null,
       title: input.title.trim(),
+      type: input.type ?? "system",
       user_id: userId,
     })
     .select("id,title")

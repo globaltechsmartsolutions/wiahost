@@ -35,6 +35,7 @@ const requiredExampleKeys = [
   "NEXT_PUBLIC_SUPABASE_ANON_KEY",
   "SUPABASE_SERVICE_ROLE_KEY",
   "DATABASE_URL",
+  "EXPO_ACCESS_TOKEN",
   "RESEND_API_KEY",
   "STRIPE_SECRET_KEY",
   "STRIPE_WEBHOOK_SECRET",
@@ -61,12 +62,14 @@ const serverOnlyEnvNames = [
   "STRIPE_SECRET_KEY",
   "STRIPE_WEBHOOK_SECRET",
   "DATABASE_URL",
+  "EXPO_ACCESS_TOKEN",
   "RESEND_API_KEY",
 ];
 
 const allowedServerOnlyFiles = new Set([
   "apps/web/src/lib/supabase/admin.ts",
   "apps/web/src/lib/stripe/server.ts",
+  "apps/web/src/lib/services/push-notifications.ts",
   "apps/web/src/app/api/stripe/webhook/route.ts",
 ]);
 
