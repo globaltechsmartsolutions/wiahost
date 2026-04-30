@@ -942,6 +942,50 @@ export type Database = {
           },
         ]
       }
+      mobile_push_tokens: {
+        Row: {
+          app_version: string | null
+          created_at: string
+          device_name: string | null
+          expo_push_token: string
+          id: string
+          last_seen_at: string
+          platform: string
+          profile_id: string
+          updated_at: string
+        }
+        Insert: {
+          app_version?: string | null
+          created_at?: string
+          device_name?: string | null
+          expo_push_token: string
+          id?: string
+          last_seen_at?: string
+          platform: string
+          profile_id: string
+          updated_at?: string
+        }
+        Update: {
+          app_version?: string | null
+          created_at?: string
+          device_name?: string | null
+          expo_push_token?: string
+          id?: string
+          last_seen_at?: string
+          platform?: string
+          profile_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mobile_push_tokens_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       notifications: {
         Row: {
           body: string | null

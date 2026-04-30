@@ -5,11 +5,30 @@ import { Card, SectionTitle, StatusBadge } from "@/src/components/cards";
 import { PrimaryButton } from "@/src/components/form";
 import { Screen } from "@/src/components/screen";
 import { useAuth } from "@/src/features/auth/auth-provider";
+import { usePushNotifications } from "@/src/hooks/use-push-notifications";
 import { isSupabaseConfigured } from "@/src/lib/supabase";
 import { colors } from "@/src/lib/theme";
 
 export default function SettingsScreen() {
   const { profile, session, signOut } = useAuth();
+  const push = usePushNotifications();
+  const pushMessage =
+    push.registration?.message ??
+    (push.registrationError instanceof Error
+      ? push.registrationError.message
+      : null) ??
+    push.status?.message ??
+    (push.statusError instanceof Error ? push.statusError.message : null) ??
+    "Activa avisos para check-ins, SLA de inbox, incidencias y tareas criticas.";
+  const pushLabel =
+    push.registration?.status === "registered" ||
+    push.status?.status === "registered"
+      ? "Push registrada"
+      : push.status?.status === "needs_permission"
+        ? "Permiso pendiente"
+        : push.status?.status === "needs_eas_project"
+          ? "Falta EAS"
+          : "Preparada";
 
   return (
     <Screen
@@ -48,6 +67,23 @@ export default function SettingsScreen() {
         <Text style={styles.meta}>
           EXPO_PUBLIC_SUPABASE_URL y EXPO_PUBLIC_SUPABASE_ANON_KEY conectan esta app al mismo backend que la web.
         </Text>
+      </Card>
+
+      <Card>
+        <SectionTitle helper="Avisos para operacion critica en el movil.">
+          Notificaciones push
+        </SectionTitle>
+        <StatusBadge label={pushLabel} />
+        <Text style={styles.meta}>{pushMessage}</Text>
+        <PrimaryButton
+          disabled={!session || push.isRegistering || push.statusLoading}
+          onPress={() => {
+            void push.register();
+          }}
+          variant="secondary"
+        >
+          {push.isRegistering ? "Registrando..." : "Activar avisos"}
+        </PrimaryButton>
       </Card>
 
       <View style={styles.actions}>

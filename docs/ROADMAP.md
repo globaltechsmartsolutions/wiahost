@@ -154,10 +154,11 @@
 - Implementado: cambio de estado mobile para reservas e incidencias con invalidacion de cache operativa.
 - Implementado: configuracion inicial `apps/mobile/eas.json` para builds `development`, `preview` y `production` de Android.
 - Implementado: subida de evidencias/fotos desde camara o galeria en fichas mobile de activos, incidencias y tareas, con Storage (`property-media`, `incident-attachments`, `reservation-documents`) y registro en `documents`.
+- Implementado: registro mobile de push notifications desde Ajustes con `expo-notifications`, permisos nativos, canal Android `operations`, tabla `mobile_push_tokens` y RLS por usuario.
 - Implementado: TanStack Query para cache/refresco de datos operativos y lectura directa de Supabase con RLS.
 - Implementado: fallback demo para poder revisar la experiencia movil aunque no esten copiadas las variables.
 - Implementado: typecheck movil limpio.
-- Pendiente inmediato: push notifications, previsualizacion avanzada de evidencias/PDF, EAS Build real con cuenta Expo y tests e2e mobile.
+- Pendiente inmediato: envio servidor de push notifications, previsualizacion avanzada de evidencias/PDF, EAS Build real con cuenta Expo y tests e2e mobile.
 
 ## Fase 5 - IA y automatizacion avanzada
 

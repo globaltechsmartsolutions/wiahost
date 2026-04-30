@@ -18,6 +18,7 @@ WIAHost tiene app movil real con Expo React Native en `apps/mobile`. No es una W
 - Historial completo de conversaciones desde `/inbox/[conversationId]`.
 - Cambio de estado desde mobile para conversaciones, reservas, tareas e incidencias.
 - Subida de evidencias/fotos desde camara o galeria en activos, incidencias y tareas, usando Supabase Storage y registros en `documents`.
+- Registro de dispositivo para push notifications desde Ajustes, con permisos nativos, canal Android `operations` y guardado en `mobile_push_tokens`.
 - Login y registro con Supabase Auth.
 - Persistencia de sesion con `@react-native-async-storage/async-storage`.
 - TanStack Query para cache y refresco de datos operativos.
@@ -96,10 +97,21 @@ CI ejecuta `pnpm build:mobile` y `expo export --platform web` como guardarrail l
 
 ## Funciones prioritarias siguientes
 
-- Push notifications para check-in, SLA de inbox e incidencias.
+- Envio servidor de push notifications para check-in, SLA de inbox e incidencias cuando este configurado EAS projectId y credenciales Expo.
 - Previsualizacion enriquecida de evidencias y subida de PDF/documentos.
 - Offline read-only basico para tareas del dia.
 - Tests e2e mobile con Maestro o Detox cuando el flujo nativo se estabilice.
+
+## Push notifications
+
+La app movil usa `expo-notifications` y `expo-device`. Desde `/settings`, el usuario puede activar avisos. El flujo:
+
+- pide permiso nativo de notificaciones;
+- crea canal Android `operations`;
+- obtiene `ExpoPushToken` si existe `EAS projectId`;
+- guarda el token en `mobile_push_tokens` con RLS por usuario.
+
+En Expo Go o sin `EAS projectId`, la app no rompe: muestra que el permiso esta listo pero falta configurar EAS. El envio remoto se conectara desde backend/Edge Function cuando tengamos proyecto Expo/EAS definitivo.
 
 ## Play Store
 
