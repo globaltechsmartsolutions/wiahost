@@ -10,6 +10,19 @@ import { isSupabaseConfigured } from "@/src/lib/supabase";
 import { colors } from "@/src/lib/theme";
 import { useMobileDashboard } from "@/src/hooks/use-mobile-dashboard";
 
+function cachedAtLabel(value: string | undefined) {
+  if (!value) {
+    return "ultima sincronizacion disponible";
+  }
+
+  return new Intl.DateTimeFormat("es-ES", {
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    month: "short",
+  }).format(new Date(value));
+}
+
 export default function DashboardScreen() {
   const { profile, session } = useAuth();
   const { data, isLoading, refetch, isRefetching } = useMobileDashboard();
@@ -49,6 +62,17 @@ export default function DashboardScreen() {
               Crear cuenta
             </PrimaryButton>
           </View>
+        </Card>
+      ) : null}
+
+      {data?.source === "cache" ? (
+        <Card>
+          <Text style={styles.bannerTitle}>Modo offline read-only</Text>
+          <Text style={styles.bannerText}>
+            Mostrando la ultima operativa guardada en este movil:{" "}
+            {cachedAtLabel(data.cachedAt)}. Tira para refrescar cuando vuelva la
+            conexion.
+          </Text>
         </Card>
       ) : null}
 

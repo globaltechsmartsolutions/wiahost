@@ -24,6 +24,7 @@ WIAHost tiene app movil real con Expo React Native en `apps/mobile`. No es una W
 - Login y registro con Supabase Auth.
 - Persistencia de sesion con `@react-native-async-storage/async-storage`.
 - TanStack Query para cache y refresco de datos operativos.
+- Offline read-only basico para dashboard/listas principales: guarda la ultima respuesta viva en AsyncStorage y la muestra con banner si falla la red.
 - Conexion directa a Supabase con RLS.
 - Fallback demo si no hay variables `EXPO_PUBLIC_*`, para poder revisar la experiencia sin romper el arranque.
 - NativeWind preparado para evolucionar UI movil sin bloquear el MVP actual. La UI actual usa `StyleSheet`; `withNativeWind` en Metro queda para una pasada especifica porque en Windows/Node 24 rompia `expo export`.
@@ -112,7 +113,7 @@ La guia operativa completa esta en `docs/EAS_BUILD.md`.
 ## Funciones prioritarias siguientes
 
 - Automatizar disparadores push para check-in, SLA de inbox e incidencias usando el endpoint servidor ya preparado.
-- Offline read-only basico para tareas del dia.
+- Extender offline read-only a fichas de reserva/tarea/incidencia y cola de tareas del dia.
 - Tests e2e mobile con Maestro o Detox cuando el flujo nativo se estabilice.
 
 ## Push notifications

@@ -8,6 +8,10 @@ import {
   demoQueue,
   demoReservations,
 } from "@/src/lib/demo-data";
+import {
+  readOfflineCache,
+  writeOfflineCache,
+} from "@/src/lib/offline-cache";
 import { isSupabaseConfigured, supabase } from "@/src/lib/supabase";
 
 export type MobileMetric = (typeof demoMetrics)[number];
@@ -24,13 +28,17 @@ export type MobileQueueItem = {
 };
 
 export type MobileDashboardData = {
+  cachedAt?: string;
   inbox: MobileInboxThread[];
   incidents: MobileIncident[];
   metrics: MobileMetric[];
   properties: MobileProperty[];
   queue: MobileQueueItem[];
   reservations: MobileReservation[];
+  source: "cache" | "demo" | "live";
 };
+
+const mobileDashboardCacheKey = "mobile-dashboard-v1";
 
 const statusLabels: Record<string, string> = {
   active: "Activo",
@@ -95,6 +103,23 @@ function fallbackData(): MobileDashboardData {
     properties: demoProperties,
     queue: demoQueue as MobileQueueItem[],
     reservations: demoReservations,
+    source: "demo",
+  };
+}
+
+async function cachedDashboardData() {
+  const cached = await readOfflineCache<MobileDashboardData>(
+    mobileDashboardCacheKey,
+  );
+
+  if (!cached) {
+    return null;
+  }
+
+  return {
+    ...cached.value,
+    cachedAt: cached.savedAt,
+    source: "cache" as const,
   };
 }
 
@@ -267,7 +292,7 @@ async function loadMobileDashboard(): Promise<MobileDashboardData> {
     }, 0);
     const riskCount = mappedQueue.length + mappedIncidents.length;
 
-    return {
+    const data = {
       inbox: mappedInbox.length ? mappedInbox : demoInbox,
       incidents: mappedIncidents.length ? mappedIncidents : demoIncidents,
       metrics: [
@@ -295,9 +320,14 @@ async function loadMobileDashboard(): Promise<MobileDashboardData> {
       properties: mappedProperties.length ? mappedProperties : demoProperties,
       queue: mappedQueue.length ? mappedQueue : (demoQueue as MobileQueueItem[]),
       reservations: mappedReservations.length ? mappedReservations : demoReservations,
+      source: "live" as const,
     };
+
+    await writeOfflineCache(mobileDashboardCacheKey, data);
+
+    return data;
   } catch {
-    return fallbackData();
+    return (await cachedDashboardData()) ?? fallbackData();
   }
 }
 
