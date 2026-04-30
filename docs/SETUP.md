@@ -47,6 +47,12 @@ URLs locales verificadas:
 - Supabase API: `http://127.0.0.1:54321`
 - Database: `postgresql://postgres:postgres@127.0.0.1:54322/postgres`
 
+Preview online verificado:
+
+- Web staging demo: `https://wiahost-fqdqh89js-globaltechsmartsolutions-projects.vercel.app`
+- Health check: `pnpm check:deployment -- --url https://wiahost-fqdqh89js-globaltechsmartsolutions-projects.vercel.app`
+- Estado: build remoto en Vercel correcto, pendiente de conectar Supabase hosted y variables runtime reales para dejar de usar fallback demo.
+
 Usuarios demo tras `pnpm db:reset`:
 
 - `admin@wiahost.local` / `Password123!`

@@ -75,6 +75,15 @@ Estado actual:
 - Health check verificado con `pnpm check:deployment`.
 - `.vercelignore` reduce el upload del monorepo y mantiene fuera mobile, reports, artefactos, `.env` y migraciones raíz.
 
+Pendiente actual para convertir el preview en staging conectado:
+
+- Crear o elegir proyecto Supabase hosted de staging.
+- Autenticar Supabase CLI con `SUPABASE_ACCESS_TOKEN` o login interactivo fuera de Codex.
+- Ejecutar `supabase link --project-ref <staging-project-ref>` y `supabase db push`.
+- Configurar en Vercel las variables runtime reales de Supabase, Stripe test, Resend y Expo server-side.
+- Configurar en GitHub Actions `VERCEL_TOKEN`, `VERCEL_ORG_ID` y `VERCEL_PROJECT_ID`.
+- Repetir `pnpm check:deployment -- --url <preview-url>` tras conectar Supabase hosted.
+
 Hay dos caminos validos.
 
 ### Opcion A: Git integration
