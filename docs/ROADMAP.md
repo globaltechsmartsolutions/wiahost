@@ -207,4 +207,5 @@
 - Implementado: gate local de release `pnpm release:check` para typecheck, lint, tests, auditorias, build web, build mobile y bundles Android/iOS.
 - Implementado: reporte `quality/reports/release-check.json` con resultado de release y lista de pruebas manuales que requieren dispositivo fisico o cuentas externas.
 - Implementado: documento canonico `docs/RELEASE.md` con APK demo, iOS/TestFlight, checks manuales pendientes y checklist antes de produccion SaaS.
+- Implementado: workflow manual `Release Check` en GitHub Actions para ejecutar el gate de release y subir reportes JSON como artefacto.
 - Pendiente: conectar entorno staging/produccion real, backups Supabase hosted, observabilidad externa y cuentas de stores.

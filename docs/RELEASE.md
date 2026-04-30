@@ -31,6 +31,16 @@ quality/reports/release-check.json
 
 Si el comando pasa, el proyecto queda listo para validacion manual de dispositivo. No sustituye la prueba en movil real.
 
+## Gate manual en GitHub Actions
+
+Tambien existe el workflow manual:
+
+```text
+.github/workflows/release-check.yml
+```
+
+Se lanza desde GitHub Actions con `Run workflow`. Ejecuta `pnpm release:check`, refresca `quality:summary` y sube los reportes JSON como artefacto. Es util antes de una demo o antes de generar builds EAS, sin depender de que el terminal local este exactamente igual.
+
 ## Pendiente manual por dispositivo
 
 Estas pruebas quedan aparcadas hasta que haya tiempo/dispositivo:

@@ -34,6 +34,7 @@ Ya existe:
 - Lighthouse CI configurado para landing/login/register con budgets iniciales, reportes en filesystem y wrapper local para estabilizar Chrome en Windows.
 - CI inicial con typecheck, lint, unit tests y build web.
 - CI ejecuta `pnpm quality:ci` y sube reportes JSON de calidad como artefacto para poder revisar estado de rutas, readiness y resumen global.
+- Workflow manual `Release Check` ejecuta `pnpm release:check` y sube reportes JSON antes de demos/builds.
 
 Falta:
 
