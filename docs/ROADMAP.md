@@ -156,7 +156,7 @@
 - Implementado: subida de evidencias/fotos desde camara o galeria en fichas mobile de activos, incidencias y tareas, con Storage (`property-media`, `incident-attachments`, `reservation-documents`) y registro en `documents`.
 - Implementado: selector mobile de PDF/documentos para evidencias y previsualizacion de adjuntos con miniatura de imagen, etiqueta PDF/DOC y apertura por URL firmada temporal.
 - Implementado: registro mobile de push notifications desde Ajustes con `expo-notifications`, permisos nativos, canal Android `operations`, tabla `mobile_push_tokens` y RLS por usuario.
-- Implementado: preparacion EAS Build con `eas-cli`, scripts raiz para login/configure/preview/production/submit, perfil preview APK, production AAB con autoincremento y guia `docs/EAS_BUILD.md`.
+- Implementado: preparacion EAS Build con `eas-cli`, scripts raiz para login/configure/preview/production/submit, perfil preview APK, production AAB, perfiles iOS simulator/preview/production, bundle identifier iOS y guia `docs/EAS_BUILD.md`.
 - Implementado: vinculacion del proyecto Expo/EAS con `extra.eas.projectId` no secreto, build preview Android real verificado en EAS y configuracion Metro endurecida para pnpm monorepo, evitando fallos de SHA en EAS Android y React duplicado en export web.
 - Implementado: envio servidor de push notifications con API `POST /api/notifications/push`, validacion Zod, control de rol operador/admin, Expo Push Service, `EXPO_ACCESS_TOKEN` opcional y auditoria en `push_notification_deliveries`.
 - Implementado: TanStack Query para cache/refresco de datos operativos y lectura directa de Supabase con RLS.

@@ -2,7 +2,7 @@
 
 ## Objetivo
 
-Preparar WIAHost Mobile para instalarse como app real de Android, primero con APK de preview y despues con AAB para Google Play Internal Testing.
+Preparar WIAHost Mobile para instalarse como app real de Android e iOS. Android usa APK/AAB; iOS no usa APK, usa builds `.ipa` firmadas por Apple y distribuidas mediante TestFlight, App Store Connect o perfiles internos.
 
 ## Estado
 
@@ -10,10 +10,16 @@ Preparar WIAHost Mobile para instalarse como app real de Android, primero con AP
 - `apps/mobile/eas.json` tiene perfiles `development`, `preview` y `production`.
 - `preview` genera APK para instalacion interna.
 - `production` genera AAB para Play Store y usa `autoIncrement`.
+- iOS tiene `bundleIdentifier`: `com.globaltech.wiahost`.
+- iOS declara `ITSAppUsesNonExemptEncryption: false` porque la app no usa cifrado no exento; evita el aviso manual inicial en App Store Connect.
+- `ios-simulator` genera una build para simulador iOS, util para validar sin cuenta Apple Developer.
+- `preview` en iOS genera una build interna para iPhone real, pero requiere Apple Developer y dispositivos registrados o TestFlight segun el flujo.
+- `production` en iOS genera build para App Store Connect/TestFlight.
 - Las push notifications ya leen `extra.eas.projectId`, que se rellena al vincular el proyecto con EAS.
 - El proyecto esta vinculado a Expo/EAS con `extra.eas.projectId`. Ese identificador no es secreto.
 - Metro usa un shim local para `webidl-conversions` y `disableHierarchicalLookup` para evitar dos problemas tipicos de pnpm monorepo: fallos de SHA en EAS Android al resolver rutas internas `.pnpm` y React duplicado durante `expo export --platform web`.
 - Primer build preview Android verificado en EAS: `f22caba0-54a4-4e88-954d-39b9cc21afa7`.
+- Primer build iOS simulator verificado en EAS: `7a041ea5-20f9-4547-94f5-ae96eb7edce9`.
 
 ## Primer build preview Android
 
@@ -37,6 +43,31 @@ EXPO_PUBLIC_SUPABASE_ANON_KEY=tu_anon_key
 Para desarrollo local con Expo Go se puede seguir usando `apps/mobile/.env`.
 
 Si se activa seguridad reforzada de Expo Push Service, configura tambien `EXPO_ACCESS_TOKEN` en el entorno server-side de la web. No es una variable publica y no debe llegar a la app movil.
+
+## Build preview iOS
+
+Importante: iOS no permite instalar un `.apk`. Para iPhone real necesitas una build iOS firmada por Apple.
+
+Para validar en simulador iOS:
+
+```bash
+pnpm eas:build:ios:simulator
+```
+
+Para iPhone real en distribucion interna:
+
+```bash
+pnpm eas:build:ios:preview
+```
+
+Este comando pedira credenciales de Apple Developer si no estan configuradas. Si no hay cuenta Apple Developer activa, no se puede generar una build instalable en iPhone real.
+
+Para TestFlight/App Store:
+
+```bash
+pnpm eas:build:ios:production
+pnpm eas:submit:ios
+```
 
 ## Build production Android
 
@@ -73,6 +104,7 @@ El perfil `submit.production.android.track` apunta a `internal`.
 - Activar push notifications en Ajustes.
 - Validar que `mobile_push_tokens` recibe el token tras build EAS.
 - Enviar una prueba desde `POST /api/notifications/push` y confirmar auditoria en `push_notification_deliveries`.
+- Para iOS real: Apple Developer activo, bundle identifier disponible, certificados/provisioning profiles creados por EAS y app creada en App Store Connect antes de submit.
 
 ## Notas
 

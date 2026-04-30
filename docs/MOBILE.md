@@ -31,6 +31,7 @@ WIAHost tiene app movil real con Expo React Native en `apps/mobile`. No es una W
 - NativeWind preparado para evolucionar UI movil sin bloquear el MVP actual. La UI actual usa `StyleSheet`; `withNativeWind` en Metro queda para una pasada especifica porque en Windows/Node 24 rompia `expo export`.
 - TypeScript strict y scripts `typecheck`, `lint`, `build` y `test`.
 - E2E mobile con Maestro en `apps/mobile/e2e`: suite demo por defecto y suite conectada para login, alta de activo e incidencia con Supabase.
+- EAS preparado para Android e iOS. Android genera APK/AAB; iOS genera build de simulador o `.ipa` firmado para TestFlight/App Store, nunca APK.
 
 ## Arquitectura
 
@@ -109,7 +110,11 @@ pnpm eas:login
 pnpm eas:configure
 pnpm eas:build:android:preview
 pnpm eas:build:android:production
+pnpm eas:build:ios:simulator
+pnpm eas:build:ios:preview
+pnpm eas:build:ios:production
 pnpm eas:submit:android:internal
+pnpm eas:submit:ios
 ```
 
 La guia operativa completa esta en `docs/EAS_BUILD.md`.
@@ -164,3 +169,13 @@ eas submit --profile production --platform android
 ```
 
 El proyecto ya incluye `apps/mobile/eas.json` con perfiles `development`, `preview` y `production`. El perfil `production` genera `.aab`, que es el formato esperado por Play Store.
+
+## iOS / TestFlight
+
+iOS no usa APK. Opciones:
+
+- Simulador: `pnpm eas:build:ios:simulator`.
+- iPhone real interno: `pnpm eas:build:ios:preview`, requiere Apple Developer.
+- TestFlight/App Store: `pnpm eas:build:ios:production` y despues `pnpm eas:submit:ios`.
+
+El identificador iOS configurado es `com.globaltech.wiahost`. Para publicar necesitaremos Apple Developer Program activo, app creada en App Store Connect, politica de privacidad, capturas, icono final y declaracion de datos.
