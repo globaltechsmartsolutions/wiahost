@@ -101,6 +101,7 @@
 - Implementado: modulo web de documentos y evidencias con alta, edicion, eliminacion, vinculacion a propiedad/reserva/incidencia, API GET/POST/GET detail/PATCH/DELETE, subida real a Storage con URL firmada y descarga temporal segura.
 - Implementado: modulo web de owner statements con alta, edicion, eliminacion, periodos, costes, payout neto y API GET/POST/GET detail/PATCH/DELETE.
 - Implementado: modulo web de pagos iniciales con alta, edicion, eliminacion, estados, proveedor, importe, fecha de pago, enlaces tokenizados de checkout, Stripe Checkout opcional si hay claves, webhook firmado, confirmacion solo con `payment_status = paid` y API GET/POST/GET detail/PATCH/DELETE/checkout-link.
+- Implementado: logica de decision del webhook Stripe extraida y cubierta con unit tests para eventos pagados, asincronos, sin referencia y no pagados.
 - Implementado: centro de notificaciones `/notifications` con campana en topbar, contador de no leidas, marcado como leido y API GET/POST/PATCH.
 
 ## Fase 3 - Distribucion y canales
@@ -124,7 +125,7 @@
 - Implementado: normalizacion de mensajes entrantes `/api/channels/messages` y formulario en `/inbox` para convertir mensajes de Airbnb/Booking/Vrbo/email/WhatsApp en contacto, conversacion, mensaje inbound y evento de sync.
 - Implementado: control inicial de precios `/pricing` sobre `pricing_observations`, con API GET/POST/GET detail/PATCH/DELETE para precio actual, sugerido, aprobado/final, ocupacion y conversion.
 - Implementado: registro de sincronizacion outbound de precio desde `/pricing` mediante `channel_sync_events.payload.action = price_update` y API POST `/api/pricing/observations/[id]/sync`.
-- Pendiente: probar Stripe en entorno real con claves de test, APIs oficiales por canal y sincronizacion automatica de precios con proveedores externos.
+- Pendiente: probar Stripe en entorno real con claves de test, webhook firmado desde Stripe CLI/Dashboard, APIs oficiales por canal y sincronizacion automatica de precios con proveedores externos.
 
 ## Fase 4 - App movil
 

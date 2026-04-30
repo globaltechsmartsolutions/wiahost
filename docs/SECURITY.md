@@ -7,6 +7,7 @@
 - Ninguna clave server-only debe usarse desde componentes con `"use client"`.
 - Supabase RLS es la defensa principal de datos. La UI y los Route Handlers ayudan, pero no sustituyen RLS.
 - Stripe solo confirma pagos desde webhook firmado y con `payment_status = paid`.
+- La decision del webhook Stripe esta cubierta por unit tests: eventos pagados, pagos asincronos, sesiones sin referencia y sesiones no pagadas.
 - Las cuentas externas de canales se documentan en `channel_accounts`, pero las credenciales reales deben vivir en variables seguras o vault del proveedor.
 - Los documentos usan buckets privados y URL firmadas temporales para subida/descarga. El navegador solo recibe un token temporal de Storage; no se deben publicar rutas de storage como enlaces permanentes.
 - Las push notifications usan tokens de dispositivo guardados con RLS. `EXPO_ACCESS_TOKEN`, si se activa en EAS, solo puede vivir en servidor.

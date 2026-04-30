@@ -161,6 +161,19 @@ Luego validar manualmente:
 - `/payments`
 - `/settings`
 
+## Stripe test
+
+Antes de activar pagos live:
+
+1. Configurar en staging `STRIPE_SECRET_KEY` y `STRIPE_WEBHOOK_SECRET` de modo test.
+2. Generar un link desde `/payments` o desde `/leads`.
+3. Completar una Checkout Session con tarjeta test de Stripe.
+4. Verificar que `POST /api/stripe/webhook` recibe un evento firmado.
+5. Comprobar que el pago cambia a `paid` solo si `payment_status = paid`.
+6. Comprobar que la reserva asociada pasa de `inquiry`/`pending` a `confirmed`.
+
+La decision interna del webhook esta cubierta por unit tests para no depender solo de una prueba manual externa.
+
 ## Reglas de promocion a produccion
 
 No promocionar si:
