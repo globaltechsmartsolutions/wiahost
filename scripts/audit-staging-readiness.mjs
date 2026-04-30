@@ -7,6 +7,7 @@ const reportPath = resolve(root, "quality/reports/staging-readiness.json");
 const requiredFiles = [
   "docs/DEPLOYMENT.md",
   "docs/RELEASE.md",
+  ".env.staging.example",
   ".vercelignore",
   ".github/workflows/release-check.yml",
   ".github/workflows/vercel-web-deploy.yml",
@@ -17,6 +18,8 @@ const requiredScripts = [
   "release:check",
   "quality:prod:production",
   "quality:summary",
+  "staging:supabase",
+  "vercel:env:sync",
 ];
 
 const requiredRuntimeEnvKeys = [
@@ -43,6 +46,9 @@ const requiredDeploymentDocTerms = [
   "VERCEL_PROJECT_ID",
   "Root Directory",
   ".vercelignore",
+  "SUPABASE_PROJECT_REF",
+  "staging:supabase",
+  "vercel:env:sync",
 ];
 
 function readText(path) {

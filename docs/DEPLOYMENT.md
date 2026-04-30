@@ -80,7 +80,10 @@ Pendiente actual para convertir el preview en staging conectado:
 - Crear o elegir proyecto Supabase hosted de staging.
 - Autenticar Supabase CLI con `SUPABASE_ACCESS_TOKEN` o login interactivo fuera de Codex.
 - Comprobar que `pnpm accounts:check` detecta al menos un proyecto hosted visible para el token.
-- Ejecutar `supabase link --project-ref <staging-project-ref>` y `supabase db push`.
+- Copiar `.env.staging.example` a `.env.staging.local` y completar `SUPABASE_PROJECT_REF`, `SUPABASE_DB_PASSWORD`, claves Supabase hosted y URL de preview/staging.
+- Ejecutar `pnpm staging:supabase` para enlazar Supabase hosted y ver el dry-run de migraciones.
+- Ejecutar `pnpm staging:supabase -- --apply` para aplicar migraciones y regenerar tipos cuando el dry-run sea correcto.
+- Ejecutar `pnpm vercel:env:sync -- --file .env.staging.local --environment preview` para sincronizar variables en Vercel sin imprimir valores.
 - Configurar en Vercel las variables runtime reales de Supabase, Stripe test, Resend y Expo server-side.
 - Configurar en GitHub Actions `VERCEL_TOKEN`, `VERCEL_ORG_ID` y `VERCEL_PROJECT_ID`.
 - Repetir `pnpm check:deployment -- --url <preview-url>` tras conectar Supabase hosted.
@@ -140,6 +143,15 @@ RESEND_API_KEY
 ```
 
 `EXPO_ACCESS_TOKEN`, `RESEND_API_KEY`, `STRIPE_SECRET_KEY` y `STRIPE_WEBHOOK_SECRET` son opcionales hasta activar esas integraciones, pero deben quedar como server-only cuando se usen.
+
+Sincronizacion segura desde archivo local:
+
+```bash
+cp .env.staging.example .env.staging.local
+pnpm vercel:env:sync -- --file .env.staging.local --environment preview
+```
+
+El script no imprime valores, ignora claves locales como `SUPABASE_ACCESS_TOKEN`, `SUPABASE_PROJECT_REF` y `SUPABASE_DB_PASSWORD`, y falla si detecta placeholders.
 
 ## Checklist antes de crear staging
 

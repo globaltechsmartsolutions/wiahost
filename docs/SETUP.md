@@ -53,6 +53,17 @@ Preview online verificado:
 - Health check: `pnpm check:deployment -- --url https://wiahost-fqdqh89js-globaltechsmartsolutions-projects.vercel.app`
 - Estado: build remoto en Vercel correcto, pendiente de conectar Supabase hosted y variables runtime reales para dejar de usar fallback demo.
 
+Preparacion de staging hosted:
+
+```bash
+cp .env.staging.example .env.staging.local
+pnpm staging:supabase
+pnpm staging:supabase -- --apply
+pnpm vercel:env:sync -- --file .env.staging.local --environment preview
+```
+
+`pnpm staging:supabase` hace primero un dry-run de migraciones. Solo `--apply` aplica cambios reales y regenera tipos desde el proyecto linked. `pnpm vercel:env:sync` envia variables a Vercel sin imprimir valores y bloquea placeholders.
+
 Usuarios demo tras `pnpm db:reset`:
 
 - `admin@wiahost.local` / `Password123!`

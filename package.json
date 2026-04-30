@@ -40,6 +40,8 @@
     "release:check": "node scripts/run-release-check.mjs",
     "check:deployment": "node scripts/check-deployment-health.mjs",
     "accounts:check": "node scripts/check-external-accounts.mjs",
+    "staging:supabase": "node scripts/setup-supabase-staging.mjs",
+    "vercel:env:sync": "node scripts/sync-vercel-env.mjs",
     "audit:web": "pnpm --filter web audit:web && pnpm test:visual",
     "audit:visual": "pnpm test:visual",
     "audit:lighthouse": "pnpm build:web && pnpm lighthouse",
