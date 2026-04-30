@@ -1,0 +1,16 @@
+appId: com.globaltech.wiahost
+name: WIAHost mobile demo smoke
+tags:
+  - smoke
+  - demo
+---
+- launchApp
+- assertVisible: "WIAHost mobile"
+- assertVisible: "Centro de mando movil"
+- assertVisible: "Reservas activas"
+- tapOn: "Reservas"
+- assertVisible: "Reservas"
+- tapOn: "Riesgo"
+- assertVisible: "Riesgo"
+- tapOn: "Ajustes"
+- assertVisible: "Ajustes"

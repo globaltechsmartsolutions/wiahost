@@ -11,6 +11,7 @@
     "build": "tsc --noEmit",
     "lint": "tsc --noEmit",
     "typecheck": "tsc --noEmit",
+    "test:e2e": "maestro test e2e/maestro",
     "test": "tsc --noEmit"
   },
   "dependencies": {

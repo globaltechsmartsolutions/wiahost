@@ -29,6 +29,7 @@ WIAHost tiene app movil real con Expo React Native en `apps/mobile`. No es una W
 - Fallback demo si no hay variables `EXPO_PUBLIC_*`, para poder revisar la experiencia sin romper el arranque.
 - NativeWind preparado para evolucionar UI movil sin bloquear el MVP actual. La UI actual usa `StyleSheet`; `withNativeWind` en Metro queda para una pasada especifica porque en Windows/Node 24 rompia `expo export`.
 - TypeScript strict y scripts `typecheck`, `lint`, `build` y `test`.
+- Estructura E2E mobile con Maestro en `apps/mobile/e2e`, preparada para smoke demo y futuros flujos con build preview.
 
 ## Arquitectura
 
@@ -94,6 +95,7 @@ pnpm --filter mobile ios
 pnpm --filter mobile web
 pnpm --filter mobile typecheck
 pnpm --filter mobile exec expo export --platform web
+pnpm test:mobile:e2e
 ```
 
 CI ejecuta `pnpm build:mobile` y `expo export --platform web` como guardarrail ligero hasta que se configure EAS Build.
@@ -110,11 +112,13 @@ pnpm eas:submit:android:internal
 
 La guia operativa completa esta en `docs/EAS_BUILD.md`.
 
+`pnpm test:mobile:e2e` requiere Maestro CLI y un dispositivo/emulador con la app instalada. No se ejecuta en CI inicial hasta tener build preview estable.
+
 ## Funciones prioritarias siguientes
 
 - Automatizar disparadores push para check-in, SLA de inbox e incidencias usando el endpoint servidor ya preparado.
 - Extender offline read-only a fichas de reserva/tarea/incidencia y cola de tareas del dia.
-- Tests e2e mobile con Maestro o Detox cuando el flujo nativo se estabilice.
+- Anadir flujos Maestro conectados a Supabase: login demo, alta de activo, incidencia, evidencia y push.
 
 ## Push notifications
 

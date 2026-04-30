@@ -16,8 +16,9 @@ Ya existe:
 
 - Vitest en `packages/shared`, `packages/database` y `apps/web`.
 - Playwright instalado en `apps/web`.
-- `pnpm typecheck`, `pnpm lint`, `pnpm test`, `pnpm test:e2e` y `pnpm build:web`.
+- `pnpm typecheck`, `pnpm lint`, `pnpm test`, `pnpm test:e2e`, `pnpm test:mobile:e2e` y `pnpm build:web`.
 - Tests iniciales de validadores compartidos.
+- Smoke E2E mobile preparado con Maestro en `apps/mobile/e2e` para ejecutar contra dispositivo/emulador cuando exista build instalada.
 - Test inicial de configuracion Supabase.
 - `playwright.config.ts` formal en `apps/web`.
 - Tests E2E versionados para smoke publico/auth, login demo, iCal publico/import, mensajes entrantes de canal, pricing con sync outbound, notificaciones, creacion/edicion de reserva UI/API, leads directos con preparacion de pago, owners/settings, guest list/detail/edit, calendar blocks y mutaciones API completas de tareas, incidencias e inbox.

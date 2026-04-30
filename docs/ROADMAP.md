@@ -160,9 +160,10 @@
 - Implementado: envio servidor de push notifications con API `POST /api/notifications/push`, validacion Zod, control de rol operador/admin, Expo Push Service, `EXPO_ACCESS_TOKEN` opcional y auditoria en `push_notification_deliveries`.
 - Implementado: TanStack Query para cache/refresco de datos operativos y lectura directa de Supabase con RLS.
 - Implementado: offline read-only basico en mobile para dashboard/listas principales con cache AsyncStorage, fallback a ultima operativa viva y banner visible.
+- Implementado: estructura E2E mobile con Maestro, script `pnpm test:mobile:e2e` y primer smoke demo sobre navegacion principal.
 - Implementado: fallback demo para poder revisar la experiencia movil aunque no esten copiadas las variables.
 - Implementado: typecheck movil limpio.
-- Pendiente inmediato: ejecutar `pnpm eas:login` con cuenta Expo, vincular proyecto con `pnpm eas:configure`, lanzar build preview real, automatizar disparadores push, extender offline a fichas detalle y tests e2e mobile.
+- Pendiente inmediato: ejecutar `pnpm eas:login` con cuenta Expo, vincular proyecto con `pnpm eas:configure`, lanzar build preview real, automatizar disparadores push, extender offline a fichas detalle y ampliar Maestro con flujos conectados.
 
 ## Fase 5 - IA y automatizacion avanzada
 
