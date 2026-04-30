@@ -11,6 +11,8 @@ Preparar WIAHost Mobile para instalarse como app real de Android, primero con AP
 - `preview` genera APK para instalacion interna.
 - `production` genera AAB para Play Store y usa `autoIncrement`.
 - Las push notifications ya leen `extra.eas.projectId`, que se rellena al vincular el proyecto con EAS.
+- El proyecto esta vinculado a Expo/EAS con `extra.eas.projectId`. Ese identificador no es secreto.
+- Metro usa un shim local para `webidl-conversions` y `disableHierarchicalLookup` para evitar dos problemas tipicos de pnpm monorepo: fallos de SHA en EAS Android al resolver rutas internas `.pnpm` y React duplicado durante `expo export --platform web`.
 
 ## Primer build preview Android
 
@@ -61,6 +63,8 @@ El perfil `submit.production.android.track` apunta a `internal`.
 - `pnpm lint`
 - `pnpm test`
 - `pnpm --filter mobile exec expo install --check`
+- `pnpm --filter mobile exec expo export:embed --eager --platform android --dev false`
+- `pnpm --filter mobile exec expo export --platform web`
 - Login mobile en dispositivo real.
 - Crear activo desde mobile.
 - Crear reserva/tarea/incidencia desde mobile.
@@ -72,3 +76,5 @@ El perfil `submit.production.android.track` apunta a `internal`.
 ## Notas
 
 Sin login Expo, los comandos EAS remotos no pueden ejecutarse desde terminal no interactivo. El repo ya deja los scripts preparados; el primer paso manual imprescindible es `pnpm eas:login`.
+
+Si EAS falla en la fase `Bundle JavaScript` con un mensaje similar a `Failed to get the SHA-1`, revisa primero `apps/mobile/metro.config.js`: no debe apuntar a archivos dentro de `node_modules/.pnpm/...` para dependencias resueltas manualmente. Usa shims locales dentro de `apps/mobile/src/lib/polyfills` para que Metro pueda hashear los archivos de forma estable en Linux.

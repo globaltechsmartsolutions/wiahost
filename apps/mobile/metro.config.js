@@ -5,19 +5,32 @@ const projectRoot = __dirname;
 const workspaceRoot = path.resolve(projectRoot, "../..");
 const config = getDefaultConfig(projectRoot);
 const mobileWebidlConversions = path.resolve(
-  workspaceRoot,
-  "node_modules/.pnpm/whatwg-url@5.0.0/node_modules/webidl-conversions/lib/index.js",
+  projectRoot,
+  "src/lib/polyfills/webidl-conversions.js",
 );
 
-config.watchFolders = [
+function escapePathForRegex(value) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+config.watchFolders = Array.from(new Set([
+  ...(config.watchFolders ?? []),
   path.resolve(workspaceRoot, "packages"),
   path.resolve(workspaceRoot, "node_modules"),
-];
+]));
 config.resolver.nodeModulesPaths = [
   path.resolve(projectRoot, "node_modules"),
   path.resolve(workspaceRoot, "node_modules"),
 ];
+// pnpm can expose nested React copies through hoisted dependencies. Disabling
+// hierarchical lookup keeps native/web exports on the app-level React instance.
 config.resolver.disableHierarchicalLookup = true;
+config.resolver.extraNodeModules = {
+  ...(config.resolver.extraNodeModules ?? {}),
+  react: path.resolve(projectRoot, "node_modules/react"),
+  "react-dom": path.resolve(projectRoot, "node_modules/react-dom"),
+  "react-native": path.resolve(projectRoot, "node_modules/react-native"),
+};
 const defaultResolveRequest = config.resolver.resolveRequest;
 config.resolver.resolveRequest = (context, moduleName, platform) => {
   if (moduleName === "webidl-conversions") {
@@ -32,10 +45,10 @@ config.resolver.resolveRequest = (context, moduleName, platform) => {
     : context.resolveRequest(context, moduleName, platform);
 };
 config.resolver.blockList = [
-  ...config.resolver.blockList,
-  new RegExp(`${path.resolve(workspaceRoot, "apps/web").replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}.*`),
-  new RegExp(`${path.resolve(projectRoot, "dist").replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}.*`),
-  new RegExp(`${path.resolve(projectRoot, ".turbo").replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}.*`),
+  ...(config.resolver.blockList ?? []),
+  new RegExp(`${escapePathForRegex(path.resolve(workspaceRoot, "apps/web"))}.*`),
+  new RegExp(`${escapePathForRegex(path.resolve(projectRoot, "dist"))}.*`),
+  new RegExp(`${escapePathForRegex(path.resolve(projectRoot, ".turbo"))}.*`),
 ];
 
 module.exports = config;

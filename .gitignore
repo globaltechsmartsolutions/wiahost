@@ -24,6 +24,7 @@ quality/reports/playwright
 
 # logs
 *.log
+logs/
 tmp_*
 npm-debug.log*
 pnpm-debug.log*
