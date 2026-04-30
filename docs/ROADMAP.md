@@ -168,7 +168,8 @@
 - Implementado: typecheck movil limpio.
 - Implementado: cache offline read-only para evidencias/documentos recientes en fichas mobile de activos, tareas e incidencias, con aviso visible cuando se muestran datos guardados.
 - Implementado: Maestro demo valida que las fichas mobile exponen evidencias, y suite conectada anade flujos de cambio de estado real para incidencia, tarea y reserva.
-- Pendiente inmediato: instalar y validar el APK preview en dispositivo real, ampliar Maestro con subida de evidencia y registro push reales.
+- Implementado: cobertura Maestro conectada de readiness push en Ajustes, sin depender todavia de permisos del sistema operativo.
+- Pendiente inmediato: instalar y validar el APK preview en dispositivo real, ampliar Maestro con subida de evidencia real y registro push con permisos controlados en dispositivo fisico.
 
 ## Fase 5 - IA y automatizacion avanzada
 

@@ -42,7 +42,9 @@ export default function SettingsScreen() {
         <View style={styles.profileRow}>
           <View style={styles.avatar}>
             <Text style={styles.avatarText}>
-              {(profile?.full_name ?? session?.user.email ?? "W").slice(0, 1).toUpperCase()}
+              {(profile?.full_name ?? session?.user.email ?? "W")
+                .slice(0, 1)
+                .toUpperCase()}
             </Text>
           </View>
           <View style={styles.profileCopy}>
@@ -50,13 +52,19 @@ export default function SettingsScreen() {
               {profile?.full_name ?? session?.user.email ?? "Modo demo"}
             </Text>
             <Text style={styles.meta}>
-              {profile?.role ?? "Sin rol activo"} ·{" "}
+              {profile?.role ?? "Sin rol activo"} -{" "}
               {isSupabaseConfigured() ? "Supabase configurado" : "Demo local"}
             </Text>
           </View>
         </View>
         <StatusBadge
-          label={session ? "Sesion activa" : isSupabaseConfigured() ? "Sin sesion" : "Demo"}
+          label={
+            session
+              ? "Sesion activa"
+              : isSupabaseConfigured()
+                ? "Sin sesion"
+                : "Demo"
+          }
         />
       </Card>
 
@@ -65,7 +73,8 @@ export default function SettingsScreen() {
           Conexion
         </SectionTitle>
         <Text style={styles.meta}>
-          EXPO_PUBLIC_SUPABASE_URL y EXPO_PUBLIC_SUPABASE_ANON_KEY conectan esta app al mismo backend que la web.
+          EXPO_PUBLIC_SUPABASE_URL y EXPO_PUBLIC_SUPABASE_ANON_KEY conectan esta
+          app al mismo backend que la web.
         </Text>
       </Card>
 
@@ -80,6 +89,7 @@ export default function SettingsScreen() {
           onPress={() => {
             void push.register();
           }}
+          testID="push-register"
           variant="secondary"
         >
           {push.isRegistering ? "Registrando..." : "Activar avisos"}
@@ -97,7 +107,9 @@ export default function SettingsScreen() {
           </PrimaryButton>
         ) : (
           <>
-            <PrimaryButton onPress={() => router.push("/login")}>Entrar</PrimaryButton>
+            <PrimaryButton onPress={() => router.push("/login")}>
+              Entrar
+            </PrimaryButton>
             <PrimaryButton
               onPress={() => router.push("/register")}
               variant="secondary"

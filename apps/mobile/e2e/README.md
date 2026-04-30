@@ -51,7 +51,8 @@ WIAHOST_EMAIL=operaciones@wiahost.local WIAHOST_PASSWORD='Password123!' pnpm tes
 - `maestro/connected/04-incident-status.yaml`: crea una incidencia real y valida que el cambio de estado esta disponible desde mobile.
 - `maestro/connected/05-task-status.yaml`: crea una tarea real y valida que puede pasar a en curso desde mobile.
 - `maestro/connected/06-reservation-status.yaml`: crea una reserva real y valida el cambio de estado operativo desde mobile.
+- `maestro/connected/07-push-readiness.yaml`: valida que la sesion conectada expone el bloque de registro push en Ajustes.
 
 ## Siguiente paso
 
-Ampliar flujos conectados con subida de evidencia y registro push reales.
+Ampliar flujos conectados con subida de evidencia real y registro push con permisos controlados en dispositivo fisico.

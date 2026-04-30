@@ -1,0 +1,21 @@
+appId: com.globaltech.wiahost
+name: WIAHost mobile connected push readiness
+tags:
+  - connected
+  - push
+---
+- launchApp:
+    clearState: true
+- assertVisible: "Entrar"
+- tapOn:
+    id: "login-email"
+- inputText: "${WIAHOST_EMAIL}"
+- tapOn:
+    id: "login-password"
+- inputText: "${WIAHOST_PASSWORD}"
+- hideKeyboard
+- tapOn: "Entrar en WIAHost"
+- assertVisible: "Centro de mando movil"
+- tapOn: "Ajustes"
+- assertVisible: "Notificaciones push"
+- assertVisible: "Activar avisos"

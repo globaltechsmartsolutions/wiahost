@@ -39,11 +39,13 @@ export function PrimaryButton({
   children,
   disabled,
   onPress,
+  testID,
   variant = "primary",
 }: {
   children: ReactNode;
   disabled?: boolean;
   onPress?: () => void;
+  testID?: string;
   variant?: "primary" | "secondary";
 }) {
   return (
@@ -56,6 +58,7 @@ export function PrimaryButton({
         variant === "secondary" && styles.secondaryButton,
         disabled && styles.disabledButton,
       ]}
+      testID={testID}
     >
       <Text
         style={[
