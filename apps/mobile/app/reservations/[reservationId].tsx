@@ -1,19 +1,22 @@
-import {
-  reservationStatuses,
-  type ReservationStatus,
-} from "@wiahost/shared";
+import { reservationStatuses, type ReservationStatus } from "@wiahost/shared";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useLocalSearchParams } from "expo-router";
 import { useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 
-import { Card, EmptyState, SectionTitle, StatusBadge } from "@/src/components/cards";
+import {
+  Card,
+  EmptyState,
+  OfflineBanner,
+  SectionTitle,
+  StatusBadge,
+} from "@/src/components/cards";
 import { Screen } from "@/src/components/screen";
 import {
   StatusActionGroup,
   type StatusOption,
 } from "@/src/components/status-actions";
-import { useMobileDashboard } from "@/src/hooks/use-mobile-dashboard";
+import { useReservationDetail } from "@/src/hooks/use-reservation-detail";
 import { isSupabaseConfigured, supabase } from "@/src/lib/supabase";
 import { colors } from "@/src/lib/theme";
 import { isGuid } from "@/src/lib/utils";
@@ -42,11 +45,15 @@ async function updateReservationStatus({
   status: ReservationStatus;
 }) {
   if (!isSupabaseConfigured()) {
-    throw new Error("Configura Supabase para actualizar reservas desde mobile.");
+    throw new Error(
+      "Configura Supabase para actualizar reservas desde mobile.",
+    );
   }
 
   if (!isGuid(reservationId)) {
-    throw new Error("Esta reserva demo es solo lectura. Con datos reales sera editable.");
+    throw new Error(
+      "Esta reserva demo es solo lectura. Con datos reales sera editable.",
+    );
   }
 
   const { error } = await supabase
@@ -67,13 +74,20 @@ function normalizeStatus(value: string): ReservationStatus {
 
 export default function ReservationDetailScreen() {
   const { reservationId } = useLocalSearchParams<{ reservationId: string }>();
-  const { data, isLoading, refetch, isRefetching } = useMobileDashboard();
+  const {
+    data: reservation,
+    isLoading,
+    refetch,
+    isRefetching,
+  } = useReservationDetail(reservationId);
   const queryClient = useQueryClient();
   const [statusError, setStatusError] = useState<string | null>(null);
-  const reservation = data?.reservations.find((item) => item.id === reservationId);
   const mutation = useMutation({
     mutationFn: updateReservationStatus,
     onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: ["reservation-detail", reservationId],
+      });
       await queryClient.invalidateQueries({ queryKey: ["mobile-dashboard"] });
       await refetch();
     },
@@ -82,7 +96,9 @@ export default function ReservationDetailScreen() {
     ? normalizeStatus(reservation.statusValue)
     : "pending";
   const canMutateReservation =
-    Boolean(reservation) && isSupabaseConfigured() && isGuid(reservation?.id ?? "");
+    Boolean(reservation) &&
+    isSupabaseConfigured() &&
+    isGuid(reservation?.id ?? "");
 
   const changeStatus = async (status: ReservationStatus) => {
     setStatusError(null);
@@ -111,6 +127,9 @@ export default function ReservationDetailScreen() {
     >
       {reservation ? (
         <>
+          {reservation.source === "cache" ? (
+            <OfflineBanner cachedAt={reservation.cachedAt} />
+          ) : null}
           <Card>
             <View style={styles.headerRow}>
               <View style={styles.headerCopy}>
@@ -145,7 +164,9 @@ export default function ReservationDetailScreen() {
               }
               title="Estado de la reserva"
             />
-            {statusError ? <Text style={styles.error}>{statusError}</Text> : null}
+            {statusError ? (
+              <Text style={styles.error}>{statusError}</Text>
+            ) : null}
           </Card>
         </>
       ) : (

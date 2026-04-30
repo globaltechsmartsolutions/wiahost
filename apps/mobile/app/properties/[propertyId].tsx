@@ -1,7 +1,13 @@
 import { router, useLocalSearchParams } from "expo-router";
 import { StyleSheet, Text, View } from "react-native";
 
-import { Card, EmptyState, SectionTitle, StatusBadge } from "@/src/components/cards";
+import {
+  Card,
+  EmptyState,
+  OfflineBanner,
+  SectionTitle,
+  StatusBadge,
+} from "@/src/components/cards";
 import { EvidenceUploader } from "@/src/components/evidence-uploader";
 import { PrimaryButton } from "@/src/components/form";
 import { Screen } from "@/src/components/screen";
@@ -12,8 +18,12 @@ import { isGuid } from "@/src/lib/utils";
 
 export default function PropertyDetailScreen() {
   const { propertyId } = useLocalSearchParams<{ propertyId: string }>();
-  const { data: property, isLoading, refetch, isRefetching } =
-    usePropertyDetail(propertyId);
+  const {
+    data: property,
+    isLoading,
+    refetch,
+    isRefetching,
+  } = usePropertyDetail(propertyId);
   const canEditProperty =
     Boolean(property) && isSupabaseConfigured() && isGuid(property?.id ?? "");
 
@@ -42,6 +52,9 @@ export default function PropertyDetailScreen() {
     >
       {property ? (
         <>
+          {property.source === "cache" ? (
+            <OfflineBanner cachedAt={property.cachedAt} />
+          ) : null}
           <Card>
             <View style={styles.headerRow}>
               <View style={styles.avatar}>
@@ -64,7 +77,10 @@ export default function PropertyDetailScreen() {
               Operativa
             </SectionTitle>
             <DetailRow label="Ciudad" value={property.city} />
-            <DetailRow label="Precio base" value={`${property.basePrice} EUR`} />
+            <DetailRow
+              label="Precio base"
+              value={`${property.basePrice} EUR`}
+            />
             <DetailRow label="Limpieza" value={`${property.cleaningFee} EUR`} />
             <DetailRow
               label="Capacidad"
@@ -73,8 +89,8 @@ export default function PropertyDetailScreen() {
             <DetailRow label="Estado" value={property.statusLabel} />
             {!canEditProperty ? (
               <Text style={styles.meta}>
-                Modo demo o dato no editable desde mobile. Conecta Supabase y abre
-                un activo real para editarlo.
+                Modo demo o dato no editable desde mobile. Conecta Supabase y
+                abre un activo real para editarlo.
               </Text>
             ) : null}
           </Card>

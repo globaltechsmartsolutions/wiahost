@@ -1,20 +1,23 @@
-import {
-  incidentStatuses,
-  type IncidentStatus,
-} from "@wiahost/shared";
+import { incidentStatuses, type IncidentStatus } from "@wiahost/shared";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useLocalSearchParams } from "expo-router";
 import { useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 
-import { Card, EmptyState, SectionTitle, StatusBadge } from "@/src/components/cards";
+import {
+  Card,
+  EmptyState,
+  OfflineBanner,
+  SectionTitle,
+  StatusBadge,
+} from "@/src/components/cards";
 import { EvidenceUploader } from "@/src/components/evidence-uploader";
 import { Screen } from "@/src/components/screen";
 import {
   StatusActionGroup,
   type StatusOption,
 } from "@/src/components/status-actions";
-import { useMobileDashboard } from "@/src/hooks/use-mobile-dashboard";
+import { useIncidentDetail } from "@/src/hooks/use-incident-detail";
 import { isSupabaseConfigured, supabase } from "@/src/lib/supabase";
 import { colors } from "@/src/lib/theme";
 import { isGuid } from "@/src/lib/utils";
@@ -42,11 +45,15 @@ async function updateIncidentStatus({
   status: IncidentStatus;
 }) {
   if (!isSupabaseConfigured()) {
-    throw new Error("Configura Supabase para actualizar incidencias desde mobile.");
+    throw new Error(
+      "Configura Supabase para actualizar incidencias desde mobile.",
+    );
   }
 
   if (!isGuid(incidentId)) {
-    throw new Error("Esta incidencia demo es solo lectura. Con datos reales sera editable.");
+    throw new Error(
+      "Esta incidencia demo es solo lectura. Con datos reales sera editable.",
+    );
   }
 
   const { error } = await supabase
@@ -67,13 +74,20 @@ function normalizeStatus(value: string): IncidentStatus {
 
 export default function IncidentDetailScreen() {
   const { incidentId } = useLocalSearchParams<{ incidentId: string }>();
-  const { data, isLoading, refetch, isRefetching } = useMobileDashboard();
+  const {
+    data: incident,
+    isLoading,
+    refetch,
+    isRefetching,
+  } = useIncidentDetail(incidentId);
   const queryClient = useQueryClient();
   const [statusError, setStatusError] = useState<string | null>(null);
-  const incident = data?.incidents.find((item) => item.id === incidentId);
   const mutation = useMutation({
     mutationFn: updateIncidentStatus,
     onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: ["incident-detail", incidentId],
+      });
       await queryClient.invalidateQueries({ queryKey: ["mobile-dashboard"] });
       await refetch();
     },
@@ -111,6 +125,9 @@ export default function IncidentDetailScreen() {
     >
       {incident ? (
         <>
+          {incident.source === "cache" ? (
+            <OfflineBanner cachedAt={incident.cachedAt} />
+          ) : null}
           <Card>
             <View style={styles.headerRow}>
               <View style={styles.headerCopy}>
@@ -144,7 +161,9 @@ export default function IncidentDetailScreen() {
               }
               title="Estado de la incidencia"
             />
-            {statusError ? <Text style={styles.error}>{statusError}</Text> : null}
+            {statusError ? (
+              <Text style={styles.error}>{statusError}</Text>
+            ) : null}
           </Card>
           <EvidenceUploader
             context={{

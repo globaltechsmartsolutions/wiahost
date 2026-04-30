@@ -21,10 +21,11 @@ WIAHost tiene app movil real con Expo React Native en `apps/mobile`. No es una W
 - Previsualizacion movil de evidencias guardadas con miniatura para imagenes, etiqueta PDF/DOC y apertura mediante URL firmada temporal.
 - Registro de dispositivo para push notifications desde Ajustes, con permisos nativos, canal Android `operations` y guardado en `mobile_push_tokens`.
 - Envio servidor de push notifications mediante `/api/notifications/push`, con auditoria en `push_notification_deliveries`.
+- Disparadores push automaticos para mensajes entrantes, reservas relevantes, tareas prioritarias e incidencias operativas. Son no bloqueantes: si Expo falla, la escritura principal sigue adelante.
 - Login y registro con Supabase Auth.
 - Persistencia de sesion con `@react-native-async-storage/async-storage`.
 - TanStack Query para cache y refresco de datos operativos.
-- Offline read-only basico para dashboard/listas principales: guarda la ultima respuesta viva en AsyncStorage y la muestra con banner si falla la red.
+- Offline read-only para dashboard/listas principales y fichas de activo, reserva, conversacion, tarea e incidencia: guarda la ultima respuesta viva en AsyncStorage y la muestra con banner si falla la red.
 - Conexion directa a Supabase con RLS.
 - Fallback demo si no hay variables `EXPO_PUBLIC_*`, para poder revisar la experiencia sin romper el arranque.
 - NativeWind preparado para evolucionar UI movil sin bloquear el MVP actual. La UI actual usa `StyleSheet`; `withNativeWind` en Metro queda para una pasada especifica porque en Windows/Node 24 rompia `expo export`.
@@ -116,8 +117,7 @@ La guia operativa completa esta en `docs/EAS_BUILD.md`.
 
 ## Funciones prioritarias siguientes
 
-- Automatizar disparadores push para check-in, SLA de inbox e incidencias usando el endpoint servidor ya preparado.
-- Extender offline read-only a fichas de reserva/tarea/incidencia y cola de tareas del dia.
+- Extender offline read-only a cola de tareas del dia y documentos/evidencias recientes.
 - Anadir flujos Maestro conectados a Supabase: login demo, alta de activo, incidencia, evidencia y push.
 
 ## Push notifications
@@ -132,6 +132,8 @@ La app movil usa `expo-notifications` y `expo-device`. Desde `/settings`, el usu
 En Expo Go o sin `EAS projectId`, la app no rompe: muestra que el permiso esta listo pero falta configurar EAS.
 
 El backend web ya expone `POST /api/notifications/push` para que operadores/admins creen una notificacion interna y la envien al dispositivo movil del usuario destino. El endpoint valida sesion, rol, payload Zod, lee `mobile_push_tokens`, envia a Expo Push Service y deja trazabilidad por dispositivo en `push_notification_deliveries`.
+
+Ademas, `apps/web/src/lib/services/operational-push.ts` centraliza los disparadores automaticos. Las operaciones de reservas, tareas, incidencias y mensajes entrantes llaman a esta capa tras guardar datos y eventos de auditoria. El envio se hace con `Promise.allSettled` y captura de errores para que una caida temporal de Expo no bloquee la operacion de negocio.
 
 Si se activa seguridad reforzada de Expo Push Service en EAS, configurar `EXPO_ACCESS_TOKEN` solo en servidor (`apps/web/.env.local` o variables de Vercel). Nunca va en `apps/mobile/.env`.
 

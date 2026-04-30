@@ -1,11 +1,13 @@
 import { useQuery } from "@tanstack/react-query";
 
 import { demoQueue } from "@/src/lib/demo-data";
+import { readOfflineCache, writeOfflineCache } from "@/src/lib/offline-cache";
 import { isSupabaseConfigured, supabase } from "@/src/lib/supabase";
 
 type Relation<T> = T | T[] | null | undefined;
 
 export type MobileTaskDetail = {
+  cachedAt?: string;
   description: string;
   due: string;
   id: string;
@@ -13,11 +15,14 @@ export type MobileTaskDetail = {
   property: string;
   propertyId: string | null;
   reservationId: string | null;
+  source: "cache" | "demo" | "live";
   status: string;
   statusValue: string;
   title: string;
   type: string;
 };
+
+const taskDetailCacheKey = (taskId: string) => `task-detail-v1:${taskId}`;
 
 const statusLabels: Record<string, string> = {
   blocked: "Bloqueada",
@@ -56,7 +61,9 @@ function label(value: string | null | undefined) {
     return "Pendiente";
   }
 
-  return statusLabels[value] ?? priorityLabels[value] ?? typeLabels[value] ?? value;
+  return (
+    statusLabels[value] ?? priorityLabels[value] ?? typeLabels[value] ?? value
+  );
 }
 
 function dueLabel(value: string | null | undefined) {
@@ -80,13 +87,15 @@ function fallbackTask(taskId: string): MobileTaskDetail | null {
   }
 
   return {
-    description: "Tarea demo para validar el flujo movil antes de conectar Supabase.",
+    description:
+      "Tarea demo para validar el flujo movil antes de conectar Supabase.",
     due: task.meta,
     id: task.id,
     priority: task.priority,
     property: task.meta,
     propertyId: null,
     reservationId: null,
+    source: "demo",
     status: "Abierta",
     statusValue: "open",
     title: task.label,
@@ -94,7 +103,25 @@ function fallbackTask(taskId: string): MobileTaskDetail | null {
   };
 }
 
-async function loadTaskDetail(taskId: string): Promise<MobileTaskDetail | null> {
+async function cachedTask(taskId: string) {
+  const cached = await readOfflineCache<MobileTaskDetail>(
+    taskDetailCacheKey(taskId),
+  );
+
+  if (!cached) {
+    return null;
+  }
+
+  return {
+    ...cached.value,
+    cachedAt: cached.savedAt,
+    source: "cache" as const,
+  };
+}
+
+async function loadTaskDetail(
+  taskId: string,
+): Promise<MobileTaskDetail | null> {
   if (!isSupabaseConfigured()) {
     return fallbackTask(taskId);
   }
@@ -102,7 +129,9 @@ async function loadTaskDetail(taskId: string): Promise<MobileTaskDetail | null> 
   try {
     const { data, error } = await supabase
       .from("tasks")
-      .select("id,title,type,status,priority,due_at,description,property_id,reservation_id,properties(name)")
+      .select(
+        "id,title,type,status,priority,due_at,description,property_id,reservation_id,properties(name)",
+      )
       .eq("id", taskId)
       .single();
 
@@ -123,7 +152,7 @@ async function loadTaskDetail(taskId: string): Promise<MobileTaskDetail | null> 
       type: string | null;
     };
 
-    return {
+    const detail = {
       description: task.description ?? "Sin descripcion ampliada.",
       due: dueLabel(task.due_at),
       id: task.id,
@@ -131,13 +160,18 @@ async function loadTaskDetail(taskId: string): Promise<MobileTaskDetail | null> 
       property: one(task.properties)?.name ?? "Propiedad sin asignar",
       propertyId: task.property_id,
       reservationId: task.reservation_id,
+      source: "live" as const,
       status: label(task.status),
       statusValue: task.status ?? "open",
       title: task.title,
       type: label(task.type),
     };
+
+    await writeOfflineCache(taskDetailCacheKey(taskId), detail);
+
+    return detail;
   } catch {
-    return fallbackTask(taskId);
+    return (await cachedTask(taskId)) ?? fallbackTask(taskId);
   }
 }
 

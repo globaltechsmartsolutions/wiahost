@@ -11,7 +11,13 @@ import { useState } from "react";
 import { Controller, type Resolver, useForm } from "react-hook-form";
 import { StyleSheet, Text, View } from "react-native";
 
-import { Card, EmptyState, SectionTitle, StatusBadge } from "@/src/components/cards";
+import {
+  Card,
+  EmptyState,
+  OfflineBanner,
+  SectionTitle,
+  StatusBadge,
+} from "@/src/components/cards";
 import { Field, PrimaryButton } from "@/src/components/form";
 import { Screen } from "@/src/components/screen";
 import {
@@ -43,7 +49,9 @@ async function sendMessage(input: MessageInput) {
   }
 
   if (!isGuid(input.conversationId)) {
-    throw new Error("Este hilo demo es solo lectura. Con Supabase conectado sera editable.");
+    throw new Error(
+      "Este hilo demo es solo lectura. Con Supabase conectado sera editable.",
+    );
   }
 
   const {
@@ -89,7 +97,9 @@ async function updateConversationStatus({
   }
 
   if (!isGuid(conversationId)) {
-    throw new Error("Este hilo demo es solo lectura. Con datos reales podras cambiarlo.");
+    throw new Error(
+      "Este hilo demo es solo lectura. Con datos reales podras cambiarlo.",
+    );
   }
 
   const { error } = await supabase
@@ -110,8 +120,12 @@ function normalizeStatus(value: string): ConversationStatus {
 
 export default function InboxDetailScreen() {
   const { conversationId } = useLocalSearchParams<{ conversationId: string }>();
-  const { data: conversation, isLoading, refetch, isRefetching } =
-    useConversationDetail(conversationId);
+  const {
+    data: conversation,
+    isLoading,
+    refetch,
+    isRefetching,
+  } = useConversationDetail(conversationId);
   const queryClient = useQueryClient();
   const [formError, setFormError] = useState<string | null>(null);
   const [statusError, setStatusError] = useState<string | null>(null);
@@ -176,7 +190,9 @@ export default function InboxDetailScreen() {
     ? normalizeStatus(conversation.statusValue)
     : "open";
   const canMutateConversation =
-    Boolean(conversation) && isSupabaseConfigured() && isGuid(conversation?.id ?? "");
+    Boolean(conversation) &&
+    isSupabaseConfigured() &&
+    isGuid(conversation?.id ?? "");
 
   const changeStatus = async (status: ConversationStatus) => {
     setStatusError(null);
@@ -205,6 +221,9 @@ export default function InboxDetailScreen() {
     >
       {conversation ? (
         <>
+          {conversation.source === "cache" ? (
+            <OfflineBanner cachedAt={conversation.cachedAt} />
+          ) : null}
           <Card>
             <View style={styles.headerRow}>
               <View style={styles.headerCopy}>
@@ -217,7 +236,9 @@ export default function InboxDetailScreen() {
             </View>
           </Card>
           <Card>
-            <SectionTitle helper={`Ultima actividad visible: ${conversation.waiting}`}>
+            <SectionTitle
+              helper={`Ultima actividad visible: ${conversation.waiting}`}
+            >
               Historial
             </SectionTitle>
             {conversation.messages.length ? (
@@ -243,7 +264,9 @@ export default function InboxDetailScreen() {
                 );
               })
             ) : (
-              <Text style={styles.meta}>Todavia no hay mensajes en este hilo.</Text>
+              <Text style={styles.meta}>
+                Todavia no hay mensajes en este hilo.
+              </Text>
             )}
           </Card>
           <Card>
@@ -264,7 +287,9 @@ export default function InboxDetailScreen() {
               }
               title="Estado del hilo"
             />
-            {statusError ? <Text style={styles.error}>{statusError}</Text> : null}
+            {statusError ? (
+              <Text style={styles.error}>{statusError}</Text>
+            ) : null}
           </Card>
           <Card>
             <SectionTitle helper="La respuesta se guarda como mensaje outbound.">
@@ -272,7 +297,8 @@ export default function InboxDetailScreen() {
             </SectionTitle>
             {!canMutateConversation ? (
               <Text style={styles.meta}>
-                Solo lectura en modo demo. Conecta Supabase para enviar respuestas reales desde mobile.
+                Solo lectura en modo demo. Conecta Supabase para enviar
+                respuestas reales desde mobile.
               </Text>
             ) : (
               <>
@@ -293,7 +319,9 @@ export default function InboxDetailScreen() {
                     />
                   )}
                 />
-                {formError ? <Text style={styles.error}>{formError}</Text> : null}
+                {formError ? (
+                  <Text style={styles.error}>{formError}</Text>
+                ) : null}
                 <PrimaryButton disabled={mutation.isPending} onPress={onSubmit}>
                   {mutation.isPending ? "Enviando..." : "Enviar respuesta"}
                 </PrimaryButton>

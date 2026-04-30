@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 
 import { demoInbox } from "@/src/lib/demo-data";
+import { readOfflineCache, writeOfflineCache } from "@/src/lib/offline-cache";
 import { isSupabaseConfigured, supabase } from "@/src/lib/supabase";
 
 type Relation<T> = T | T[] | null | undefined;
@@ -14,15 +15,20 @@ export type MobileConversationMessage = {
 };
 
 export type MobileConversationDetail = {
+  cachedAt?: string;
   channel: string;
   guest: string;
   id: string;
   messages: MobileConversationMessage[];
   property: string;
+  source: "cache" | "demo" | "live";
   status: string;
   statusValue: string;
   waiting: string;
 };
+
+const conversationDetailCacheKey = (conversationId: string) =>
+  `conversation-detail-v1:${conversationId}`;
 
 const statusLabels: Record<string, string> = {
   archived: "Archivada",
@@ -84,7 +90,9 @@ function shortDateTime(value: string | null | undefined) {
   }).format(new Date(value));
 }
 
-function fallbackConversation(conversationId: string): MobileConversationDetail | null {
+function fallbackConversation(
+  conversationId: string,
+): MobileConversationDetail | null {
   const thread = demoInbox.find((item) => item.id === conversationId);
 
   if (!thread) {
@@ -105,9 +113,26 @@ function fallbackConversation(conversationId: string): MobileConversationDetail 
       },
     ],
     property: thread.property,
+    source: "demo",
     status: thread.status,
     statusValue: "open",
     waiting: thread.waiting,
+  };
+}
+
+async function cachedConversation(conversationId: string) {
+  const cached = await readOfflineCache<MobileConversationDetail>(
+    conversationDetailCacheKey(conversationId),
+  );
+
+  if (!cached) {
+    return null;
+  }
+
+  return {
+    ...cached.value,
+    cachedAt: cached.savedAt,
+    source: "cache" as const,
   };
 }
 
@@ -149,17 +174,19 @@ async function loadConversationDetail(
     };
     const reservation = one(row.reservations);
 
-    return {
+    const detail = {
       channel: label(reservation?.channel ?? "inbox"),
       guest: one(row.guests)?.full_name ?? "Contacto sin nombre",
       id: row.id,
-      messages: ((messages ?? []) as Array<{
-        body: string;
-        channel: string | null;
-        direction: string | null;
-        id: string;
-        sent_at: string | null;
-      }>).map((message) => ({
+      messages: (
+        (messages ?? []) as Array<{
+          body: string;
+          channel: string | null;
+          direction: string | null;
+          id: string;
+          sent_at: string | null;
+        }>
+      ).map((message) => ({
         body: message.body,
         channel: label(message.channel),
         direction: label(message.direction),
@@ -167,12 +194,20 @@ async function loadConversationDetail(
         sentAt: shortDateTime(message.sent_at),
       })),
       property: one(row.properties)?.name ?? "Propiedad sin asignar",
+      source: "live" as const,
       status: label(row.status),
       statusValue: row.status ?? "open",
       waiting: shortDateTime(row.last_message_at),
     };
+
+    await writeOfflineCache(conversationDetailCacheKey(conversationId), detail);
+
+    return detail;
   } catch {
-    return fallbackConversation(conversationId);
+    return (
+      (await cachedConversation(conversationId)) ??
+      fallbackConversation(conversationId)
+    );
   }
 }
 

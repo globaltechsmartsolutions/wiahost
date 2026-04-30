@@ -9,7 +9,9 @@ type CardProps = {
 };
 
 export function Card({ children, compact }: CardProps) {
-  return <View style={[styles.card, compact && styles.compactCard]}>{children}</View>;
+  return (
+    <View style={[styles.card, compact && styles.compactCard]}>{children}</View>
+  );
 }
 
 export function StatCard({
@@ -104,6 +106,27 @@ export function EmptyState({
   );
 }
 
+export function OfflineBanner({ cachedAt }: { cachedAt?: string }) {
+  const label = cachedAt
+    ? new Intl.DateTimeFormat("es-ES", {
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        month: "short",
+      }).format(new Date(cachedAt))
+    : "ultima sincronizacion";
+
+  return (
+    <View style={styles.offlineBanner}>
+      <Text style={styles.offlineTitle}>Modo offline read-only</Text>
+      <Text style={styles.offlineCopy}>
+        Mostrando la ficha guardada en {label}. Vuelve a refrescar cuando haya
+        red.
+      </Text>
+    </View>
+  );
+}
+
 const styles = StyleSheet.create({
   badge: {
     borderRadius: 999,
@@ -179,6 +202,24 @@ const styles = StyleSheet.create({
     color: colors.muted,
     fontSize: 12,
     lineHeight: 17,
+  },
+  offlineBanner: {
+    backgroundColor: "#fff8e6",
+    borderColor: "#ead4a8",
+    borderRadius: 18,
+    borderWidth: 1,
+    gap: 4,
+    padding: 13,
+  },
+  offlineCopy: {
+    color: colors.muted,
+    fontSize: 12,
+    lineHeight: 17,
+  },
+  offlineTitle: {
+    color: colors.ink,
+    fontSize: 13,
+    fontWeight: "900",
   },
   sectionHeading: {
     color: colors.ink,

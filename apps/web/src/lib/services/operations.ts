@@ -8,6 +8,10 @@ import type {
 } from "@wiahost/shared";
 import type { createSupabaseServerClient } from "@/lib/supabase/server";
 import { createPaymentCheckoutLink } from "@/lib/services/payments";
+import {
+  sendOperationalPushSafely,
+  shouldAlertOperations,
+} from "@/lib/services/operational-push";
 
 type SupabaseServerClient = Awaited<
   ReturnType<typeof createSupabaseServerClient>
@@ -76,7 +80,11 @@ function toDatabaseDateTime(value: string | undefined) {
   return Number.isNaN(date.getTime()) ? null : date.toISOString();
 }
 
-function taskOutcome(status: string, dueAt: string | null, completedAt: string | null) {
+function taskOutcome(
+  status: string,
+  dueAt: string | null,
+  completedAt: string | null,
+) {
   if (status === "cancelled") {
     return "cancelled";
   }
@@ -227,6 +235,25 @@ export async function createManualReservation(
     userId,
   });
 
+  if (["confirmed", "checked_in", "pending"].includes(data.status)) {
+    await sendOperationalPushSafely(supabase, userId, {
+      body: `${input.guestFullName} - ${input.checkIn} a ${input.checkOut}.`,
+      data: {
+        entityId: data.id,
+        entityType: "reservation",
+        propertyId: data.property_id,
+        reservationId: data.id,
+        route: `/reservations/${data.id}`,
+        status: data.status,
+      },
+      includeOperators: true,
+      priority: data.status === "checked_in" ? "high" : "normal",
+      skipUserId: userId,
+      title: "Nueva reserva operativa",
+      type: "reservation_created",
+    });
+  }
+
   return data;
 }
 
@@ -262,6 +289,27 @@ export async function updateReservationStatus(
     reservationId: data.id,
     userId,
   });
+
+  if (
+    ["confirmed", "checked_in", "checked_out", "cancelled"].includes(status)
+  ) {
+    await sendOperationalPushSafely(supabase, userId, {
+      body: `La reserva ${data.id.slice(0, 8)} cambia a ${status}.`,
+      data: {
+        entityId: data.id,
+        entityType: "reservation",
+        propertyId: data.property_id,
+        reservationId: data.id,
+        route: `/reservations/${data.id}`,
+        status,
+      },
+      includeOperators: true,
+      priority: status === "cancelled" ? "high" : "normal",
+      skipUserId: userId,
+      title: "Reserva actualizada",
+      type: "reservation_status_updated",
+    });
+  }
 
   return data;
 }
@@ -552,6 +600,26 @@ export async function createTask(
     userId,
   });
 
+  if (shouldAlertOperations({ priority: data.priority, status: data.status })) {
+    await sendOperationalPushSafely(supabase, userId, {
+      assignedTo: data.assigned_to,
+      body: `${input.title} - prioridad ${data.priority}.`,
+      data: {
+        entityId: data.id,
+        entityType: "task",
+        propertyId: data.property_id,
+        reservationId: data.reservation_id,
+        route: `/tasks/${data.id}`,
+        taskId: data.id,
+      },
+      includeOperators: !data.assigned_to,
+      priority: data.priority === "critical" ? "high" : "normal",
+      skipUserId: userId,
+      title: "Nueva tarea prioritaria",
+      type: "task_created",
+    });
+  }
+
   return data;
 }
 
@@ -609,6 +677,27 @@ export async function updateTask(
     taskId: data.id,
     userId,
   });
+
+  if (shouldAlertOperations({ priority: data.priority, status: data.status })) {
+    await sendOperationalPushSafely(supabase, userId, {
+      assignedTo: data.assigned_to,
+      body: `La tarea ${data.id.slice(0, 8)} esta ahora en ${data.status}.`,
+      data: {
+        entityId: data.id,
+        entityType: "task",
+        propertyId: data.property_id,
+        reservationId: data.reservation_id,
+        route: `/tasks/${data.id}`,
+        status: data.status,
+        taskId: data.id,
+      },
+      includeOperators: data.status === "blocked",
+      priority: data.status === "blocked" ? "high" : "normal",
+      skipUserId: userId,
+      title: "Tarea actualizada",
+      type: "task_status_updated",
+    });
+  }
 
   return data;
 }
@@ -704,6 +793,26 @@ export async function createIncident(
     userId,
   });
 
+  if (shouldAlertOperations({ severity: data.severity, status: data.status })) {
+    await sendOperationalPushSafely(supabase, userId, {
+      body: `${input.title} - severidad ${data.severity}.`,
+      data: {
+        entityId: data.id,
+        entityType: "incident",
+        incidentId: data.id,
+        propertyId: data.property_id,
+        reservationId: data.reservation_id,
+        route: `/incidents/${data.id}`,
+        severity: data.severity,
+      },
+      includeOperators: true,
+      priority: data.severity === "critical" ? "high" : "normal",
+      skipUserId: userId,
+      title: "Nueva incidencia operativa",
+      type: "incident_created",
+    });
+  }
+
   return data;
 }
 
@@ -753,6 +862,26 @@ export async function updateIncident(
     reservationId: data.reservation_id,
     userId,
   });
+
+  if (shouldAlertOperations({ severity: data.severity, status: data.status })) {
+    await sendOperationalPushSafely(supabase, userId, {
+      body: `La incidencia ${data.id.slice(0, 8)} cambia a ${data.status}.`,
+      data: {
+        entityId: data.id,
+        entityType: "incident",
+        incidentId: data.id,
+        propertyId: data.property_id,
+        reservationId: data.reservation_id,
+        route: `/incidents/${data.id}`,
+        status: data.status,
+      },
+      includeOperators: true,
+      priority: data.status === "investigating" ? "high" : "normal",
+      skipUserId: userId,
+      title: "Incidencia actualizada",
+      type: "incident_status_updated",
+    });
+  }
 
   return data;
 }
@@ -942,6 +1071,7 @@ function validSentAt(value: string | undefined) {
 export async function ingestChannelMessage(
   supabase: SupabaseServerClient,
   input: ChannelInboundMessageInput,
+  userId?: string,
 ) {
   const sentAt = validSentAt(input.sentAt);
   let guestId: string | null = null;
@@ -1075,6 +1205,27 @@ export async function ingestChannelMessage(
     property_id: input.propertyId,
     status: "synced",
   });
+
+  if (userId) {
+    await sendOperationalPushSafely(supabase, userId, {
+      body: `${input.guestFullName}: ${input.body.slice(0, 120)}`,
+      data: {
+        channel: input.channel,
+        conversationId,
+        entityId: conversationId,
+        entityType: "conversation",
+        messageId: message.id,
+        propertyId: input.propertyId,
+        reservationId: input.reservationId ?? null,
+        route: `/inbox/${conversationId}`,
+      },
+      includeOperators: true,
+      priority: "high",
+      skipUserId: userId,
+      title: "Nuevo mensaje de huesped",
+      type: "inbound_message",
+    });
+  }
 
   return {
     conversationId,

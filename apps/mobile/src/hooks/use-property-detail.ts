@@ -2,12 +2,18 @@ import { type PropertyInput, type PropertyStatus } from "@wiahost/shared";
 import { useQuery } from "@tanstack/react-query";
 
 import { demoProperties } from "@/src/lib/demo-data";
+import { readOfflineCache, writeOfflineCache } from "@/src/lib/offline-cache";
 import { isSupabaseConfigured, supabase } from "@/src/lib/supabase";
 
 export type MobilePropertyDetail = PropertyInput & {
+  cachedAt?: string;
   id: string;
+  source: "cache" | "demo" | "live";
   statusLabel: string;
 };
+
+const propertyDetailCacheKey = (propertyId: string) =>
+  `property-detail-v1:${propertyId}`;
 
 const statusLabels: Record<PropertyStatus, string> = {
   active: "Activo",
@@ -52,8 +58,25 @@ function fallbackProperty(propertyId: string): MobilePropertyDetail | null {
     maxGuests: 2,
     name: property.name,
     province: property.city,
+    source: "demo",
     status,
     statusLabel: statusLabels[status],
+  };
+}
+
+async function cachedProperty(propertyId: string) {
+  const cached = await readOfflineCache<MobilePropertyDetail>(
+    propertyDetailCacheKey(propertyId),
+  );
+
+  if (!cached) {
+    return null;
+  }
+
+  return {
+    ...cached.value,
+    cachedAt: cached.savedAt,
+    source: "cache" as const,
   };
 }
 
@@ -79,7 +102,7 @@ async function loadPropertyDetail(
 
     const status = normalizeStatus(data.status);
 
-    return {
+    const detail = {
       addressLine: data.address_line,
       basePrice: Number(data.base_price ?? 0),
       bathrooms: Number(data.bathrooms ?? 0),
@@ -93,11 +116,16 @@ async function loadPropertyDetail(
       maxGuests: Number(data.max_guests ?? 1),
       name: data.name,
       province: data.province ?? "",
+      source: "live" as const,
       status,
       statusLabel: statusLabels[status],
     };
+
+    await writeOfflineCache(propertyDetailCacheKey(propertyId), detail);
+
+    return detail;
   } catch {
-    return fallbackProperty(propertyId);
+    return (await cachedProperty(propertyId)) ?? fallbackProperty(propertyId);
   }
 }
 

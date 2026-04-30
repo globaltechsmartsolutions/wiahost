@@ -1,13 +1,16 @@
-import {
-  taskStatuses,
-  type TaskStatus,
-} from "@wiahost/shared";
+import { taskStatuses, type TaskStatus } from "@wiahost/shared";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useLocalSearchParams } from "expo-router";
 import { useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 
-import { Card, EmptyState, SectionTitle, StatusBadge } from "@/src/components/cards";
+import {
+  Card,
+  EmptyState,
+  OfflineBanner,
+  SectionTitle,
+  StatusBadge,
+} from "@/src/components/cards";
 import { EvidenceUploader } from "@/src/components/evidence-uploader";
 import { Screen } from "@/src/components/screen";
 import {
@@ -28,10 +31,12 @@ const statusLabels: Record<TaskStatus, string> = {
   scheduled: "Programada",
 };
 
-const statusOptions: StatusOption<TaskStatus>[] = taskStatuses.map((status) => ({
-  label: statusLabels[status],
-  value: status,
-}));
+const statusOptions: StatusOption<TaskStatus>[] = taskStatuses.map(
+  (status) => ({
+    label: statusLabels[status],
+    value: status,
+  }),
+);
 
 async function updateTaskStatus({
   status,
@@ -45,10 +50,15 @@ async function updateTaskStatus({
   }
 
   if (!isGuid(taskId)) {
-    throw new Error("Esta tarea demo es solo lectura. Con datos reales sera editable.");
+    throw new Error(
+      "Esta tarea demo es solo lectura. Con datos reales sera editable.",
+    );
   }
 
-  const { error } = await supabase.from("tasks").update({ status }).eq("id", taskId);
+  const { error } = await supabase
+    .from("tasks")
+    .update({ status })
+    .eq("id", taskId);
 
   if (error) {
     throw error;
@@ -56,18 +66,27 @@ async function updateTaskStatus({
 }
 
 function normalizeStatus(value: string): TaskStatus {
-  return taskStatuses.includes(value as TaskStatus) ? (value as TaskStatus) : "open";
+  return taskStatuses.includes(value as TaskStatus)
+    ? (value as TaskStatus)
+    : "open";
 }
 
 export default function TaskDetailScreen() {
   const { taskId } = useLocalSearchParams<{ taskId: string }>();
-  const { data: task, isLoading, refetch, isRefetching } = useTaskDetail(taskId);
+  const {
+    data: task,
+    isLoading,
+    refetch,
+    isRefetching,
+  } = useTaskDetail(taskId);
   const queryClient = useQueryClient();
   const [statusError, setStatusError] = useState<string | null>(null);
   const mutation = useMutation({
     mutationFn: updateTaskStatus,
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["task-detail", taskId] });
+      await queryClient.invalidateQueries({
+        queryKey: ["task-detail", taskId],
+      });
       await queryClient.invalidateQueries({ queryKey: ["mobile-dashboard"] });
       await refetch();
     },
@@ -103,6 +122,9 @@ export default function TaskDetailScreen() {
     >
       {task ? (
         <>
+          {task.source === "cache" ? (
+            <OfflineBanner cachedAt={task.cachedAt} />
+          ) : null}
           <Card>
             <View style={styles.headerRow}>
               <View style={styles.headerCopy}>
@@ -139,7 +161,9 @@ export default function TaskDetailScreen() {
               }
               title="Estado de la tarea"
             />
-            {statusError ? <Text style={styles.error}>{statusError}</Text> : null}
+            {statusError ? (
+              <Text style={styles.error}>{statusError}</Text>
+            ) : null}
           </Card>
           <EvidenceUploader
             context={{

@@ -29,7 +29,7 @@ async function requireInboxContext() {
     );
   }
 
-  return { supabase };
+  return { supabase, userId: userData.user.id };
 }
 
 function inboundMessageInputFromForm(formData: FormData) {
@@ -56,10 +56,10 @@ export async function ingestChannelMessageAction(formData: FormData) {
     );
   }
 
-  const { supabase } = await requireInboxContext();
+  const { supabase, userId } = await requireInboxContext();
 
   try {
-    await ingestChannelMessage(supabase, parsed.data);
+    await ingestChannelMessage(supabase, parsed.data, userId);
   } catch (error) {
     if (error instanceof OperationMutationError) {
       redirectWithError(error.message);

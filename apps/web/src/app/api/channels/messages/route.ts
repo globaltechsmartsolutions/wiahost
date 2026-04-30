@@ -28,7 +28,11 @@ export async function POST(request: Request) {
   }
 
   try {
-    const message = await ingestChannelMessage(context.supabase, parsed.data);
+    const message = await ingestChannelMessage(
+      context.supabase,
+      parsed.data,
+      context.userId,
+    );
     return NextResponse.json({ data: message }, { status: 201 });
   } catch (error) {
     if (error instanceof OperationMutationError) {
