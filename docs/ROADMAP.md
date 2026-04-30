@@ -75,6 +75,7 @@
 - Implementado: whitelist explicita de checks server-only de readiness para que `pnpm quality:prod` no mezcle auditoria segura de secretos con exposicion accidental.
 - Implementado: rate limit defensivo en endpoints publicos de reserva directa y checkout demo, con tests unitarios de ventana/limite/aislamiento.
 - Implementado: cabeceras HTTP de seguridad en Next.js, con CSP report-only para validar integraciones antes de enforcement y auditoria en `pnpm quality:prod`.
+- Implementado: errores API trazables con `error.requestId` y cabecera `X-Request-Id`, cubiertos con unit tests.
 - Implementado: `/api/health` con snapshot JSON de app, Supabase, base de datos, Stripe y metadata segura de runtime/deploy para monitorizacion futura.
 - Implementado: CI inicial con typecheck, lint, unit tests, `pnpm quality:ci`, build web, Lighthouse CI no bloqueante y artefactos de reportes JSON/Lighthouse.
 - Implementado: CI valida tambien `build:mobile` y export Expo web para detectar errores de bundling movil antes de publicar.
