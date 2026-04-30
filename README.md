@@ -127,6 +127,7 @@ Documentos principales:
 - Seguridad/readiness: `docs/SECURITY.md`
 - Deployment/staging: `docs/DEPLOYMENT.md`
 - Observabilidad: `docs/OBSERVABILITY.md`
+- Incident response: `docs/INCIDENT_RESPONSE.md`
 - Calidad: `docs/QUALITY_AND_AUDIT_STRATEGY.md`
 - Mobile: `docs/MOBILE.md`
 - EAS Build Android: `docs/EAS_BUILD.md`
