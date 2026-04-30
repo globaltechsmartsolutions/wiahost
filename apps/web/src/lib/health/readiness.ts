@@ -21,7 +21,17 @@ export type ReadinessSnapshot = {
   checkedAt: string;
   checks: ReadinessCheck[];
   database: ReadinessCheckStatus;
+  runtime: ReadinessRuntime;
   status: "degraded" | "ok";
+};
+
+export type ReadinessRuntime = {
+  appUrl: string | null;
+  branch: string | null;
+  commit: string | null;
+  environment: string;
+  nodeEnv: string;
+  provider: "local" | "vercel";
 };
 
 type ReadinessOptions = {
@@ -43,6 +53,20 @@ function createCheck(
 
 function resolveOverallStatus(checks: ReadinessCheck[]) {
   return checks.some((check) => check.status === "error") ? "degraded" : "ok";
+}
+
+function resolveRuntime(appUrl: string | undefined): ReadinessRuntime {
+  const vercelUrl = process.env.VERCEL_URL;
+  const publicAppUrl = appUrl && appUrl.trim().length > 0 ? appUrl : null;
+
+  return {
+    appUrl: publicAppUrl ?? (vercelUrl ? `https://${vercelUrl}` : null),
+    branch: process.env.VERCEL_GIT_COMMIT_REF ?? null,
+    commit: process.env.VERCEL_GIT_COMMIT_SHA?.slice(0, 12) ?? null,
+    environment: process.env.VERCEL_ENV ?? "local",
+    nodeEnv: process.env.NODE_ENV ?? "development",
+    provider: vercelUrl ? "vercel" : "local",
+  };
 }
 
 export async function getReadinessSnapshot(
@@ -162,6 +186,7 @@ export async function getReadinessSnapshot(
     checkedAt: new Date().toISOString(),
     checks,
     database: databaseStatus,
+    runtime: resolveRuntime(appUrl),
     status: resolveOverallStatus(checks),
   };
 }

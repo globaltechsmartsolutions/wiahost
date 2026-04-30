@@ -42,8 +42,9 @@ Genera `quality/reports/production-readiness.json`, `quality/reports/database-se
 - Service role server-only.
 - Consulta server-side a base de datos.
 - Stripe Checkout y webhook.
+- Runtime/deploy seguro: entorno, proveedor, rama y commit corto cuando Vercel lo expone.
 
-El endpoint no devuelve valores de secretos. Sirve para monitores externos y para la tarjeta "Readiness tecnico" de Settings.
+El endpoint no devuelve valores de secretos. Sirve para monitores externos, trazabilidad de despliegues y para la tarjeta "Readiness tecnico" de Settings.
 
 Para una comprobacion de entorno de produccion:
 

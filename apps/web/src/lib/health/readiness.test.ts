@@ -25,6 +25,11 @@ describe("readiness snapshot", () => {
 
     expect(snapshot.app).toBe("wiahost");
     expect(snapshot.status).toBe("ok");
+    expect(snapshot.runtime).toMatchObject({
+      appUrl: "http://localhost:3002",
+      environment: "local",
+      provider: "local",
+    });
     expect(supabaseCheck?.status).toBe("warning");
     expect(databaseCheck?.status).toBe("skipped");
     expect(JSON.stringify(snapshot)).not.toContain(
@@ -47,5 +52,27 @@ describe("readiness snapshot", () => {
 
     expect(stripeCheck?.status).toBe("warning");
     expect(stripeCheck?.message).toContain("STRIPE_WEBHOOK_SECRET");
+  });
+
+  it("adds safe deployment metadata when running on Vercel", async () => {
+    vi.stubEnv("NEXT_PUBLIC_APP_URL", "");
+    vi.stubEnv("NEXT_PUBLIC_SUPABASE_URL", "http://127.0.0.1:54321");
+    vi.stubEnv("NEXT_PUBLIC_SUPABASE_ANON_KEY", "demo-anon-key");
+    vi.stubEnv("SUPABASE_SERVICE_ROLE_KEY", "demo-service-role-key");
+    vi.stubEnv("VERCEL_ENV", "preview");
+    vi.stubEnv("VERCEL_GIT_COMMIT_REF", "feature/demo");
+    vi.stubEnv("VERCEL_GIT_COMMIT_SHA", "1234567890abcdef");
+    vi.stubEnv("VERCEL_URL", "wiahost-preview.vercel.app");
+
+    const snapshot = await getReadinessSnapshot({ checkDatabase: false });
+
+    expect(snapshot.runtime).toEqual({
+      appUrl: "https://wiahost-preview.vercel.app",
+      branch: "feature/demo",
+      commit: "1234567890ab",
+      environment: "preview",
+      nodeEnv: "test",
+      provider: "vercel",
+    });
   });
 });
