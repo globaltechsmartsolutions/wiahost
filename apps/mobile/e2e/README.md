@@ -48,7 +48,8 @@ WIAHOST_EMAIL=operaciones@wiahost.local WIAHOST_PASSWORD='Password123!' pnpm tes
 - `maestro/connected/01-login.yaml`: valida login real con Supabase.
 - `maestro/connected/02-create-property.yaml`: crea un activo real desde mobile.
 - `maestro/connected/03-create-incident.yaml`: crea un activo auxiliar y una incidencia real desde mobile.
+- `maestro/connected/04-incident-status.yaml`: crea una incidencia real y valida que el cambio de estado esta disponible desde mobile.
 
 ## Siguiente paso
 
-Ampliar flujos conectados con subida de evidencia, registro push y cambios de estado sobre reserva/tarea/incidencia reales.
+Ampliar flujos conectados con subida de evidencia, registro push y cambios de estado sobre reservas/tareas reales.

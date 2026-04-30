@@ -13,6 +13,7 @@ import {
 
 import { Card, SectionTitle } from "@/src/components/cards";
 import { PrimaryButton } from "@/src/components/form";
+import { readOfflineCache, writeOfflineCache } from "@/src/lib/offline-cache";
 import { isSupabaseConfigured, supabase } from "@/src/lib/supabase";
 import { colors } from "@/src/lib/theme";
 import { isGuid } from "@/src/lib/utils";
@@ -43,6 +44,12 @@ type EvidenceDocument = {
   mime_type: string | null;
   storage_path: string;
   title: string;
+};
+
+type EvidenceDocumentsResult = {
+  cachedAt?: string;
+  documents: EvidenceDocument[];
+  source: "cache" | "live";
 };
 
 type PickSource = "camera" | "document" | "library";
@@ -126,6 +133,17 @@ function evidenceQueryKey(context: EvidenceContext) {
   return ["mobile-evidence", context.type, id] as const;
 }
 
+function evidenceCacheKey(context: EvidenceContext) {
+  const id =
+    context.type === "property"
+      ? context.propertyId
+      : context.type === "incident"
+        ? context.incidentId
+        : context.taskId;
+
+  return `mobile-evidence-v1:${context.type}:${id}`;
+}
+
 function buildDocumentPayload({
   context,
   mimeType,
@@ -144,34 +162,73 @@ function buildDocumentPayload({
     mime_type: mimeType,
     owner_profile_id: userId,
     property_id:
-      context.type === "property" ? context.propertyId : context.propertyId ?? null,
-    reservation_id: context.type === "task" ? context.reservationId ?? null : null,
+      context.type === "property"
+        ? context.propertyId
+        : (context.propertyId ?? null),
+    reservation_id:
+      context.type === "task" ? (context.reservationId ?? null) : null,
     storage_path: storagePath,
     title,
   };
 }
 
+async function cachedEvidenceDocuments(context: EvidenceContext) {
+  const cached = await readOfflineCache<EvidenceDocument[]>(
+    evidenceCacheKey(context),
+    1000 * 60 * 60 * 24 * 7,
+  );
+
+  if (!cached) {
+    return null;
+  }
+
+  return {
+    cachedAt: cached.savedAt,
+    documents: cached.value,
+    source: "cache" as const,
+  };
+}
+
 async function getEvidenceDocuments(
   context: EvidenceContext,
-): Promise<EvidenceDocument[]> {
+): Promise<EvidenceDocumentsResult> {
   if (!isSupabaseConfigured()) {
-    return [];
+    return {
+      documents: [],
+      source: "live",
+    };
   }
 
-  const bucket = bucketByContext[context.type];
-  const storagePrefix = `${bucket}/${contextFolder(context)}/`;
-  const { data, error } = await supabase
-    .from("documents")
-    .select("id,title,storage_path,mime_type,created_at")
-    .ilike("storage_path", `${storagePrefix}%`)
-    .order("created_at", { ascending: false })
-    .limit(12);
+  try {
+    const bucket = bucketByContext[context.type];
+    const storagePrefix = `${bucket}/${contextFolder(context)}/`;
+    const { data, error } = await supabase
+      .from("documents")
+      .select("id,title,storage_path,mime_type,created_at")
+      .ilike("storage_path", `${storagePrefix}%`)
+      .order("created_at", { ascending: false })
+      .limit(12);
 
-  if (error) {
-    throw error;
+    if (error) {
+      throw error;
+    }
+
+    const documents = (data ?? []) as EvidenceDocument[];
+
+    await writeOfflineCache(evidenceCacheKey(context), documents);
+
+    return {
+      documents,
+      source: "live",
+    };
+  } catch {
+    return (
+      (await cachedEvidenceDocuments(context)) ?? {
+        documents: [],
+        source: "live",
+      }
+    );
   }
-
-  return (data ?? []) as EvidenceDocument[];
 }
 
 async function uploadEvidence({
@@ -239,17 +296,15 @@ async function uploadEvidence({
         ? `${titlePrefix} incidencia - ${context.label}`
         : `${titlePrefix} tarea - ${context.label}`;
 
-  const { error: documentError } = await supabase
-    .from("documents")
-    .insert(
-      buildDocumentPayload({
-        context,
-        mimeType,
-        storagePath,
-        title,
-        userId: userData.user.id,
-      }),
-    );
+  const { error: documentError } = await supabase.from("documents").insert(
+    buildDocumentPayload({
+      context,
+      mimeType,
+      storagePath,
+      title,
+      userId: userData.user.id,
+    }),
+  );
 
   if (documentError) {
     throw documentError;
@@ -374,9 +429,7 @@ function EvidencePreview({ document }: { document: EvidenceDocument }) {
 
   return (
     <View style={styles.fileBadge}>
-      <Text style={styles.fileBadgeText}>
-        {kind === "pdf" ? "PDF" : "DOC"}
-      </Text>
+      <Text style={styles.fileBadgeText}>{kind === "pdf" ? "PDF" : "DOC"}</Text>
     </View>
   );
 }
@@ -417,8 +470,9 @@ export function EvidenceUploader({
     }
   };
 
-  const documents = documentsQuery.data ?? [];
+  const documents = documentsQuery.data?.documents ?? [];
   const isDisabled = disabled || mutation.isPending || !isSupabaseConfigured();
+  const hasCachedDocuments = documentsQuery.data?.source === "cache";
 
   return (
     <Card>
@@ -465,6 +519,15 @@ export function EvidenceUploader({
       {documentsQuery.isLoading ? (
         <Text style={styles.helper}>Cargando evidencias...</Text>
       ) : null}
+      {hasCachedDocuments ? (
+        <Text style={styles.offline}>
+          Mostrando evidencias guardadas sin conexion
+          {documentsQuery.data?.cachedAt
+            ? ` (${shortDate(documentsQuery.data.cachedAt)})`
+            : ""}
+          .
+        </Text>
+      ) : null}
       {documentsQuery.error ? (
         <Text style={styles.error}>
           No hemos podido cargar las evidencias guardadas.
@@ -484,7 +547,8 @@ export function EvidenceUploader({
               <View style={styles.documentCopy}>
                 <Text style={styles.documentTitle}>{document.title}</Text>
                 <Text style={styles.helper}>
-                  {document.mime_type ?? "imagen"} - {shortDate(document.created_at)}
+                  {document.mime_type ?? "imagen"} -{" "}
+                  {shortDate(document.created_at)}
                 </Text>
               </View>
               <Text style={styles.openLink}>Abrir</Text>
@@ -550,6 +614,17 @@ const styles = StyleSheet.create({
     color: colors.muted,
     fontSize: 12,
     lineHeight: 17,
+  },
+  offline: {
+    backgroundColor: "#f1ffd0",
+    borderColor: colors.lime,
+    borderRadius: 14,
+    borderWidth: 1,
+    color: colors.ink,
+    fontSize: 12,
+    fontWeight: "800",
+    lineHeight: 17,
+    padding: 10,
   },
   openLink: {
     color: colors.ink,

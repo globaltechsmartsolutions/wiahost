@@ -10,6 +10,7 @@ tags:
 - tapOn: "Atico Gran Via Sky"
 - assertVisible: "Operativa"
 - assertVisible: "Precio base"
+- assertVisible: "Evidencias"
 - back
 - tapOn: "Reservas"
 - tapOn: "Sofia Martin"
@@ -24,6 +25,8 @@ tags:
 - tapOn: "Riesgo"
 - tapOn: "Preparar Atico Gran Via"
 - assertVisible: "Estado de la tarea"
+- assertVisible: "Evidencias"
 - back
 - tapOn: "Ruido en aire acondicionado"
 - assertVisible: "Estado de la incidencia"
+- assertVisible: "Evidencias"

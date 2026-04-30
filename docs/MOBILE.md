@@ -32,6 +32,7 @@ WIAHost tiene app movil real con Expo React Native en `apps/mobile`. No es una W
 - TypeScript strict y scripts `typecheck`, `lint`, `build` y `test`.
 - E2E mobile con Maestro en `apps/mobile/e2e`: suite demo por defecto y suite conectada para login, alta de activo e incidencia con Supabase.
 - EAS preparado para Android e iOS. Android genera APK/AAB; iOS genera build de simulador o `.ipa` firmado para TestFlight/App Store, nunca APK.
+- Las fichas de activo, tarea e incidencia conservan evidencias/documentos recientes en cache offline read-only para que el equipo pueda revisar contexto aunque se caiga la conexion.
 
 ## Arquitectura
 

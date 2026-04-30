@@ -19,6 +19,7 @@ Preparar WIAHost Mobile para instalarse como app real de Android e iOS. Android 
 - El proyecto esta vinculado a Expo/EAS con `extra.eas.projectId`. Ese identificador no es secreto.
 - Metro usa un shim local para `webidl-conversions` y `disableHierarchicalLookup` para evitar dos problemas tipicos de pnpm monorepo: fallos de SHA en EAS Android al resolver rutas internas `.pnpm` y React duplicado durante `expo export --platform web`.
 - Primer build preview Android verificado en EAS: `f22caba0-54a4-4e88-954d-39b9cc21afa7`.
+- Build preview Android demo para compartir verificado en EAS: `29364734-a53b-420e-81b3-17ede3180610`.
 - Primer build iOS simulator verificado en EAS: `7a041ea5-20f9-4547-94f5-ae96eb7edce9`.
 
 ## Primer build preview Android

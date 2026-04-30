@@ -166,7 +166,9 @@
 - Implementado: E2E mobile con Maestro separado en suite demo (`pnpm test:mobile:e2e`) y suite conectada (`pnpm test:mobile:e2e:connected`) para login, alta de activo e incidencia real con Supabase.
 - Implementado: fallback demo para poder revisar la experiencia movil aunque no esten copiadas las variables.
 - Implementado: typecheck movil limpio.
-- Pendiente inmediato: instalar y validar el APK preview en dispositivo real, extender offline a documentos/evidencias recientes y ampliar Maestro con evidencia, push y cambios de estado reales.
+- Implementado: cache offline read-only para evidencias/documentos recientes en fichas mobile de activos, tareas e incidencias, con aviso visible cuando se muestran datos guardados.
+- Implementado: Maestro demo valida que las fichas mobile exponen evidencias, y suite conectada anade flujo de cambio de estado de incidencia real.
+- Pendiente inmediato: instalar y validar el APK preview en dispositivo real, ampliar Maestro con subida de evidencia, push y cambios de estado reales de reservas/tareas.
 
 ## Fase 5 - IA y automatizacion avanzada
 
