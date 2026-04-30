@@ -12,6 +12,7 @@
 - Los documentos usan buckets privados y URL firmadas temporales para subida/descarga. El navegador solo recibe un token temporal de Storage; no se deben publicar rutas de storage como enlaces permanentes.
 - Las push notifications usan tokens de dispositivo guardados con RLS. `EXPO_ACCESS_TOKEN`, si se activa en EAS, solo puede vivir en servidor.
 - Los endpoints publicos de reserva directa y confirmacion de checkout demo tienen rate limit defensivo por IP y contexto. Es una proteccion MVP en memoria; para produccion con varias regiones se debe migrar a Redis/Vercel KV/Upstash o un WAF gestionado.
+- La web aplica cabeceras HTTP de seguridad desde `apps/web/security-headers.ts`: anti-clickjacking, `nosniff`, referrer policy, permissions policy, HSTS y CSP report-only. CSP queda report-only hasta validar Supabase, Stripe, Storage y scripts de Next en staging.
 
 ## Auditor local
 
@@ -31,6 +32,7 @@ Genera `quality/reports/production-readiness.json`, `quality/reports/database-se
 - Que `apps/web/.env.local`, si existe, tenga valores configurados para desarrollo conectado.
 - Que Stripe Checkout no este configurado sin `STRIPE_WEBHOOK_SECRET`.
 - Que variables server-only no aparezcan en componentes cliente.
+- Que las cabeceras HTTP de seguridad sigan presentes.
 - Que cada tabla publica creada en migraciones tenga RLS activado y al menos una politica.
 - Que cada bucket de Storage creado en migraciones tenga politica sobre `storage.objects`.
 - Que `pnpm quality:summary` pueda recoger el resultado como parte de la memoria de calidad.

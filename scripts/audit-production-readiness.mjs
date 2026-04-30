@@ -10,6 +10,7 @@ import { dirname, extname, join, relative, resolve } from "node:path";
 
 const root = resolve(".");
 const reportPath = resolve(root, "quality/reports/production-readiness.json");
+const securityHeadersPath = resolve(root, "apps/web/security-headers.ts");
 
 const args = new Map();
 for (let index = 2; index < process.argv.length; index += 1) {
@@ -74,6 +75,15 @@ const allowedServerOnlyFiles = new Set([
   "apps/web/src/lib/services/push-notifications.ts",
   "apps/web/src/app/api/stripe/webhook/route.ts",
 ]);
+
+const requiredSecurityHeaders = [
+  "X-Frame-Options",
+  "X-Content-Type-Options",
+  "Referrer-Policy",
+  "Permissions-Policy",
+  "Strict-Transport-Security",
+  "Content-Security-Policy-Report-Only",
+];
 
 function readText(path) {
   return readFileSync(path, "utf8");
@@ -377,6 +387,41 @@ function checkServerOnlyExposure(findings) {
   return matches;
 }
 
+function checkSecurityHeaders(findings) {
+  if (!existsSync(securityHeadersPath)) {
+    addFinding(
+      findings,
+      "critical",
+      "missing_security_headers",
+      "The web app must keep central security headers configured.",
+      relative(root, securityHeadersPath),
+    );
+
+    return { exists: false, requiredHeaders: requiredSecurityHeaders };
+  }
+
+  const source = readText(securityHeadersPath);
+  const missingHeaders = requiredSecurityHeaders.filter(
+    (header) => !source.includes(header),
+  );
+
+  for (const header of missingHeaders) {
+    addFinding(
+      findings,
+      "high",
+      "missing_security_header",
+      `Security headers must include ${header}.`,
+      relative(root, securityHeadersPath),
+    );
+  }
+
+  return {
+    exists: true,
+    missingHeaders,
+    requiredHeaders: requiredSecurityHeaders,
+  };
+}
+
 const findings = [];
 const examples = exampleFiles.map((file) =>
   checkExampleFile(findings, resolve(root, file)),
@@ -386,6 +431,7 @@ const localEnvs = localEnvFiles.map((file) =>
 );
 const runtime = checkRuntimeEnv(findings);
 const serverOnlyReferences = checkServerOnlyExposure(findings);
+const securityHeaders = checkSecurityHeaders(findings);
 
 const blockingSeverities =
   mode === "production" ? ["critical", "high"] : ["critical"];
@@ -414,6 +460,7 @@ const report = {
           ? "low"
           : "low",
   runtime,
+  securityHeaders,
   serverOnlyReferences,
   status: blockingFindings.length > 0 ? "failed" : "passed",
   summary:
