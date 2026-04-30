@@ -85,6 +85,7 @@ pnpm dev:web
 pnpm dev:mobile
 pnpm build:web
 pnpm build:mobile
+pnpm eas:build:android:preview
 pnpm typecheck
 pnpm lint
 pnpm test
@@ -119,6 +120,7 @@ Documentos principales:
 - Seguridad/readiness: `docs/SECURITY.md`
 - Calidad: `docs/QUALITY_AND_AUDIT_STRATEGY.md`
 - Mobile: `docs/MOBILE.md`
+- EAS Build Android: `docs/EAS_BUILD.md`
 
 ## Regla visual importante
 

@@ -95,6 +95,18 @@ pnpm --filter mobile exec expo export --platform web
 
 CI ejecuta `pnpm build:mobile` y `expo export --platform web` como guardarrail ligero hasta que se configure EAS Build.
 
+Los comandos EAS estan disponibles desde la raiz:
+
+```bash
+pnpm eas:login
+pnpm eas:configure
+pnpm eas:build:android:preview
+pnpm eas:build:android:production
+pnpm eas:submit:android:internal
+```
+
+La guia operativa completa esta en `docs/EAS_BUILD.md`.
+
 ## Funciones prioritarias siguientes
 
 - Envio servidor de push notifications para check-in, SLA de inbox e incidencias cuando este configurado EAS projectId y credenciales Expo.
