@@ -67,6 +67,8 @@ const serverOnlyEnvNames = [
 ];
 
 const allowedServerOnlyFiles = new Set([
+  "apps/web/src/lib/health/readiness.ts",
+  "apps/web/src/lib/health/readiness.test.ts",
   "apps/web/src/lib/supabase/admin.ts",
   "apps/web/src/lib/stripe/server.ts",
   "apps/web/src/lib/services/push-notifications.ts",
