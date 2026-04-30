@@ -100,6 +100,7 @@ pnpm quality:db
 pnpm quality:prod
 pnpm quality:ci
 pnpm quality:summary
+pnpm release:check
 pnpm audit:web
 pnpm audit:lighthouse
 pnpm supabase:start
@@ -123,6 +124,7 @@ Documentos principales:
 - Calidad: `docs/QUALITY_AND_AUDIT_STRATEGY.md`
 - Mobile: `docs/MOBILE.md`
 - EAS Build Android: `docs/EAS_BUILD.md`
+- Release y pruebas manuales: `docs/RELEASE.md`
 
 ## Regla visual importante
 
@@ -130,4 +132,4 @@ El dashboard no debe tener huecos muertos entre modulos. Si dos cards comparten 
 
 ## Siguiente paso recomendado
 
-Probar Stripe Checkout con claves de test reales, continuar con conectores oficiales de canales y endurecer Lighthouse cuando tengamos historico estable.
+Ejecutar `pnpm release:check` antes de cada demo. Las pruebas que requieren movil fisico quedan centralizadas en `docs/RELEASE.md` para no bloquear el avance cuando no haya tiempo de instalar la APK.

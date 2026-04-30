@@ -18,6 +18,7 @@ El comando principal es:
 ```bash
 pnpm quality:prod
 pnpm quality:db
+pnpm release:check
 ```
 
 Genera `quality/reports/production-readiness.json`, `quality/reports/database-security.json` y revisa:
@@ -30,6 +31,7 @@ Genera `quality/reports/production-readiness.json`, `quality/reports/database-se
 - Que cada tabla publica creada en migraciones tenga RLS activado y al menos una politica.
 - Que cada bucket de Storage creado en migraciones tenga politica sobre `storage.objects`.
 - Que `pnpm quality:summary` pueda recoger el resultado como parte de la memoria de calidad.
+- Que `pnpm release:check` pueda dejar una foto completa de release sin depender de secretos ni dispositivos fisicos.
 
 ## Health endpoint
 

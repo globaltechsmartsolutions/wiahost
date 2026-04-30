@@ -30,6 +30,7 @@ Ya existe:
 - Reporte consolidado `pnpm quality:summary` que resume cobertura de rutas, memoria de auditoria, baselines visuales, Lighthouse, scripts de calidad y reportes JSON recientes de Playwright en `quality/reports/quality-summary.json`.
 - Auditor de readiness `pnpm quality:prod` que revisa variables de entorno, placeholders, pares Stripe/webhook y exposicion accidental de claves server-only sin imprimir secretos.
 - Auditor de base de datos `pnpm quality:db` que revisa migraciones Supabase para bloquear tablas publicas sin RLS/politicas y buckets Storage sin politica.
+- Gate de release `pnpm release:check` que agrupa las validaciones automatizables y genera `quality/reports/release-check.json` con checks manuales pendientes.
 - Lighthouse CI configurado para landing/login/register con budgets iniciales, reportes en filesystem y wrapper local para estabilizar Chrome en Windows.
 - CI inicial con typecheck, lint, unit tests y build web.
 - CI ejecuta `pnpm quality:ci` y sube reportes JSON de calidad como artefacto para poder revisar estado de rutas, readiness y resumen global.
@@ -286,6 +287,7 @@ pnpm lint
 pnpm test
 pnpm quality:ci
 pnpm build:web
+pnpm release:check
 pnpm test:e2e -- --grep @smoke
 pnpm test:e2e -- --grep @a11y
 ```

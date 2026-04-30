@@ -35,6 +35,7 @@
     "quality:prod:production": "node scripts/audit-production-readiness.mjs --mode=production",
     "quality:summary": "node scripts/audit-quality-summary.mjs",
     "quality:ci": "pnpm quality:routes && pnpm quality:db && pnpm quality:prod && pnpm quality:summary",
+    "release:check": "node scripts/run-release-check.mjs",
     "audit:web": "pnpm --filter web audit:web && pnpm test:visual",
     "audit:visual": "pnpm test:visual",
     "audit:lighthouse": "pnpm build:web && pnpm lighthouse",

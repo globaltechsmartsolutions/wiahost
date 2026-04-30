@@ -34,6 +34,7 @@ const databaseSecurityPath = resolve(
   root,
   "quality/reports/database-security.json",
 );
+const releaseCheckPath = resolve(root, "quality/reports/release-check.json");
 const lighthouseConfigPath = resolve(root, ".lighthouserc.cjs");
 const packageJsonPath = resolve(root, "package.json");
 const reportPath = resolve(root, "quality/reports/quality-summary.json");
@@ -184,6 +185,7 @@ const missingScripts = [
   "quality:db",
   "quality:prod",
   "quality:ci",
+  "release:check",
   "build:web",
 ].filter((scriptName) => !rootPackage.scripts?.[scriptName]);
 
@@ -266,6 +268,12 @@ const report = {
         note: "No database security report detected yet. Run pnpm quality:db to generate it.",
         status: "not_run",
       },
+  releaseCheck: existsSync(releaseCheckPath)
+    ? readJson(releaseCheckPath)
+    : {
+        note: "No release check report detected yet. Run pnpm release:check to generate it.",
+        status: "not_run",
+      },
   qualityScripts: {
     build: rootPackage.scripts?.["build:web"],
     e2e: rootPackage.scripts?.["test:e2e"],
@@ -273,6 +281,7 @@ const report = {
     routes: rootPackage.scripts?.["quality:routes"],
     databaseSecurity: rootPackage.scripts?.["quality:db"],
     productionReadiness: rootPackage.scripts?.["quality:prod"],
+    release: rootPackage.scripts?.["release:check"],
     ci: rootPackage.scripts?.["quality:ci"],
     typecheck: rootPackage.scripts?.typecheck,
     unit: rootPackage.scripts?.test,

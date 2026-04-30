@@ -77,6 +77,7 @@
 - Implementado: CI inicial con typecheck, lint, unit tests, `pnpm quality:ci`, build web, Lighthouse CI no bloqueante y artefactos de reportes JSON/Lighthouse.
 - Implementado: CI valida tambien `build:mobile` y export Expo web para detectar errores de bundling movil antes de publicar.
 - Implementado: snapshots visuales estrictos de primer viewport para dashboard, reservas, calendario, distribucion y pagos en portatil 1366x768.
+- Implementado: gate local `pnpm release:check` con reporte JSON para validar todo lo automatizable sin dispositivo fisico y listar checks manuales pendientes.
 - Pendiente inmediato: ampliar snapshots estrictos al resto de modulos cuando sus campos dinamicos esten congelados y endurecer Lighthouse cuando haya baseline historico.
 
 ## Fase 2 - Operacion PMS
@@ -170,7 +171,7 @@
 - Implementado: cache offline read-only para evidencias/documentos recientes en fichas mobile de activos, tareas e incidencias, con aviso visible cuando se muestran datos guardados.
 - Implementado: Maestro demo valida que las fichas mobile exponen evidencias, y suite conectada anade flujos de cambio de estado real para incidencia, tarea y reserva.
 - Implementado: cobertura Maestro conectada de readiness push en Ajustes, sin depender todavia de permisos del sistema operativo.
-- Pendiente inmediato: instalar y validar el APK preview en dispositivo real, ampliar Maestro con subida de evidencia real y registro push con permisos controlados en dispositivo fisico.
+- Pendiente manual aparcado: instalar y validar el APK preview en dispositivo real, ampliar Maestro con subida de evidencia real y registro push con permisos controlados en dispositivo fisico. No bloquea el avance de web/backend/calidad.
 
 ## Fase 5 - IA y automatizacion avanzada
 
@@ -200,3 +201,10 @@
 - Backups.
 - Seguridad avanzada.
 - Gate de readiness de produccion con `pnpm quality:prod:production` antes de cada despliegue.
+
+### Estado actual de Fase 6
+
+- Implementado: gate local de release `pnpm release:check` para typecheck, lint, tests, auditorias, build web, build mobile y bundles Android/iOS.
+- Implementado: reporte `quality/reports/release-check.json` con resultado de release y lista de pruebas manuales que requieren dispositivo fisico o cuentas externas.
+- Implementado: documento canonico `docs/RELEASE.md` con APK demo, iOS/TestFlight, checks manuales pendientes y checklist antes de produccion SaaS.
+- Pendiente: conectar entorno staging/produccion real, backups Supabase hosted, observabilidad externa y cuentas de stores.

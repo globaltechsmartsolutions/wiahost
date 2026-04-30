@@ -126,8 +126,12 @@ La guia operativa completa esta en `docs/EAS_BUILD.md`.
 
 ## Funciones prioritarias siguientes
 
-- Extender offline read-only a cola de tareas del dia y documentos/evidencias recientes.
-- Anadir flujos Maestro conectados para subida de evidencia, registro push y cambios de estado reales.
+- Validar APK preview en Android fisico cuando haya tiempo.
+- Probar subida real de evidencia desde camara, galeria y PDF con permisos nativos.
+- Probar registro push en dispositivo fisico.
+- Validar iPhone real con TestFlight/EAS preview cuando exista Apple Developer.
+
+Estos checks manuales no bloquean el avance de web/backend/calidad; estan centralizados en `docs/RELEASE.md`.
 
 ## Push notifications
 
