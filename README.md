@@ -99,6 +99,7 @@ pnpm quality:routes
 pnpm quality:db
 pnpm quality:prod
 pnpm quality:staging
+pnpm quality:observability
 pnpm quality:ci
 pnpm quality:summary
 pnpm release:check
@@ -125,6 +126,7 @@ Documentos principales:
 - Setup local: `docs/SETUP.md`
 - Seguridad/readiness: `docs/SECURITY.md`
 - Deployment/staging: `docs/DEPLOYMENT.md`
+- Observabilidad: `docs/OBSERVABILITY.md`
 - Calidad: `docs/QUALITY_AND_AUDIT_STRATEGY.md`
 - Mobile: `docs/MOBILE.md`
 - EAS Build Android: `docs/EAS_BUILD.md`

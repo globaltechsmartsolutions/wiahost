@@ -30,6 +30,7 @@ Ya existe:
 - Reporte consolidado `pnpm quality:summary` que resume cobertura de rutas, memoria de auditoria, baselines visuales, Lighthouse, scripts de calidad y reportes JSON recientes de Playwright en `quality/reports/quality-summary.json`.
 - Auditor de readiness `pnpm quality:prod` que revisa variables de entorno, placeholders, pares Stripe/webhook y exposicion accidental de claves server-only sin imprimir secretos.
 - Auditor de staging `pnpm quality:staging` que revisa guia de deployment, workflow manual de Vercel, variables documentadas y secretos GitHub requeridos sin imprimir valores.
+- Auditor de observabilidad `pnpm quality:observability` que revisa `/api/health`, request IDs, logger estructurado y documento canonico de diagnostico.
 - Auditor de base de datos `pnpm quality:db` que revisa migraciones Supabase para bloquear tablas publicas sin RLS/politicas y buckets Storage sin politica.
 - Gate de release `pnpm release:check` que agrupa las validaciones automatizables y genera `quality/reports/release-check.json` con checks manuales pendientes.
 - Smoke de despliegue `pnpm check:deployment -- --url <url>` que valida `/api/health` online y genera `quality/reports/deployment-health.json`.
@@ -406,6 +407,7 @@ Un cambio no deberia entrar si:
 - Hecho: crear `pnpm quality:staging` y sumarlo a `pnpm quality:ci` para auditar deployment docs, workflow Vercel y variables de staging antes de conectar cuentas reales.
 - Hecho: crear `pnpm check:deployment` y conectarlo al workflow Vercel para validar `/api/health` despues del deploy.
 - Hecho: crear `pnpm accounts:check` para saber que cuentas/logins/env faltan antes de staging real.
+- Hecho: crear `pnpm quality:observability` y sumarlo a `pnpm quality:ci` para preservar health check, request IDs, logs estructurados y docs de diagnostico.
 
 ### Paso 6
 

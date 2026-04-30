@@ -47,6 +47,10 @@ const externalAccountsPath = resolve(
   root,
   "quality/reports/external-accounts.json",
 );
+const observabilityReadinessPath = resolve(
+  root,
+  "quality/reports/observability-readiness.json",
+);
 const lighthouseConfigPath = resolve(root, ".lighthouserc.cjs");
 const packageJsonPath = resolve(root, "package.json");
 const reportPath = resolve(root, "quality/reports/quality-summary.json");
@@ -197,6 +201,7 @@ const missingScripts = [
   "quality:db",
   "quality:prod",
   "quality:staging",
+  "quality:observability",
   "quality:ci",
   "release:check",
   "check:deployment",
@@ -307,6 +312,12 @@ const report = {
         note: "No external account preflight detected yet. Run pnpm accounts:check before real staging setup.",
         status: "not_run",
       },
+  observabilityReadiness: existsSync(observabilityReadinessPath)
+    ? readJson(observabilityReadinessPath)
+    : {
+        note: "No observability readiness report detected yet. Run pnpm quality:observability to generate it.",
+        status: "not_run",
+      },
   qualityScripts: {
     build: rootPackage.scripts?.["build:web"],
     e2e: rootPackage.scripts?.["test:e2e"],
@@ -315,6 +326,7 @@ const report = {
     databaseSecurity: rootPackage.scripts?.["quality:db"],
     productionReadiness: rootPackage.scripts?.["quality:prod"],
     stagingReadiness: rootPackage.scripts?.["quality:staging"],
+    observabilityReadiness: rootPackage.scripts?.["quality:observability"],
     release: rootPackage.scripts?.["release:check"],
     deploymentHealth: rootPackage.scripts?.["check:deployment"],
     externalAccounts: rootPackage.scripts?.["accounts:check"],
