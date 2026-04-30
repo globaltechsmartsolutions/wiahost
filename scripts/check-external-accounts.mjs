@@ -154,17 +154,38 @@ function checkSupabase() {
     ["exec", "supabase", "projects", "list", "--output", "json"],
     { timeoutMs: 20000 },
   );
+  let projectCount = 0;
+
+  if (projects.ok && projects.output && projects.output !== "null") {
+    try {
+      const parsedProjects = JSON.parse(projects.output);
+
+      if (Array.isArray(parsedProjects)) {
+        projectCount = parsedProjects.length;
+      }
+    } catch {
+      projectCount = 0;
+    }
+  }
 
   return {
     cli: version.ok ? version.output : "not_available",
     name: "Supabase CLI",
     requiredFor: "hosted_database_migrations",
-    status: !version.ok ? "missing" : projects.ok ? "ready" : "login_required",
+    status: !version.ok
+      ? "missing"
+      : !projects.ok
+        ? "login_required"
+        : projectCount > 0
+          ? "ready"
+          : "project_required",
     summary: !version.ok
       ? "Supabase CLI is not available through pnpm."
-      : projects.ok
-        ? "Supabase CLI is installed and authenticated."
-        : "Supabase CLI is installed but login/link is still required.",
+      : !projects.ok
+        ? "Supabase CLI is installed but login/link is still required."
+        : projectCount > 0
+          ? `Supabase CLI is installed and can see ${projectCount} hosted project(s).`
+          : "Supabase CLI is authenticated, but no hosted project is visible yet.",
   };
 }
 
@@ -286,7 +307,9 @@ for (const check of envChecks) {
 }
 
 const blockers = checks.filter((check) =>
-  ["missing", "login_required", "needs_attention"].includes(check.status),
+  ["missing", "login_required", "needs_attention", "project_required"].includes(
+    check.status,
+  ),
 );
 
 const report = {

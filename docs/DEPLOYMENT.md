@@ -79,6 +79,7 @@ Pendiente actual para convertir el preview en staging conectado:
 
 - Crear o elegir proyecto Supabase hosted de staging.
 - Autenticar Supabase CLI con `SUPABASE_ACCESS_TOKEN` o login interactivo fuera de Codex.
+- Comprobar que `pnpm accounts:check` detecta al menos un proyecto hosted visible para el token.
 - Ejecutar `supabase link --project-ref <staging-project-ref>` y `supabase db push`.
 - Configurar en Vercel las variables runtime reales de Supabase, Stripe test, Resend y Expo server-side.
 - Configurar en GitHub Actions `VERCEL_TOKEN`, `VERCEL_ORG_ID` y `VERCEL_PROJECT_ID`.
