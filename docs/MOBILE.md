@@ -17,7 +17,8 @@ WIAHost tiene app movil real con Expo React Native en `apps/mobile`. No es una W
 - Respuesta outbound desde ficha de inbox movil.
 - Historial completo de conversaciones desde `/inbox/[conversationId]`.
 - Cambio de estado desde mobile para conversaciones, reservas, tareas e incidencias.
-- Subida de evidencias/fotos desde camara o galeria en activos, incidencias y tareas, usando Supabase Storage y registros en `documents`.
+- Subida de evidencias desde camara, galeria o selector PDF/documento en activos, incidencias y tareas, usando Supabase Storage y registros en `documents`.
+- Previsualizacion movil de evidencias guardadas con miniatura para imagenes, etiqueta PDF/DOC y apertura mediante URL firmada temporal.
 - Registro de dispositivo para push notifications desde Ajustes, con permisos nativos, canal Android `operations` y guardado en `mobile_push_tokens`.
 - Envio servidor de push notifications mediante `/api/notifications/push`, con auditoria en `push_notification_deliveries`.
 - Login y registro con Supabase Auth.
@@ -111,7 +112,6 @@ La guia operativa completa esta en `docs/EAS_BUILD.md`.
 ## Funciones prioritarias siguientes
 
 - Automatizar disparadores push para check-in, SLA de inbox e incidencias usando el endpoint servidor ya preparado.
-- Previsualizacion enriquecida de evidencias y subida de PDF/documentos.
 - Offline read-only basico para tareas del dia.
 - Tests e2e mobile con Maestro o Detox cuando el flujo nativo se estabilice.
 

@@ -1,7 +1,15 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import * as DocumentPicker from "expo-document-picker";
 import * as ImagePicker from "expo-image-picker";
 import { useState } from "react";
-import { Linking, Pressable, StyleSheet, Text, View } from "react-native";
+import {
+  Image,
+  Linking,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 
 import { Card, SectionTitle } from "@/src/components/cards";
 import { PrimaryButton } from "@/src/components/form";
@@ -37,7 +45,13 @@ type EvidenceDocument = {
   title: string;
 };
 
-type PickSource = "camera" | "library";
+type PickSource = "camera" | "document" | "library";
+
+type PickedEvidence = {
+  fileName: string | null;
+  mimeType: string | null;
+  uri: string;
+};
 
 const bucketByContext = {
   incident: "incident-attachments",
@@ -56,6 +70,10 @@ function cleanFilePart(value: string) {
 }
 
 function extensionFromMime(mimeType: string | null | undefined) {
+  if (mimeType?.includes("pdf")) {
+    return "pdf";
+  }
+
   if (mimeType?.includes("png")) {
     return "png";
   }
@@ -65,6 +83,24 @@ function extensionFromMime(mimeType: string | null | undefined) {
   }
 
   return "jpg";
+}
+
+function evidenceKind(mimeType: string | null | undefined, storagePath = "") {
+  const normalizedMime = mimeType?.toLowerCase() ?? "";
+  const normalizedPath = storagePath.toLowerCase();
+
+  if (
+    normalizedMime.startsWith("image/") ||
+    /\.(jpg|jpeg|png|webp)$/i.test(normalizedPath)
+  ) {
+    return "image";
+  }
+
+  if (normalizedMime.includes("pdf") || normalizedPath.endsWith(".pdf")) {
+    return "pdf";
+  }
+
+  return "document";
 }
 
 function contextFolder(context: EvidenceContext) {
@@ -160,6 +196,69 @@ async function uploadEvidence({
     throw new Error("Las evidencias solo se guardan sobre registros reales.");
   }
 
+  const picked =
+    source === "document"
+      ? await pickDocumentEvidence()
+      : await pickImageEvidence(source);
+
+  if (!picked) {
+    return null;
+  }
+
+  const mimeType = picked.mimeType ?? "application/octet-stream";
+  const extension = extensionFromMime(mimeType);
+  const fileName = cleanFilePart(picked.fileName ?? `evidencia.${extension}`);
+  const bucket = bucketByContext[context.type];
+  const path = `${contextFolder(context)}/${Date.now()}-${fileName || `evidencia.${extension}`}`;
+  const storagePath = `${bucket}/${path}`;
+  const response = await fetch(picked.uri);
+  const blob = await response.blob();
+  const { data: userData, error: userError } = await supabase.auth.getUser();
+
+  if (userError || !userData.user) {
+    throw new Error("Sesion no disponible para registrar la evidencia.");
+  }
+
+  const { error: uploadError } = await supabase.storage
+    .from(bucket)
+    .upload(path, blob, {
+      contentType: mimeType,
+      upsert: false,
+    });
+
+  if (uploadError) {
+    throw uploadError;
+  }
+
+  const isImage = evidenceKind(mimeType) === "image";
+  const titlePrefix = isImage ? "Foto" : "Documento";
+  const title =
+    context.type === "property"
+      ? `${titlePrefix} de ${context.label}`
+      : context.type === "incident"
+        ? `${titlePrefix} incidencia - ${context.label}`
+        : `${titlePrefix} tarea - ${context.label}`;
+
+  const { error: documentError } = await supabase
+    .from("documents")
+    .insert(
+      buildDocumentPayload({
+        context,
+        mimeType,
+        storagePath,
+        title,
+        userId: userData.user.id,
+      }),
+    );
+
+  if (documentError) {
+    throw documentError;
+  }
+
+  return storagePath;
+}
+
+async function pickImageEvidence(source: Exclude<PickSource, "document">) {
   const permission =
     source === "camera"
       ? await ImagePicker.requestCameraPermissionsAsync()
@@ -187,55 +286,32 @@ async function uploadEvidence({
   }
 
   const asset = result.assets[0];
-  const mimeType = asset.mimeType ?? "image/jpeg";
-  const extension = extensionFromMime(mimeType);
-  const fileName = cleanFilePart(asset.fileName ?? `evidencia.${extension}`);
-  const bucket = bucketByContext[context.type];
-  const path = `${contextFolder(context)}/${Date.now()}-${fileName || `evidencia.${extension}`}`;
-  const storagePath = `${bucket}/${path}`;
-  const response = await fetch(asset.uri);
-  const blob = await response.blob();
-  const { data: userData, error: userError } = await supabase.auth.getUser();
 
-  if (userError || !userData.user) {
-    throw new Error("Sesion no disponible para registrar la evidencia.");
+  return {
+    fileName: asset.fileName ?? null,
+    mimeType: asset.mimeType ?? "image/jpeg",
+    uri: asset.uri,
+  } satisfies PickedEvidence;
+}
+
+async function pickDocumentEvidence() {
+  const result = await DocumentPicker.getDocumentAsync({
+    copyToCacheDirectory: true,
+    multiple: false,
+    type: ["application/pdf", "image/*"],
+  });
+
+  if (result.canceled || !result.assets[0]) {
+    return null;
   }
 
-  const { error: uploadError } = await supabase.storage
-    .from(bucket)
-    .upload(path, blob, {
-      contentType: mimeType,
-      upsert: false,
-    });
+  const asset = result.assets[0];
 
-  if (uploadError) {
-    throw uploadError;
-  }
-
-  const title =
-    context.type === "property"
-      ? `Foto de ${context.label}`
-      : context.type === "incident"
-        ? `Evidencia incidencia - ${context.label}`
-        : `Evidencia tarea - ${context.label}`;
-
-  const { error: documentError } = await supabase
-    .from("documents")
-    .insert(
-      buildDocumentPayload({
-        context,
-        mimeType,
-        storagePath,
-        title,
-        userId: userData.user.id,
-      }),
-    );
-
-  if (documentError) {
-    throw documentError;
-  }
-
-  return storagePath;
+  return {
+    fileName: asset.name ?? null,
+    mimeType: asset.mimeType ?? "application/octet-stream",
+    uri: asset.uri,
+  } satisfies PickedEvidence;
 }
 
 async function openEvidence(storagePath: string) {
@@ -262,6 +338,47 @@ function shortDate(value: string) {
     minute: "2-digit",
     month: "short",
   }).format(new Date(value));
+}
+
+function EvidencePreview({ document }: { document: EvidenceDocument }) {
+  const kind = evidenceKind(document.mime_type, document.storage_path);
+  const signedUrlQuery = useQuery({
+    enabled: kind === "image" && isSupabaseConfigured(),
+    queryFn: async () => {
+      const [bucket, ...pathParts] = document.storage_path.split("/");
+      const path = pathParts.join("/");
+
+      if (!bucket || !path) {
+        return null;
+      }
+
+      const { data, error } = await supabase.storage
+        .from(bucket)
+        .createSignedUrl(path, 300);
+
+      if (error) {
+        return null;
+      }
+
+      return data.signedUrl;
+    },
+    queryKey: ["mobile-evidence-preview", document.storage_path],
+    staleTime: 240000,
+  });
+
+  if (kind === "image" && signedUrlQuery.data) {
+    return (
+      <Image source={{ uri: signedUrlQuery.data }} style={styles.thumbnail} />
+    );
+  }
+
+  return (
+    <View style={styles.fileBadge}>
+      <Text style={styles.fileBadgeText}>
+        {kind === "pdf" ? "PDF" : "DOC"}
+      </Text>
+    </View>
+  );
 }
 
 export function EvidenceUploader({
@@ -323,6 +440,13 @@ export function EvidenceUploader({
         >
           Galeria
         </PrimaryButton>
+        <PrimaryButton
+          disabled={isDisabled}
+          onPress={() => void handleUpload("document")}
+          variant="secondary"
+        >
+          PDF
+        </PrimaryButton>
       </View>
 
       {!isSupabaseConfigured() ? (
@@ -338,6 +462,14 @@ export function EvidenceUploader({
       {mutation.isPending ? (
         <Text style={styles.helper}>Subiendo evidencia...</Text>
       ) : null}
+      {documentsQuery.isLoading ? (
+        <Text style={styles.helper}>Cargando evidencias...</Text>
+      ) : null}
+      {documentsQuery.error ? (
+        <Text style={styles.error}>
+          No hemos podido cargar las evidencias guardadas.
+        </Text>
+      ) : null}
       {error ? <Text style={styles.error}>{error}</Text> : null}
 
       <View style={styles.documentList}>
@@ -348,6 +480,7 @@ export function EvidenceUploader({
               onPress={() => void openEvidence(document.storage_path)}
               style={styles.documentItem}
             >
+              <EvidencePreview document={document} />
               <View style={styles.documentCopy}>
                 <Text style={styles.documentTitle}>{document.title}</Text>
                 <Text style={styles.helper}>
@@ -398,6 +531,21 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: "800",
   },
+  fileBadge: {
+    alignItems: "center",
+    backgroundColor: colors.card,
+    borderColor: colors.border,
+    borderRadius: 14,
+    borderWidth: 1,
+    height: 52,
+    justifyContent: "center",
+    width: 52,
+  },
+  fileBadgeText: {
+    color: colors.ink,
+    fontSize: 12,
+    fontWeight: "900",
+  },
   helper: {
     color: colors.muted,
     fontSize: 12,
@@ -407,5 +555,11 @@ const styles = StyleSheet.create({
     color: colors.ink,
     fontSize: 12,
     fontWeight: "900",
+  },
+  thumbnail: {
+    backgroundColor: colors.card,
+    borderRadius: 14,
+    height: 52,
+    width: 52,
   },
 });
