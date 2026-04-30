@@ -208,4 +208,7 @@
 - Implementado: reporte `quality/reports/release-check.json` con resultado de release y lista de pruebas manuales que requieren dispositivo fisico o cuentas externas.
 - Implementado: documento canonico `docs/RELEASE.md` con APK demo, iOS/TestFlight, checks manuales pendientes y checklist antes de produccion SaaS.
 - Implementado: workflow manual `Release Check` en GitHub Actions para ejecutar el gate de release y subir reportes JSON como artefacto.
-- Pendiente: conectar entorno staging/produccion real, backups Supabase hosted, observabilidad externa y cuentas de stores.
+- Implementado: documento canonico `docs/DEPLOYMENT.md` con flujo local/staging/production, Vercel, Supabase hosted, health check y promocion segura.
+- Implementado: workflow manual `Web Deploy to Vercel` para preview/production con `pnpm release:check`, `vercel pull`, `vercel build` y deploy prebuilt.
+- Implementado: auditor `pnpm quality:staging`, integrado en `pnpm quality:ci`, para validar deployment docs, workflow Vercel y variables/secrets documentadas.
+- Pendiente: conectar cuentas reales de Vercel/Supabase hosted, configurar secretos `VERCEL_*`, backups Supabase hosted, observabilidad externa y cuentas de stores.

@@ -12,8 +12,9 @@ Este directorio concentra la documentacion viva del producto. La idea es que cua
 6. `AI.md`: estrategia IA canonica.
 7. `QUALITY_AND_AUDIT_STRATEGY.md`: tests, auditoria visual y memoria de calidad.
 8. `SECURITY.md`: secretos, RLS, Stripe y readiness de produccion.
-9. `MOBILE.md`: app Expo, entorno movil y Play Store.
-10. `RELEASE.md`: validacion automatica, pruebas manuales pendientes y salida a stores.
+9. `DEPLOYMENT.md`: staging, Vercel, Supabase hosted y promocion a produccion.
+10. `MOBILE.md`: app Expo, entorno movil y Play Store.
+11. `RELEASE.md`: validacion automatica, pruebas manuales pendientes y salida a stores.
 
 ## Documentos principales
 
@@ -28,6 +29,7 @@ Este directorio concentra la documentacion viva del producto. La idea es que cua
 | `UI_RESEARCH.md`                | Direccion visual y referencias PMS/CRM.                                        |
 | `QUALITY_AND_AUDIT_STRATEGY.md` | Estrategia de testing, visual regression, accesibilidad y auditor inteligente. |
 | `SECURITY.md`                   | Reglas de secretos, checks de entorno y checklist antes de produccion.         |
+| `DEPLOYMENT.md`                 | Flujo local/staging/production, Vercel, Supabase hosted y checks de salida.    |
 | `RELEASE.md`                    | Gate de release, APK demo, iOS/TestFlight y checklist manual pendiente.        |
 | `AI.md`                         | Documento maestro de IA: producto, arquitectura, datos, fases y guardrails.    |
 

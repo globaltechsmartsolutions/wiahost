@@ -66,6 +66,7 @@ pnpm test:a11y
 pnpm test:visual
 pnpm quality:routes
 pnpm quality:prod
+pnpm quality:staging
 pnpm quality:ci
 pnpm release:check
 pnpm audit:web
@@ -76,6 +77,7 @@ pnpm build:web
 `pnpm test:e2e` necesita Supabase local arrancado, `apps/web/.env.local` configurado y usuarios demo creados con `pnpm db:reset`.
 `pnpm quality:routes` cruza el inventario versionado de rutas con las suites visuales y de accesibilidad para detectar pantallas nuevas sin cobertura.
 `pnpm quality:prod` genera un informe local de readiness sin imprimir secretos: revisa `.env.example`, `.env.local`, Stripe webhook y referencias server-only.
+`pnpm quality:staging` valida que la guia de deployment, el workflow manual de Vercel y las variables documentadas esten listos antes de conectar cuentas reales.
 `pnpm quality:ci` agrupa route coverage, readiness y resumen global para reproducir el gate ligero de CI.
 `pnpm release:check` ejecuta el gate completo automatizable sin dispositivo fisico: typecheck, lint, tests, auditorias, build web y bundles Android/iOS. Las pruebas de APK, push y camara quedan documentadas en `docs/RELEASE.md`.
 `pnpm test:visual -- --update-snapshots` actualiza capturas base cuando un cambio visual ha sido revisado y aceptado.

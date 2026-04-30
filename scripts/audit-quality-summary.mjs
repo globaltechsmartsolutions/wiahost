@@ -30,6 +30,10 @@ const productionReadinessPath = resolve(
   root,
   "quality/reports/production-readiness.json",
 );
+const stagingReadinessPath = resolve(
+  root,
+  "quality/reports/staging-readiness.json",
+);
 const databaseSecurityPath = resolve(
   root,
   "quality/reports/database-security.json",
@@ -184,6 +188,7 @@ const missingScripts = [
   "quality:routes",
   "quality:db",
   "quality:prod",
+  "quality:staging",
   "quality:ci",
   "release:check",
   "build:web",
@@ -262,6 +267,12 @@ const report = {
         note: "No production readiness report detected yet. Run pnpm quality:prod to generate it.",
         status: "not_run",
       },
+  stagingReadiness: existsSync(stagingReadinessPath)
+    ? readJson(stagingReadinessPath)
+    : {
+        note: "No staging readiness report detected yet. Run pnpm quality:staging to generate it.",
+        status: "not_run",
+      },
   databaseSecurity: existsSync(databaseSecurityPath)
     ? readJson(databaseSecurityPath)
     : {
@@ -281,6 +292,7 @@ const report = {
     routes: rootPackage.scripts?.["quality:routes"],
     databaseSecurity: rootPackage.scripts?.["quality:db"],
     productionReadiness: rootPackage.scripts?.["quality:prod"],
+    stagingReadiness: rootPackage.scripts?.["quality:staging"],
     release: rootPackage.scripts?.["release:check"],
     ci: rootPackage.scripts?.["quality:ci"],
     typecheck: rootPackage.scripts?.typecheck,

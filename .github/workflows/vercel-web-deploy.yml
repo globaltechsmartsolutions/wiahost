@@ -1,0 +1,98 @@
+name: Web Deploy to Vercel
+
+on:
+  workflow_dispatch:
+    inputs:
+      target:
+        description: "Deployment target"
+        options:
+          - preview
+          - production
+        required: true
+        type: choice
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    env:
+      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          run_install: false
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run release gate
+        run: pnpm release:check
+
+      - name: Validate Vercel secrets
+        run: |
+          missing=0
+          for key in VERCEL_TOKEN VERCEL_ORG_ID VERCEL_PROJECT_ID; do
+            if [ -z "${!key}" ]; then
+              echo "::error::$key is required as a GitHub secret."
+              missing=1
+            fi
+          done
+          exit "$missing"
+
+      - name: Install Vercel CLI
+        run: npm install --global vercel@52.2.1
+
+      - name: Pull Vercel preview environment
+        if: ${{ inputs.target == 'preview' }}
+        run: vercel pull --yes --environment=preview --token="$VERCEL_TOKEN"
+
+      - name: Pull Vercel production environment
+        if: ${{ inputs.target == 'production' }}
+        run: vercel pull --yes --environment=production --token="$VERCEL_TOKEN"
+
+      - name: Build preview artifact
+        if: ${{ inputs.target == 'preview' }}
+        run: vercel build --token="$VERCEL_TOKEN"
+
+      - name: Build production artifact
+        if: ${{ inputs.target == 'production' }}
+        run: vercel build --prod --token="$VERCEL_TOKEN"
+
+      - name: Deploy preview artifact
+        if: ${{ inputs.target == 'preview' }}
+        id: deploy_preview
+        run: |
+          url=$(vercel deploy --prebuilt --token="$VERCEL_TOKEN")
+          echo "url=$url" >> "$GITHUB_OUTPUT"
+          echo "### Preview deploy" >> "$GITHUB_STEP_SUMMARY"
+          echo "$url" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Deploy production artifact
+        if: ${{ inputs.target == 'production' }}
+        id: deploy_production
+        run: |
+          url=$(vercel deploy --prebuilt --prod --token="$VERCEL_TOKEN")
+          echo "url=$url" >> "$GITHUB_OUTPUT"
+          echo "### Production deploy" >> "$GITHUB_STEP_SUMMARY"
+          echo "$url" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload release reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: web-deploy-quality-reports
+          path: quality/reports/*.json
+          if-no-files-found: ignore

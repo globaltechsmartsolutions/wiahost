@@ -18,6 +18,7 @@ El comando principal es:
 ```bash
 pnpm quality:prod
 pnpm quality:db
+pnpm quality:staging
 pnpm release:check
 ```
 
@@ -32,6 +33,8 @@ Genera `quality/reports/production-readiness.json`, `quality/reports/database-se
 - Que cada bucket de Storage creado en migraciones tenga politica sobre `storage.objects`.
 - Que `pnpm quality:summary` pueda recoger el resultado como parte de la memoria de calidad.
 - Que `pnpm release:check` pueda dejar una foto completa de release sin depender de secretos ni dispositivos fisicos.
+
+`pnpm quality:staging` genera `quality/reports/staging-readiness.json` y comprueba que el proyecto tenga guia de deployment, workflow manual de Vercel, variables de entorno documentadas y lista de secretos GitHub necesarios antes de conectar cuentas reales.
 
 ## Health endpoint
 
@@ -59,6 +62,7 @@ En modo produccion se espera `https`, sin `localhost`, y se bloquea si faltan va
 - Crear proyecto Supabase hosted y aplicar migraciones.
 - Activar backups y revisar RLS con usuarios reales de prueba.
 - Configurar variables en Vercel sin copiarlas al repositorio.
+- Ejecutar `pnpm quality:staging` antes de crear el primer despliegue preview.
 - Probar Stripe con claves de test, webhook firmado y eventos reales.
 - Revisar Storage policies antes de subir documentos sensibles.
 - Activar logs, alertas y monitorizacion de errores.
