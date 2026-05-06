@@ -232,4 +232,5 @@
 - Implementado: `pnpm staging:rotate-db-password` para rotar credenciales Postgres de staging, actualizar `.env.staging.local` y verificar el nuevo acceso sin imprimir secretos.
 - Implementado: alias estable `https://wiahost-staging.vercel.app` para demos, reasignable al ultimo preview validado.
 - Implementado: `pnpm staging:backup` para crear dumps locales ignorados por Git de Supabase hosted antes de cambios sensibles.
-- Pendiente: configurar secretos `VERCEL_*` en GitHub Actions, backups automaticos Supabase hosted, Stripe test, observabilidad externa y cuentas de stores.
+- Implementado: secretos `VERCEL_*` configurados en GitHub Actions, `Web Deploy to Vercel` validado con preview prebuilt y health check post-deploy.
+- Pendiente: backups automaticos Supabase hosted, Stripe test, observabilidad externa y cuentas de stores.

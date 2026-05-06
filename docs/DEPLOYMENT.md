@@ -73,6 +73,7 @@ Estado actual:
 - Deployment protection SSO desactivado para que las demos internas y `/api/health` sean accesibles.
 - Preview conectado a Supabase hosted verificado: `https://wiahost-staging.vercel.app`.
 - Production deployment automatico desde GitHub validado: `https://wiahost-bvwmr29o8-globaltechsmartsolutions-projects.vercel.app`.
+- Workflow manual `Web Deploy to Vercel` configurado con secretos GitHub `VERCEL_TOKEN`, `VERCEL_ORG_ID` y `VERCEL_PROJECT_ID`, scope de equipo `globaltechsmartsolutions-projects` y deploy prebuilt validado.
 - Health check verificado con `pnpm check:deployment`.
 - `.vercelignore` reduce el upload del monorepo y mantiene fuera mobile, reports, artefactos, `.env` y migraciones raiz.
 
@@ -86,11 +87,10 @@ Staging conectado actual:
 
 Pendiente actual para endurecer staging/production:
 
-- Configurar `VERCEL_TOKEN`, `VERCEL_ORG_ID` y `VERCEL_PROJECT_ID` en GitHub Actions para poder ejecutar deploys manuales prebuilt desde workflows ademas del despliegue automatico de Vercel Git.
 - Ejecutar `pnpm vercel:deploy:env -- --file .env.staging.local --target preview` cuando se quiera crear un nuevo preview con variables locales sin depender de Git integration.
 - Configurar en Vercel/GitHub las variables runtime reales de Stripe test, Resend y Expo server-side cuando se activen.
-- Configurar en GitHub Actions `VERCEL_TOKEN`, `VERCEL_ORG_ID` y `VERCEL_PROJECT_ID`.
-- Repetir `pnpm check:deployment -- --url <preview-url>` tras conectar Supabase hosted.
+- Automatizar backups de Supabase hosted y monitorizacion externa cuando haya produccion real.
+- Repetir `pnpm check:deployment -- --url <preview-url>` tras cada preview manual o cambio sensible.
 
 Hay dos caminos validos.
 
@@ -123,6 +123,10 @@ Usa:
 - `vercel build`;
 - `vercel deploy --prebuilt`.
 - `node scripts/check-deployment-health.mjs` contra la URL desplegada.
+
+El workflow debe ejecutarse desde la raiz del monorepo, no desde `apps/web`, porque el proyecto remoto de Vercel ya tiene `Root Directory = apps/web`. Si se ejecuta desde `apps/web`, Vercel intentara resolver `apps/web/apps/web/package.json`.
+
+El scope del equipo queda fijado en el workflow como `globaltechsmartsolutions-projects` para que los comandos `vercel pull/build/deploy` no dependan del contexto interactivo del runner.
 
 Secretos necesarios en GitHub:
 
@@ -195,6 +199,8 @@ El alias estable apunta al ultimo preview validado. Si se genera un preview nuev
 ```bash
 pnpm dlx vercel@52.2.1 alias set <deployment>.vercel.app wiahost-staging.vercel.app
 ```
+
+El ultimo workflow manual prebuilt validado genero un preview saludable y paso `Check preview health`. Para nuevas demos, usar preferiblemente el alias estable salvo que se quiera revisar una URL preview concreta del run.
 
 ## Checklist antes de crear staging
 
