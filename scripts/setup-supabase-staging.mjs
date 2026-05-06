@@ -93,6 +93,7 @@ function runPnpm(args, options = {}) {
       ...process.env,
       CI: "1",
       NO_COLOR: "1",
+      ...(options.env ?? {}),
     },
     stdio: options.capture ? ["ignore", "pipe", "pipe"] : "inherit",
     timeout: options.timeoutMs ?? 120000,
@@ -122,40 +123,26 @@ if (isPlaceholder(projectRef) || isPlaceholder(dbPassword)) {
 }
 
 console.log("Linking Supabase staging project...");
-runPnpm([
-  "exec",
-  "supabase",
-  "link",
-  "--project-ref",
-  projectRef,
-  "--password",
-  dbPassword,
-  "--yes",
-]);
+runPnpm(["exec", "supabase", "link", "--project-ref", projectRef, "--yes"], {
+  env: {
+    SUPABASE_DB_PASSWORD: dbPassword,
+  },
+});
 
 console.log("Checking remote migration plan...");
-runPnpm([
-  "exec",
-  "supabase",
-  "db",
-  "push",
-  "--dry-run",
-  "--password",
-  dbPassword,
-  "--yes",
-]);
+runPnpm(["exec", "supabase", "db", "push", "--dry-run", "--yes"], {
+  env: {
+    SUPABASE_DB_PASSWORD: dbPassword,
+  },
+});
 
 if (shouldApply) {
   console.log("Applying migrations to Supabase staging...");
-  runPnpm([
-    "exec",
-    "supabase",
-    "db",
-    "push",
-    "--password",
-    dbPassword,
-    "--yes",
-  ]);
+  runPnpm(["exec", "supabase", "db", "push", "--yes"], {
+    env: {
+      SUPABASE_DB_PASSWORD: dbPassword,
+    },
+  });
 
   console.log("Generating database types from linked staging...");
   const generatedTypes = runPnpm(

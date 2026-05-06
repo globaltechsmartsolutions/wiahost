@@ -71,21 +71,22 @@ Estado actual:
 - Root Directory configurado en `apps/web`.
 - Node.js configurado en `22.x`, alineado con GitHub Actions.
 - Deployment protection SSO desactivado para que las demos internas y `/api/health` sean accesibles.
-- Preview verificado: `https://wiahost-fqdqh89js-globaltechsmartsolutions-projects.vercel.app`.
+- Preview conectado a Supabase hosted verificado: `https://wiahost-2mt44dmsd-globaltechsmartsolutions-projects.vercel.app`.
 - Health check verificado con `pnpm check:deployment`.
 - `.vercelignore` reduce el upload del monorepo y mantiene fuera mobile, reports, artefactos, `.env` y migraciones raíz.
 
-Pendiente actual para convertir el preview en staging conectado:
+Staging conectado actual:
 
-- Crear o elegir proyecto Supabase hosted de staging.
-- Autenticar Supabase CLI con `SUPABASE_ACCESS_TOKEN` o login interactivo fuera de Codex.
-- Si `pnpm exec supabase orgs list --output json` devuelve `[]`, crear primero una organizacion en Supabase Dashboard y despues un proyecto staging.
-- Comprobar que `pnpm accounts:check` detecta al menos un proyecto hosted visible para el token.
-- Copiar `.env.staging.example` a `.env.staging.local` y completar `SUPABASE_PROJECT_REF`, `SUPABASE_DB_PASSWORD`, claves Supabase hosted y URL de preview/staging.
-- Ejecutar `pnpm staging:supabase` para enlazar Supabase hosted y ver el dry-run de migraciones.
-- Ejecutar `pnpm staging:supabase -- --apply` para aplicar migraciones y regenerar tipos cuando el dry-run sea correcto.
-- Ejecutar `pnpm vercel:env:sync -- --file .env.staging.local --environment preview` para sincronizar variables en Vercel sin imprimir valores.
-- Configurar en Vercel las variables runtime reales de Supabase, Stripe test, Resend y Expo server-side.
+- Proyecto Supabase hosted `ywrmzhudqmmgnjeymkuf`.
+- Migraciones aplicadas en Supabase hosted.
+- Tipos de base de datos regenerados desde el proyecto linked.
+- Variables Supabase usadas en deployment preview sin imprimir valores.
+
+Pendiente actual para endurecer staging/production:
+
+- Conectar GitHub repo dentro del proyecto Vercel para poder guardar variables `preview` por rama desde Vercel.
+- Ejecutar `pnpm vercel:deploy:env -- --file .env.staging.local --target preview` cuando se quiera crear un nuevo preview con variables locales sin depender de Git integration.
+- Configurar en Vercel/GitHub las variables runtime reales de Stripe test, Resend y Expo server-side cuando se activen.
 - Configurar en GitHub Actions `VERCEL_TOKEN`, `VERCEL_ORG_ID` y `VERCEL_PROJECT_ID`.
 - Repetir `pnpm check:deployment -- --url <preview-url>` tras conectar Supabase hosted.
 
@@ -149,10 +150,13 @@ Sincronizacion segura desde archivo local:
 
 ```bash
 cp .env.staging.example .env.staging.local
+pnpm staging:supabase
+pnpm staging:supabase -- --apply
 pnpm vercel:env:sync -- --file .env.staging.local --environment preview
+pnpm vercel:deploy:env -- --file .env.staging.local --target preview
 ```
 
-El script no imprime valores, ignora claves locales como `SUPABASE_ACCESS_TOKEN`, `SUPABASE_PROJECT_REF` y `SUPABASE_DB_PASSWORD`, y falla si detecta placeholders.
+`staging:supabase` enlaza Supabase hosted, primero en dry-run y despues con `--apply` para aplicar migraciones. `vercel:env:sync` configura variables persistentes en el proyecto Vercel. Si el proyecto Vercel aun no tiene Git repo conectado, `preview` puede exigir rama y fallar; en ese caso usar `vercel:deploy:env`, que crea un deployment con variables de build/runtime desde `.env.staging.local` sin imprimir valores. Estos scripts ignoran claves locales como `SUPABASE_ACCESS_TOKEN`, `SUPABASE_PROJECT_REF` y `SUPABASE_DB_PASSWORD`, y fallan si detectan placeholders.
 
 ## Checklist antes de crear staging
 

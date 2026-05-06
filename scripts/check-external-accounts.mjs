@@ -150,11 +150,32 @@ function checkGitRemote() {
 
 function checkSupabase() {
   const version = runPnpm(["exec", "supabase", "--version"]);
+  const orgs = runPnpm(
+    ["exec", "supabase", "orgs", "list", "--output", "json"],
+    {
+      timeoutMs: 20000,
+    },
+  );
   const projects = runPnpm(
     ["exec", "supabase", "projects", "list", "--output", "json"],
     { timeoutMs: 20000 },
   );
+  const linkedProjectPath = resolve(root, "supabase/.temp/project-ref");
+  const hasLinkedProject = existsSync(linkedProjectPath);
+  let orgCount = 0;
   let projectCount = 0;
+
+  if (orgs.ok && orgs.output && orgs.output !== "null") {
+    try {
+      const parsedOrgs = JSON.parse(orgs.output);
+
+      if (Array.isArray(parsedOrgs)) {
+        orgCount = parsedOrgs.length;
+      }
+    } catch {
+      orgCount = 0;
+    }
+  }
 
   if (projects.ok && projects.output && projects.output !== "null") {
     try {
@@ -168,24 +189,29 @@ function checkSupabase() {
     }
   }
 
+  const isAuthenticated = orgs.ok && orgCount > 0;
+  const isReady = isAuthenticated && (projectCount > 0 || hasLinkedProject);
+
   return {
     cli: version.ok ? version.output : "not_available",
     name: "Supabase CLI",
     requiredFor: "hosted_database_migrations",
     status: !version.ok
       ? "missing"
-      : !projects.ok
+      : !isAuthenticated
         ? "login_required"
-        : projectCount > 0
+        : isReady
           ? "ready"
           : "project_required",
     summary: !version.ok
       ? "Supabase CLI is not available through pnpm."
-      : !projects.ok
-        ? "Supabase CLI is installed but login/link is still required."
+      : !isAuthenticated
+        ? "Supabase CLI is installed but login is still required."
         : projectCount > 0
           ? `Supabase CLI is installed and can see ${projectCount} hosted project(s).`
-          : "Supabase CLI is authenticated, but no hosted project is visible yet.",
+          : hasLinkedProject
+            ? "Supabase CLI is authenticated and a hosted project is linked locally."
+            : "Supabase CLI is authenticated, but no hosted project is visible yet.",
   };
 }
 

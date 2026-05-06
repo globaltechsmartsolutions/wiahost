@@ -25,6 +25,10 @@ function argValue(name, fallback) {
 
 const envFile = argValue("--file", ".env.staging.local");
 const targetEnvironment = argValue("--environment", "preview");
+const gitBranch = argValue(
+  "--git-branch",
+  targetEnvironment === "preview" ? "main" : "",
+);
 const allowedEnvironments = new Set(["development", "preview", "production"]);
 
 function fail(message) {
@@ -97,18 +101,37 @@ function runPnpm(args, input) {
           command: "pnpm",
         };
 
-  execFileSync(command.command, command.args, {
-    cwd: root,
-    encoding: "utf8",
-    env: {
-      ...process.env,
-      CI: "1",
-      NO_COLOR: "1",
-    },
-    input,
-    stdio: ["pipe", "pipe", "pipe"],
-    timeout: 120000,
-  });
+  try {
+    execFileSync(command.command, command.args, {
+      cwd: root,
+      encoding: "utf8",
+      env: {
+        ...process.env,
+        CI: "1",
+        NO_COLOR: "1",
+      },
+      input: "",
+      stdio: ["pipe", "pipe", "pipe"],
+      timeout: 120000,
+    });
+  } catch (error) {
+    const stderr = Buffer.isBuffer(error?.stderr)
+      ? error.stderr.toString("utf8")
+      : typeof error?.stderr === "string"
+        ? error.stderr
+        : "";
+    const stdout = Buffer.isBuffer(error?.stdout)
+      ? error.stdout.toString("utf8")
+      : typeof error?.stdout === "string"
+        ? error.stdout
+        : "";
+    const message = `${stdout}\n${stderr}`
+      .replace(input, "<redacted-value>")
+      .replace(root, "<repo>")
+      .trim();
+
+    throw new Error(message || "Vercel env command failed.");
+  }
 }
 
 const deniedKeys = new Set([
@@ -158,9 +181,12 @@ for (const entry of entries) {
         "add",
         entry.key,
         targetEnvironment,
+        ...(gitBranch ? [gitBranch] : []),
         "--force",
         "--yes",
         sensitivityFlag,
+        "--value",
+        entry.value,
       ],
       entry.value,
     );
@@ -184,6 +210,7 @@ const report = {
   environment: targetEnvironment,
   failed,
   file: envFile,
+  gitBranch: gitBranch || null,
   status: failed.length > 0 ? "failed" : "passed",
   summary:
     failed.length > 0

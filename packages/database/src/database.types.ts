@@ -7,6 +7,11 @@ export type Json =
   | Json[]
 
 export type Database = {
+  // Allows to automatically instantiate createClient with right options
+  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
+  __InternalSupabase: {
+    PostgrestVersion: "14.5"
+  }
   graphql_public: {
     Tables: {
       [_ in never]: never
@@ -814,6 +819,50 @@ export type Database = {
           },
         ]
       }
+      mobile_push_tokens: {
+        Row: {
+          app_version: string | null
+          created_at: string
+          device_name: string | null
+          expo_push_token: string
+          id: string
+          last_seen_at: string
+          platform: string
+          profile_id: string
+          updated_at: string
+        }
+        Insert: {
+          app_version?: string | null
+          created_at?: string
+          device_name?: string | null
+          expo_push_token: string
+          id?: string
+          last_seen_at?: string
+          platform: string
+          profile_id: string
+          updated_at?: string
+        }
+        Update: {
+          app_version?: string | null
+          created_at?: string
+          device_name?: string | null
+          expo_push_token?: string
+          id?: string
+          last_seen_at?: string
+          platform?: string
+          profile_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mobile_push_tokens_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       model_predictions: {
         Row: {
           confidence: number | null
@@ -938,120 +987,6 @@ export type Database = {
             columns: ["task_id"]
             isOneToOne: false
             referencedRelation: "tasks"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      mobile_push_tokens: {
-        Row: {
-          app_version: string | null
-          created_at: string
-          device_name: string | null
-          expo_push_token: string
-          id: string
-          last_seen_at: string
-          platform: string
-          profile_id: string
-          updated_at: string
-        }
-        Insert: {
-          app_version?: string | null
-          created_at?: string
-          device_name?: string | null
-          expo_push_token: string
-          id?: string
-          last_seen_at?: string
-          platform: string
-          profile_id: string
-          updated_at?: string
-        }
-        Update: {
-          app_version?: string | null
-          created_at?: string
-          device_name?: string | null
-          expo_push_token?: string
-          id?: string
-          last_seen_at?: string
-          platform?: string
-          profile_id?: string
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "mobile_push_tokens_profile_id_fkey"
-            columns: ["profile_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      push_notification_deliveries: {
-        Row: {
-          created_at: string
-          error_code: string | null
-          error_message: string | null
-          expo_push_token: string
-          expo_ticket_id: string | null
-          id: string
-          notification_id: string | null
-          payload: Json
-          profile_id: string
-          sent_at: string
-          status: string
-          token_id: string | null
-          updated_at: string
-        }
-        Insert: {
-          created_at?: string
-          error_code?: string | null
-          error_message?: string | null
-          expo_push_token: string
-          expo_ticket_id?: string | null
-          id?: string
-          notification_id?: string | null
-          payload?: Json
-          profile_id: string
-          sent_at?: string
-          status?: string
-          token_id?: string | null
-          updated_at?: string
-        }
-        Update: {
-          created_at?: string
-          error_code?: string | null
-          error_message?: string | null
-          expo_push_token?: string
-          expo_ticket_id?: string | null
-          id?: string
-          notification_id?: string | null
-          payload?: Json
-          profile_id?: string
-          sent_at?: string
-          status?: string
-          token_id?: string | null
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "push_notification_deliveries_notification_id_fkey"
-            columns: ["notification_id"]
-            isOneToOne: false
-            referencedRelation: "notifications"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "push_notification_deliveries_profile_id_fkey"
-            columns: ["profile_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "push_notification_deliveries_token_id_fkey"
-            columns: ["token_id"]
-            isOneToOne: false
-            referencedRelation: "mobile_push_tokens"
             referencedColumns: ["id"]
           },
         ]
@@ -1605,6 +1540,76 @@ export type Database = {
             columns: ["property_id"]
             isOneToOne: false
             referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      push_notification_deliveries: {
+        Row: {
+          created_at: string
+          error_code: string | null
+          error_message: string | null
+          expo_push_token: string
+          expo_ticket_id: string | null
+          id: string
+          notification_id: string | null
+          payload: Json
+          profile_id: string
+          sent_at: string
+          status: string
+          token_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          error_code?: string | null
+          error_message?: string | null
+          expo_push_token: string
+          expo_ticket_id?: string | null
+          id?: string
+          notification_id?: string | null
+          payload?: Json
+          profile_id: string
+          sent_at?: string
+          status?: string
+          token_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          error_code?: string | null
+          error_message?: string | null
+          expo_push_token?: string
+          expo_ticket_id?: string | null
+          id?: string
+          notification_id?: string | null
+          payload?: Json
+          profile_id?: string
+          sent_at?: string
+          status?: string
+          token_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "push_notification_deliveries_notification_id_fkey"
+            columns: ["notification_id"]
+            isOneToOne: false
+            referencedRelation: "notifications"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "push_notification_deliveries_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "push_notification_deliveries_token_id_fkey"
+            columns: ["token_id"]
+            isOneToOne: false
+            referencedRelation: "mobile_push_tokens"
             referencedColumns: ["id"]
           },
         ]
@@ -2241,101 +2246,6 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
-      }
-      iceberg_namespaces: {
-        Row: {
-          bucket_name: string
-          catalog_id: string
-          created_at: string
-          id: string
-          metadata: Json
-          name: string
-          updated_at: string
-        }
-        Insert: {
-          bucket_name: string
-          catalog_id: string
-          created_at?: string
-          id?: string
-          metadata?: Json
-          name: string
-          updated_at?: string
-        }
-        Update: {
-          bucket_name?: string
-          catalog_id?: string
-          created_at?: string
-          id?: string
-          metadata?: Json
-          name?: string
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "iceberg_namespaces_catalog_id_fkey"
-            columns: ["catalog_id"]
-            isOneToOne: false
-            referencedRelation: "buckets_analytics"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      iceberg_tables: {
-        Row: {
-          bucket_name: string
-          catalog_id: string
-          created_at: string
-          id: string
-          location: string
-          name: string
-          namespace_id: string
-          remote_table_id: string | null
-          shard_id: string | null
-          shard_key: string | null
-          updated_at: string
-        }
-        Insert: {
-          bucket_name: string
-          catalog_id: string
-          created_at?: string
-          id?: string
-          location: string
-          name: string
-          namespace_id: string
-          remote_table_id?: string | null
-          shard_id?: string | null
-          shard_key?: string | null
-          updated_at?: string
-        }
-        Update: {
-          bucket_name?: string
-          catalog_id?: string
-          created_at?: string
-          id?: string
-          location?: string
-          name?: string
-          namespace_id?: string
-          remote_table_id?: string | null
-          shard_id?: string | null
-          shard_key?: string | null
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "iceberg_tables_catalog_id_fkey"
-            columns: ["catalog_id"]
-            isOneToOne: false
-            referencedRelation: "buckets_analytics"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "iceberg_tables_namespace_id_fkey"
-            columns: ["namespace_id"]
-            isOneToOne: false
-            referencedRelation: "iceberg_namespaces"
-            referencedColumns: ["id"]
-          },
-        ]
       }
       migrations: {
         Row: {

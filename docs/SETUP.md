@@ -47,11 +47,11 @@ URLs locales verificadas:
 - Supabase API: `http://127.0.0.1:54321`
 - Database: `postgresql://postgres:postgres@127.0.0.1:54322/postgres`
 
-Preview online verificado:
+Preview online conectado verificado:
 
-- Web staging demo: `https://wiahost-fqdqh89js-globaltechsmartsolutions-projects.vercel.app`
-- Health check: `pnpm check:deployment -- --url https://wiahost-fqdqh89js-globaltechsmartsolutions-projects.vercel.app`
-- Estado: build remoto en Vercel correcto, pendiente de conectar Supabase hosted y variables runtime reales para dejar de usar fallback demo.
+- Web staging conectado: `https://wiahost-2mt44dmsd-globaltechsmartsolutions-projects.vercel.app`
+- Health check: `pnpm check:deployment -- --url https://wiahost-2mt44dmsd-globaltechsmartsolutions-projects.vercel.app`
+- Estado: build remoto en Vercel correcto, migraciones aplicadas en Supabase hosted y health check contra base real.
 
 Preparacion de staging hosted:
 
@@ -60,9 +60,10 @@ cp .env.staging.example .env.staging.local
 pnpm staging:supabase
 pnpm staging:supabase -- --apply
 pnpm vercel:env:sync -- --file .env.staging.local --environment preview
+pnpm vercel:deploy:env -- --file .env.staging.local --target preview
 ```
 
-`pnpm staging:supabase` hace primero un dry-run de migraciones. Solo `--apply` aplica cambios reales y regenera tipos desde el proyecto linked. `pnpm vercel:env:sync` envia variables a Vercel sin imprimir valores y bloquea placeholders.
+`pnpm staging:supabase` hace primero un dry-run de migraciones. Solo `--apply` aplica cambios reales y regenera tipos desde el proyecto linked. `pnpm vercel:env:sync` envia variables persistentes a Vercel sin imprimir valores y bloquea placeholders. Si Vercel no tiene Git conectado y preview exige rama, usar `pnpm vercel:deploy:env` para crear un deployment preview con variables locales de forma segura.
 
 Usuarios demo tras `pnpm db:reset`:
 

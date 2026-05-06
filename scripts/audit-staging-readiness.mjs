@@ -20,6 +20,7 @@ const requiredScripts = [
   "quality:summary",
   "staging:supabase",
   "vercel:env:sync",
+  "vercel:deploy:env",
 ];
 
 const requiredRuntimeEnvKeys = [
@@ -49,6 +50,7 @@ const requiredDeploymentDocTerms = [
   "SUPABASE_PROJECT_REF",
   "staging:supabase",
   "vercel:env:sync",
+  "vercel:deploy:env",
 ];
 
 function readText(path) {
