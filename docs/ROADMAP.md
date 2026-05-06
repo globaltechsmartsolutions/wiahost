@@ -79,6 +79,7 @@
 - Implementado: logging estructurado seguro para errores API 5xx, preparado para Vercel Runtime Logs/Drains sin registrar payloads sensibles.
 - Implementado: `/api/health` con snapshot JSON de app, Supabase, base de datos, Stripe y metadata segura de runtime/deploy para monitorizacion futura.
 - Implementado: tests unitarios extra de servicios criticos para importacion iCal, deduplicacion de bloqueos, sync events y enlaces firmados de documentos/Storage con rechazo de rutas inseguras.
+- Implementado: tests unitarios de pagos para checkout demo, Stripe Checkout simulado, rechazo de token invalido y confirmacion Stripe con actualizacion de reserva y evento de sincronizacion.
 - Implementado: CI inicial con typecheck, lint, unit tests, `pnpm quality:ci`, build web, Lighthouse CI no bloqueante y artefactos de reportes JSON/Lighthouse.
 - Implementado: CI valida tambien `build:mobile` y export Expo web para detectar errores de bundling movil antes de publicar.
 - Implementado: snapshots visuales estrictos de primer viewport para dashboard, reservas, calendario, distribucion y pagos en portatil 1366x768.
