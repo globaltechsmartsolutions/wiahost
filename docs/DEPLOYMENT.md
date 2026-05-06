@@ -71,7 +71,7 @@ Estado actual:
 - Root Directory configurado en `apps/web`.
 - Node.js configurado en `22.x`, alineado con GitHub Actions.
 - Deployment protection SSO desactivado para que las demos internas y `/api/health` sean accesibles.
-- Preview conectado a Supabase hosted verificado: `https://wiahost-l5e5e3d2i-globaltechsmartsolutions-projects.vercel.app`.
+- Preview conectado a Supabase hosted verificado: `https://wiahost-staging.vercel.app`.
 - Health check verificado con `pnpm check:deployment`.
 - `.vercelignore` reduce el upload del monorepo y mantiene fuera mobile, reports, artefactos, `.env` y migraciones raiz.
 
@@ -85,7 +85,7 @@ Staging conectado actual:
 
 Pendiente actual para endurecer staging/production:
 
-- Conectar GitHub repo dentro del proyecto Vercel para poder guardar variables `preview` por rama desde Vercel.
+- Autorizar la GitHub App de Vercel para `globaltechsmartsolutions/wiahost` y conectar el repo dentro del proyecto Vercel para poder guardar variables `preview` por rama desde Vercel. El intento por CLI con `vercel git connect https://github.com/globaltechsmartsolutions/wiahost.git` fallo por falta de acceso de Vercel al repo.
 - Ejecutar `pnpm vercel:deploy:env -- --file .env.staging.local --target preview` cuando se quiera crear un nuevo preview con variables locales sin depender de Git integration.
 - Configurar en Vercel/GitHub las variables runtime reales de Stripe test, Resend y Expo server-side cuando se activen.
 - Configurar en GitHub Actions `VERCEL_TOKEN`, `VERCEL_ORG_ID` y `VERCEL_PROJECT_ID`.
@@ -184,7 +184,13 @@ limpieza@wiahost.local / Password123!
 La URL preview conectada y validada con login demo es:
 
 ```text
-https://wiahost-l5e5e3d2i-globaltechsmartsolutions-projects.vercel.app
+https://wiahost-staging.vercel.app
+```
+
+El alias estable apunta al ultimo preview validado. Si se genera un preview nuevo con `pnpm vercel:deploy:env`, reasignar el alias:
+
+```bash
+pnpm dlx vercel@52.2.1 alias set <deployment>.vercel.app wiahost-staging.vercel.app
 ```
 
 ## Checklist antes de crear staging

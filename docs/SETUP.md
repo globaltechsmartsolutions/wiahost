@@ -49,8 +49,8 @@ URLs locales verificadas:
 
 Preview online conectado verificado:
 
-- Web staging conectado: `https://wiahost-l5e5e3d2i-globaltechsmartsolutions-projects.vercel.app`
-- Health check: `pnpm check:deployment -- --url https://wiahost-l5e5e3d2i-globaltechsmartsolutions-projects.vercel.app`
+- Web staging conectado: `https://wiahost-staging.vercel.app`
+- Health check: `pnpm check:deployment -- --url https://wiahost-staging.vercel.app`
 - Estado: build remoto en Vercel correcto, migraciones aplicadas en Supabase hosted y health check contra base real.
 
 Preparacion de staging hosted:
@@ -81,7 +81,7 @@ Usuarios demo tras `pnpm db:reset`:
 Los mismos usuarios quedan disponibles en staging hosted tras `pnpm staging:seed -- --apply`. La URL verificada actualmente es:
 
 ```text
-https://wiahost-l5e5e3d2i-globaltechsmartsolutions-projects.vercel.app
+https://wiahost-staging.vercel.app
 ```
 
 Login demo recomendado para revisar el panel:

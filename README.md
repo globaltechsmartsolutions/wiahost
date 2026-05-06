@@ -23,7 +23,7 @@ El objetivo es centralizar propiedades, reservas, calendario multi-canal, mensaj
 - Paquetes compartidos para tipos y validaciones en `packages/shared`.
 - Paquete de tipos de base de datos en `packages/database`.
 - Staging web online conectado a Supabase hosted y verificado con login demo:
-  `https://wiahost-l5e5e3d2i-globaltechsmartsolutions-projects.vercel.app`
+  `https://wiahost-staging.vercel.app`
 
 Importante: la web mantiene fallback demo para poder navegar sin entorno local, pero con `.env.local` configurado trabaja contra Supabase.
 

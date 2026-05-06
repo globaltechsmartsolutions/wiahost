@@ -221,12 +221,13 @@
 - Implementado: documento `docs/OBSERVABILITY.md` y auditor `pnpm quality:observability` integrado en `quality:ci`.
 - Implementado: runbook `docs/INCIDENT_RESPONSE.md` para severidades, diagnostico, rollback, comunicacion y cierre de incidentes.
 - Implementado: proyecto Vercel real `wiahost` enlazado, Root Directory `apps/web`, Node.js `22.x`, `.vercelignore` de monorepo y preview web desplegado.
-- Implementado: smoke test real de preview con `pnpm check:deployment` contra `https://wiahost-l5e5e3d2i-globaltechsmartsolutions-projects.vercel.app`.
+- Implementado: smoke test real de preview con `pnpm check:deployment` contra `https://wiahost-staging.vercel.app`.
 - Implementado: verificacion visual rapida de preview publico con Playwright: status 200, titulo/H1 correctos y sin errores de consola.
 - Implementado: plantilla `.env.staging.example`, script `pnpm staging:supabase` para link/dry-run/apply de migraciones Supabase hosted y script `pnpm vercel:env:sync` para sincronizar variables en Vercel sin imprimir secretos.
-- Implementado: proyecto Supabase hosted visible, migraciones aplicadas, tipos regenerados desde staging y preview conectado a Supabase hosted en `https://wiahost-l5e5e3d2i-globaltechsmartsolutions-projects.vercel.app`.
+- Implementado: proyecto Supabase hosted visible, migraciones aplicadas, tipos regenerados desde staging y preview conectado a Supabase hosted en `https://wiahost-staging.vercel.app`.
 - Implementado: `pnpm vercel:deploy:env` para crear previews con variables locales cuando Vercel todavia no tiene Git integration y no permite variables preview persistentes por rama.
 - Implementado: `pnpm staging:seed` para aplicar seed demo idempotente en Supabase hosted, verificar usuarios demo, datos minimos y login real contra staging.
 - Implementado: validacion browser de login demo en preview Vercel hasta `/dashboard` sin errores de consola.
 - Implementado: `pnpm staging:rotate-db-password` para rotar credenciales Postgres de staging, actualizar `.env.staging.local` y verificar el nuevo acceso sin imprimir secretos.
-- Pendiente: conectar GitHub repo en Vercel, configurar secretos `VERCEL_*` en GitHub Actions, backups Supabase hosted, Stripe test, observabilidad externa y cuentas de stores.
+- Implementado: alias estable `https://wiahost-staging.vercel.app` para demos, reasignable al ultimo preview validado.
+- Pendiente: autorizar la GitHub App de Vercel para `globaltechsmartsolutions/wiahost`, configurar secretos `VERCEL_*` en GitHub Actions, backups Supabase hosted, Stripe test, observabilidad externa y cuentas de stores.
