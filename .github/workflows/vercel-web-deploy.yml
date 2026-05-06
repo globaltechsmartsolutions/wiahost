@@ -19,6 +19,7 @@ jobs:
       VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
       VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
       VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+      VERCEL_SCOPE: globaltechsmartsolutions-projects
 
     steps:
       - name: Checkout
@@ -62,25 +63,25 @@ jobs:
 
       - name: Pull Vercel preview environment
         if: ${{ inputs.target == 'preview' }}
-        run: vercel pull --yes --environment=preview --token="$VERCEL_TOKEN"
+        run: vercel pull --yes --environment=preview --scope="$VERCEL_SCOPE" --token="$VERCEL_TOKEN"
 
       - name: Pull Vercel production environment
         if: ${{ inputs.target == 'production' }}
-        run: vercel pull --yes --environment=production --token="$VERCEL_TOKEN"
+        run: vercel pull --yes --environment=production --scope="$VERCEL_SCOPE" --token="$VERCEL_TOKEN"
 
       - name: Build preview artifact
         if: ${{ inputs.target == 'preview' }}
-        run: vercel build --token="$VERCEL_TOKEN"
+        run: vercel build --scope="$VERCEL_SCOPE" --token="$VERCEL_TOKEN"
 
       - name: Build production artifact
         if: ${{ inputs.target == 'production' }}
-        run: vercel build --prod --token="$VERCEL_TOKEN"
+        run: vercel build --prod --scope="$VERCEL_SCOPE" --token="$VERCEL_TOKEN"
 
       - name: Deploy preview artifact
         if: ${{ inputs.target == 'preview' }}
         id: deploy_preview
         run: |
-          url=$(vercel deploy --prebuilt --token="$VERCEL_TOKEN")
+          url=$(vercel deploy --prebuilt --scope="$VERCEL_SCOPE" --token="$VERCEL_TOKEN")
           echo "url=$url" >> "$GITHUB_OUTPUT"
           echo "### Preview deploy" >> "$GITHUB_STEP_SUMMARY"
           echo "$url" >> "$GITHUB_STEP_SUMMARY"
@@ -93,7 +94,7 @@ jobs:
         if: ${{ inputs.target == 'production' }}
         id: deploy_production
         run: |
-          url=$(vercel deploy --prebuilt --prod --token="$VERCEL_TOKEN")
+          url=$(vercel deploy --prebuilt --prod --scope="$VERCEL_SCOPE" --token="$VERCEL_TOKEN")
           echo "url=$url" >> "$GITHUB_OUTPUT"
           echo "### Production deploy" >> "$GITHUB_STEP_SUMMARY"
           echo "$url" >> "$GITHUB_STEP_SUMMARY"
