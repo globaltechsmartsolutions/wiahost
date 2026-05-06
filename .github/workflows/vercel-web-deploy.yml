@@ -57,35 +57,29 @@ jobs:
         run: npm install --global vercel@52.2.1
 
       - name: Link Vercel project
-        working-directory: apps/web
         run: |
           mkdir -p .vercel
           printf '{"orgId":"%s","projectId":"%s"}\n' "$VERCEL_ORG_ID" "$VERCEL_PROJECT_ID" > .vercel/project.json
 
       - name: Pull Vercel preview environment
         if: ${{ inputs.target == 'preview' }}
-        working-directory: apps/web
         run: vercel pull --yes --environment=preview --scope="$VERCEL_SCOPE" --token="$VERCEL_TOKEN"
 
       - name: Pull Vercel production environment
         if: ${{ inputs.target == 'production' }}
-        working-directory: apps/web
         run: vercel pull --yes --environment=production --scope="$VERCEL_SCOPE" --token="$VERCEL_TOKEN"
 
       - name: Build preview artifact
         if: ${{ inputs.target == 'preview' }}
-        working-directory: apps/web
         run: vercel build --scope="$VERCEL_SCOPE" --token="$VERCEL_TOKEN"
 
       - name: Build production artifact
         if: ${{ inputs.target == 'production' }}
-        working-directory: apps/web
         run: vercel build --prod --scope="$VERCEL_SCOPE" --token="$VERCEL_TOKEN"
 
       - name: Deploy preview artifact
         if: ${{ inputs.target == 'preview' }}
         id: deploy_preview
-        working-directory: apps/web
         run: |
           url=$(vercel deploy --prebuilt --scope="$VERCEL_SCOPE" --token="$VERCEL_TOKEN")
           echo "url=$url" >> "$GITHUB_OUTPUT"
@@ -99,7 +93,6 @@ jobs:
       - name: Deploy production artifact
         if: ${{ inputs.target == 'production' }}
         id: deploy_production
-        working-directory: apps/web
         run: |
           url=$(vercel deploy --prebuilt --prod --scope="$VERCEL_SCOPE" --token="$VERCEL_TOKEN")
           echo "url=$url" >> "$GITHUB_OUTPUT"
