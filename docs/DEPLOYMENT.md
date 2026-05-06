@@ -72,6 +72,7 @@ Estado actual:
 - Node.js configurado en `22.x`, alineado con GitHub Actions.
 - Deployment protection SSO desactivado para que las demos internas y `/api/health` sean accesibles.
 - Preview conectado a Supabase hosted verificado: `https://wiahost-staging.vercel.app`.
+- Production deployment automatico desde GitHub validado: `https://wiahost-bvwmr29o8-globaltechsmartsolutions-projects.vercel.app`.
 - Health check verificado con `pnpm check:deployment`.
 - `.vercelignore` reduce el upload del monorepo y mantiene fuera mobile, reports, artefactos, `.env` y migraciones raiz.
 
@@ -85,7 +86,7 @@ Staging conectado actual:
 
 Pendiente actual para endurecer staging/production:
 
-- Autorizar la GitHub App de Vercel para `globaltechsmartsolutions/wiahost` y conectar el repo dentro del proyecto Vercel para poder guardar variables `preview` por rama desde Vercel. El intento por CLI con `vercel git connect https://github.com/globaltechsmartsolutions/wiahost.git` fallo por falta de acceso de Vercel al repo.
+- Configurar `VERCEL_TOKEN`, `VERCEL_ORG_ID` y `VERCEL_PROJECT_ID` en GitHub Actions para poder ejecutar deploys manuales prebuilt desde workflows ademas del despliegue automatico de Vercel Git.
 - Ejecutar `pnpm vercel:deploy:env -- --file .env.staging.local --target preview` cuando se quiera crear un nuevo preview con variables locales sin depender de Git integration.
 - Configurar en Vercel/GitHub las variables runtime reales de Stripe test, Resend y Expo server-side cuando se activen.
 - Configurar en GitHub Actions `VERCEL_TOKEN`, `VERCEL_ORG_ID` y `VERCEL_PROJECT_ID`.

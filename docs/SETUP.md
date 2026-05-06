@@ -50,6 +50,7 @@ URLs locales verificadas:
 Preview online conectado verificado:
 
 - Web staging conectado: `https://wiahost-staging.vercel.app`
+- Web production Git deployment: `https://wiahost-bvwmr29o8-globaltechsmartsolutions-projects.vercel.app`
 - Health check: `pnpm check:deployment -- --url https://wiahost-staging.vercel.app`
 - Estado: build remoto en Vercel correcto, migraciones aplicadas en Supabase hosted y health check contra base real.
 

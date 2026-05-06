@@ -223,6 +223,7 @@
 - Implementado: proyecto Vercel real `wiahost` enlazado, Root Directory `apps/web`, Node.js `22.x`, `.vercelignore` de monorepo y preview web desplegado.
 - Implementado: smoke test real de preview con `pnpm check:deployment` contra `https://wiahost-staging.vercel.app`.
 - Implementado: verificacion visual rapida de preview publico con Playwright: status 200, titulo/H1 correctos y sin errores de consola.
+- Implementado: push de `main` a GitHub y deployment automatico Production de Vercel desde GitHub, validado con `/api/health` y login demo.
 - Implementado: plantilla `.env.staging.example`, script `pnpm staging:supabase` para link/dry-run/apply de migraciones Supabase hosted y script `pnpm vercel:env:sync` para sincronizar variables en Vercel sin imprimir secretos.
 - Implementado: proyecto Supabase hosted visible, migraciones aplicadas, tipos regenerados desde staging y preview conectado a Supabase hosted en `https://wiahost-staging.vercel.app`.
 - Implementado: `pnpm vercel:deploy:env` para crear previews con variables locales cuando Vercel todavia no tiene Git integration y no permite variables preview persistentes por rama.
@@ -231,4 +232,4 @@
 - Implementado: `pnpm staging:rotate-db-password` para rotar credenciales Postgres de staging, actualizar `.env.staging.local` y verificar el nuevo acceso sin imprimir secretos.
 - Implementado: alias estable `https://wiahost-staging.vercel.app` para demos, reasignable al ultimo preview validado.
 - Implementado: `pnpm staging:backup` para crear dumps locales ignorados por Git de Supabase hosted antes de cambios sensibles.
-- Pendiente: autorizar la GitHub App de Vercel para `globaltechsmartsolutions/wiahost`, configurar secretos `VERCEL_*` en GitHub Actions, backups automaticos Supabase hosted, Stripe test, observabilidad externa y cuentas de stores.
+- Pendiente: configurar secretos `VERCEL_*` en GitHub Actions, backups automaticos Supabase hosted, Stripe test, observabilidad externa y cuentas de stores.

@@ -24,6 +24,8 @@ El objetivo es centralizar propiedades, reservas, calendario multi-canal, mensaj
 - Paquete de tipos de base de datos en `packages/database`.
 - Staging web online conectado a Supabase hosted y verificado con login demo:
   `https://wiahost-staging.vercel.app`
+- Production deployment automatico desde GitHub validado:
+  `https://wiahost-bvwmr29o8-globaltechsmartsolutions-projects.vercel.app`
 
 Importante: la web mantiene fallback demo para poder navegar sin entorno local, pero con `.env.local` configurado trabaja contra Supabase.
 
