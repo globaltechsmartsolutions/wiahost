@@ -71,9 +71,9 @@ Estado actual:
 - Root Directory configurado en `apps/web`.
 - Node.js configurado en `22.x`, alineado con GitHub Actions.
 - Deployment protection SSO desactivado para que las demos internas y `/api/health` sean accesibles.
-- Preview conectado a Supabase hosted verificado: `https://wiahost-2mt44dmsd-globaltechsmartsolutions-projects.vercel.app`.
+- Preview conectado a Supabase hosted verificado: `https://wiahost-l5e5e3d2i-globaltechsmartsolutions-projects.vercel.app`.
 - Health check verificado con `pnpm check:deployment`.
-- `.vercelignore` reduce el upload del monorepo y mantiene fuera mobile, reports, artefactos, `.env` y migraciones raíz.
+- `.vercelignore` reduce el upload del monorepo y mantiene fuera mobile, reports, artefactos, `.env` y migraciones raiz.
 
 Staging conectado actual:
 
@@ -155,11 +155,22 @@ pnpm staging:supabase
 pnpm staging:supabase -- --apply
 pnpm staging:seed
 pnpm staging:seed -- --apply
+pnpm staging:rotate-db-password
+pnpm staging:rotate-db-password -- --apply
 pnpm vercel:env:sync -- --file .env.staging.local --environment preview
 pnpm vercel:deploy:env -- --file .env.staging.local --target preview
 ```
 
-`staging:supabase` enlaza Supabase hosted, primero en dry-run y despues con `--apply` para aplicar migraciones. `staging:seed` hace dry-run del seed demo y con `--apply` aplica `supabase/seed.sql`, verifica usuarios Auth, datos minimos y login demo sin imprimir secretos. `vercel:env:sync` configura variables persistentes en el proyecto Vercel. Si el proyecto Vercel aun no tiene Git repo conectado, `preview` puede exigir rama y fallar; en ese caso usar `vercel:deploy:env`, que crea un deployment con variables de build/runtime desde `.env.staging.local` sin imprimir valores. Estos scripts ignoran claves locales como `SUPABASE_ACCESS_TOKEN`, `SUPABASE_PROJECT_REF` y `SUPABASE_DB_PASSWORD`, y fallan si detectan placeholders.
+`staging:supabase` enlaza Supabase hosted, primero en dry-run y despues con `--apply` para aplicar migraciones. `staging:seed` hace dry-run del seed demo y con `--apply` aplica `supabase/seed.sql`, verifica usuarios Auth, datos minimos y login demo sin imprimir secretos. `staging:rotate-db-password` genera una contrasena nueva para el rol Postgres, actualiza `.env.staging.local`, verifica el nuevo valor con un dry-run de seed y deja un reporte local sin secretos. `vercel:env:sync` configura variables persistentes en el proyecto Vercel. Si el proyecto Vercel aun no tiene Git repo conectado, `preview` puede exigir rama y fallar; en ese caso usar `vercel:deploy:env`, que crea un deployment con variables de build/runtime desde `.env.staging.local` sin imprimir valores. Estos scripts ignoran claves locales como `SUPABASE_ACCESS_TOKEN`, `SUPABASE_PROJECT_REF` y `SUPABASE_DB_PASSWORD`, y fallan si detectan placeholders.
+
+`staging:rotate-db-password -- --apply` requiere `SUPABASE_ACCESS_TOKEN` solo en la variable de entorno de la terminal. No guardarlo en Git ni en archivos compartidos.
+
+Si un token personal de Supabase se pega por error en un chat, revocarlo manualmente en la cuenta de Supabase y hacer login de nuevo en la CLI:
+
+```bash
+pnpm exec supabase logout
+pnpm exec supabase login
+```
 
 Usuarios demo de staging:
 
@@ -173,7 +184,7 @@ limpieza@wiahost.local / Password123!
 La URL preview conectada y validada con login demo es:
 
 ```text
-https://wiahost-2mt44dmsd-globaltechsmartsolutions-projects.vercel.app
+https://wiahost-l5e5e3d2i-globaltechsmartsolutions-projects.vercel.app
 ```
 
 ## Checklist antes de crear staging

@@ -49,8 +49,8 @@ URLs locales verificadas:
 
 Preview online conectado verificado:
 
-- Web staging conectado: `https://wiahost-2mt44dmsd-globaltechsmartsolutions-projects.vercel.app`
-- Health check: `pnpm check:deployment -- --url https://wiahost-2mt44dmsd-globaltechsmartsolutions-projects.vercel.app`
+- Web staging conectado: `https://wiahost-l5e5e3d2i-globaltechsmartsolutions-projects.vercel.app`
+- Health check: `pnpm check:deployment -- --url https://wiahost-l5e5e3d2i-globaltechsmartsolutions-projects.vercel.app`
 - Estado: build remoto en Vercel correcto, migraciones aplicadas en Supabase hosted y health check contra base real.
 
 Preparacion de staging hosted:
@@ -61,11 +61,15 @@ pnpm staging:supabase
 pnpm staging:supabase -- --apply
 pnpm staging:seed
 pnpm staging:seed -- --apply
+pnpm staging:rotate-db-password
+pnpm staging:rotate-db-password -- --apply
 pnpm vercel:env:sync -- --file .env.staging.local --environment preview
 pnpm vercel:deploy:env -- --file .env.staging.local --target preview
 ```
 
-`pnpm staging:supabase` hace primero un dry-run de migraciones. Solo `--apply` aplica cambios reales y regenera tipos desde el proyecto linked. `pnpm staging:seed` valida el seed demo en seco y `--apply` lo aplica en hosted, verifica usuarios demo, datos minimos y login de operaciones. `pnpm vercel:env:sync` envia variables persistentes a Vercel sin imprimir valores y bloquea placeholders. Si Vercel no tiene Git conectado y preview exige rama, usar `pnpm vercel:deploy:env` para crear un deployment preview con variables locales de forma segura.
+`pnpm staging:supabase` hace primero un dry-run de migraciones. Solo `--apply` aplica cambios reales y regenera tipos desde el proyecto linked. `pnpm staging:seed` valida el seed demo en seco y `--apply` lo aplica en hosted, verifica usuarios demo, datos minimos y login de operaciones. `pnpm staging:rotate-db-password` rota la contrasena de Postgres, actualiza `.env.staging.local` y verifica que el nuevo valor sirve para operar contra staging. `pnpm vercel:env:sync` envia variables persistentes a Vercel sin imprimir valores y bloquea placeholders. Si Vercel no tiene Git conectado y preview exige rama, usar `pnpm vercel:deploy:env` para crear un deployment preview con variables locales de forma segura.
+
+Para aplicar `pnpm staging:rotate-db-password -- --apply`, exportar `SUPABASE_ACCESS_TOKEN` solo en la terminal y no guardarlo en archivos del proyecto.
 
 Usuarios demo tras `pnpm db:reset`:
 
@@ -77,7 +81,7 @@ Usuarios demo tras `pnpm db:reset`:
 Los mismos usuarios quedan disponibles en staging hosted tras `pnpm staging:seed -- --apply`. La URL verificada actualmente es:
 
 ```text
-https://wiahost-2mt44dmsd-globaltechsmartsolutions-projects.vercel.app
+https://wiahost-l5e5e3d2i-globaltechsmartsolutions-projects.vercel.app
 ```
 
 Login demo recomendado para revisar el panel:

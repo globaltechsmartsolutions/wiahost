@@ -23,7 +23,7 @@ El objetivo es centralizar propiedades, reservas, calendario multi-canal, mensaj
 - Paquetes compartidos para tipos y validaciones en `packages/shared`.
 - Paquete de tipos de base de datos en `packages/database`.
 - Staging web online conectado a Supabase hosted y verificado con login demo:
-  `https://wiahost-2mt44dmsd-globaltechsmartsolutions-projects.vercel.app`
+  `https://wiahost-l5e5e3d2i-globaltechsmartsolutions-projects.vercel.app`
 
 Importante: la web mantiene fallback demo para poder navegar sin entorno local, pero con `.env.local` configurado trabaja contra Supabase.
 
@@ -109,6 +109,7 @@ pnpm check:deployment -- --url https://tu-preview.vercel.app
 pnpm accounts:check
 pnpm staging:supabase
 pnpm staging:seed
+pnpm staging:rotate-db-password
 pnpm audit:web
 pnpm audit:lighthouse
 pnpm supabase:start
