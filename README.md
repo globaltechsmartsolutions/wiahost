@@ -110,6 +110,7 @@ pnpm accounts:check
 pnpm staging:supabase
 pnpm staging:seed
 pnpm staging:rotate-db-password
+pnpm staging:backup
 pnpm audit:web
 pnpm audit:lighthouse
 pnpm supabase:start

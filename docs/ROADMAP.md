@@ -230,4 +230,5 @@
 - Implementado: validacion browser de login demo en preview Vercel hasta `/dashboard` sin errores de consola.
 - Implementado: `pnpm staging:rotate-db-password` para rotar credenciales Postgres de staging, actualizar `.env.staging.local` y verificar el nuevo acceso sin imprimir secretos.
 - Implementado: alias estable `https://wiahost-staging.vercel.app` para demos, reasignable al ultimo preview validado.
-- Pendiente: autorizar la GitHub App de Vercel para `globaltechsmartsolutions/wiahost`, configurar secretos `VERCEL_*` en GitHub Actions, backups Supabase hosted, Stripe test, observabilidad externa y cuentas de stores.
+- Implementado: `pnpm staging:backup` para crear dumps locales ignorados por Git de Supabase hosted antes de cambios sensibles.
+- Pendiente: autorizar la GitHub App de Vercel para `globaltechsmartsolutions/wiahost`, configurar secretos `VERCEL_*` en GitHub Actions, backups automaticos Supabase hosted, Stripe test, observabilidad externa y cuentas de stores.

@@ -157,11 +157,13 @@ pnpm staging:seed
 pnpm staging:seed -- --apply
 pnpm staging:rotate-db-password
 pnpm staging:rotate-db-password -- --apply
+pnpm staging:backup
+pnpm staging:backup -- --apply
 pnpm vercel:env:sync -- --file .env.staging.local --environment preview
 pnpm vercel:deploy:env -- --file .env.staging.local --target preview
 ```
 
-`staging:supabase` enlaza Supabase hosted, primero en dry-run y despues con `--apply` para aplicar migraciones. `staging:seed` hace dry-run del seed demo y con `--apply` aplica `supabase/seed.sql`, verifica usuarios Auth, datos minimos y login demo sin imprimir secretos. `staging:rotate-db-password` genera una contrasena nueva para el rol Postgres, actualiza `.env.staging.local`, verifica el nuevo valor con un dry-run de seed y deja un reporte local sin secretos. `vercel:env:sync` configura variables persistentes en el proyecto Vercel. Si el proyecto Vercel aun no tiene Git repo conectado, `preview` puede exigir rama y fallar; en ese caso usar `vercel:deploy:env`, que crea un deployment con variables de build/runtime desde `.env.staging.local` sin imprimir valores. Estos scripts ignoran claves locales como `SUPABASE_ACCESS_TOKEN`, `SUPABASE_PROJECT_REF` y `SUPABASE_DB_PASSWORD`, y fallan si detectan placeholders.
+`staging:supabase` enlaza Supabase hosted, primero en dry-run y despues con `--apply` para aplicar migraciones. `staging:seed` hace dry-run del seed demo y con `--apply` aplica `supabase/seed.sql`, verifica usuarios Auth, datos minimos y login demo sin imprimir secretos. `staging:rotate-db-password` genera una contrasena nueva para el rol Postgres, actualiza `.env.staging.local`, verifica el nuevo valor con un dry-run de seed y deja un reporte local sin secretos. `staging:backup` crea un dump local ignorado por Git en `supabase/backups`. `vercel:env:sync` configura variables persistentes en el proyecto Vercel. Si el proyecto Vercel aun no tiene Git repo conectado, `preview` puede exigir rama y fallar; en ese caso usar `vercel:deploy:env`, que crea un deployment con variables de build/runtime desde `.env.staging.local` sin imprimir valores. Estos scripts ignoran claves locales como `SUPABASE_ACCESS_TOKEN`, `SUPABASE_PROJECT_REF` y `SUPABASE_DB_PASSWORD`, y fallan si detectan placeholders.
 
 `staging:rotate-db-password -- --apply` requiere `SUPABASE_ACCESS_TOKEN` solo en la variable de entorno de la terminal. No guardarlo en Git ni en archivos compartidos.
 

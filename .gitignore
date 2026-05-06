@@ -41,6 +41,7 @@ Thumbs.db
 # Supabase
 supabase/.branches
 supabase/.temp
+supabase/backups
 
 # Vercel local link and pulled environment files
 .vercel
