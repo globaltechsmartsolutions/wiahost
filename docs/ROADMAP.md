@@ -56,6 +56,7 @@
 - Implementado: Supabase local verificado con Auth, seed demo, tipos generados y escrituras reales desde UI/API.
 - Implementado: proteccion de rutas web con `proxy.ts` de Next.js 16 usando Supabase Auth.
 - Implementado: Playwright E2E inicial para landing/login/register, redireccion anonima, login demo, creacion/edicion de reserva UI/API, owners/settings, guests/calendar y mutaciones completas de tareas, incidencias e inbox.
+- Implementado: suite E2E de seguridad API con accesos anonimos rechazados, payloads invalidos, IDs invalidos, rutas inseguras de documentos, checkout/webhook defensivos y `/api/health` sin exposicion de secretos.
 - Implementado: auditoria de accesibilidad con axe sobre rutas publicas, protegidas, calendario, guests, detalle, edicion de operaciones, owners y settings.
 - Implementado: baseline visual inicial para landing/auth y check de alineacion del dashboard.
 - Implementado: visual checks de densidad/overflow para rutas operativas, detalle/edicion de operaciones, calendar/guests, owners/settings y gestion de propiedades en desktop portatil.
@@ -80,6 +81,7 @@
 - Implementado: `/api/health` con snapshot JSON de app, Supabase, base de datos, Stripe y metadata segura de runtime/deploy para monitorizacion futura.
 - Implementado: tests unitarios extra de servicios criticos para importacion iCal, deduplicacion de bloqueos, sync events y enlaces firmados de documentos/Storage con rechazo de rutas inseguras.
 - Implementado: tests unitarios de pagos para checkout demo, Stripe Checkout simulado, rechazo de token invalido y confirmacion Stripe con actualizacion de reserva y evento de sincronizacion.
+- Implementado: validacion local completa de calidad web con 40 unit tests, typecheck limpio y 30 E2E operativos/smoke/seguridad pasando en Playwright.
 - Implementado: CI inicial con typecheck, lint, unit tests, `pnpm quality:ci`, build web, Lighthouse CI no bloqueante y artefactos de reportes JSON/Lighthouse.
 - Implementado: CI valida tambien `build:mobile` y export Expo web para detectar errores de bundling movil antes de publicar.
 - Implementado: snapshots visuales estrictos de primer viewport para dashboard, reservas, calendario, distribucion y pagos en portatil 1366x768.

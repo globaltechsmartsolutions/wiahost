@@ -1020,16 +1020,16 @@ test.describe("operations flows with Supabase @critical @data", () => {
       data: { checkoutUrl: string };
     };
     expect(checkoutLinkBody.data.checkoutUrl).toContain("/checkout/");
+    const checkoutUrl = new URL(checkoutLinkBody.data.checkoutUrl);
+    const checkoutPath = `${checkoutUrl.pathname}${checkoutUrl.search}`;
 
-    await page.goto(checkoutLinkBody.data.checkoutUrl);
+    await page.goto(checkoutPath);
     await expect(
       page.getByRole("heading", { name: /confirma tu reserva directa/i }),
     ).toBeVisible();
     await expect(page.getByText(`${amount} EUR`).first()).toBeVisible();
 
-    const checkoutToken = new URL(
-      checkoutLinkBody.data.checkoutUrl,
-    ).searchParams.get("token");
+    const checkoutToken = checkoutUrl.searchParams.get("token");
     expect(checkoutToken).toBeTruthy();
 
     const checkoutConfirmResponse = await page.request.post(
@@ -1038,8 +1038,12 @@ test.describe("operations flows with Supabase @critical @data", () => {
     );
     expect(checkoutConfirmResponse.status()).toBe(200);
 
-    await page.goto(checkoutLinkBody.data.checkoutUrl);
-    await expect(page.getByText("Pago confirmado")).toBeVisible();
+    await page.goto(checkoutPath);
+    await expect(page.getByText("Resumen del pago")).toBeVisible();
+    await expect(page.getByText("Pagado")).toBeVisible();
+    await expect(
+      page.getByRole("link", { name: /volver a wiahost/i }),
+    ).toBeVisible();
 
     const updatedAmount = amount + 1;
     const paymentPatchResponse = await page.request.patch(
