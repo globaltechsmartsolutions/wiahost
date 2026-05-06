@@ -25,10 +25,7 @@ function argValue(name, fallback) {
 
 const envFile = argValue("--file", ".env.staging.local");
 const targetEnvironment = argValue("--environment", "preview");
-const gitBranch = argValue(
-  "--git-branch",
-  targetEnvironment === "preview" ? "main" : "",
-);
+const gitBranch = argValue("--git-branch", "");
 const allowedEnvironments = new Set(["development", "preview", "production"]);
 
 function fail(message) {
@@ -182,11 +179,11 @@ for (const entry of entries) {
         entry.key,
         targetEnvironment,
         ...(gitBranch ? [gitBranch] : []),
-        "--force",
-        "--yes",
-        sensitivityFlag,
         "--value",
         entry.value,
+        "--yes",
+        "--force",
+        sensitivityFlag,
       ],
       entry.value,
     );
