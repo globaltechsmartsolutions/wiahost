@@ -7,6 +7,10 @@ import {
   uniqueName,
 } from "./helpers";
 
+function uniqueFutureOffset(base = 180) {
+  return base + (Date.now() % 20_000);
+}
+
 test.describe("operations flows with Supabase @critical @data", () => {
   test.beforeEach(async ({ page }) => {
     await signInAsDemoOperator(page);
@@ -16,14 +20,15 @@ test.describe("operations flows with Supabase @critical @data", () => {
     page,
   }) => {
     const guestName = uniqueName("E2E Reserva");
+    const dateOffset = uniqueFutureOffset();
 
     await page.goto("/reservations");
     await page.locator("#guestFullName").fill(guestName);
     await page
       .locator("#guestEmail")
       .fill(`${guestName.toLowerCase().replaceAll(" ", ".")}@example.com`);
-    await page.locator("#checkIn").fill(isoDateFromToday(30));
-    await page.locator("#checkOut").fill(isoDateFromToday(33));
+    await page.locator("#checkIn").fill(isoDateFromToday(dateOffset));
+    await page.locator("#checkOut").fill(isoDateFromToday(dateOffset + 3));
     await page.locator("#guestsCount").fill("3");
     await page.locator("#nightlyRate").fill("155");
     await page.locator("#cleaningFee").fill("45");
@@ -47,8 +52,8 @@ test.describe("operations flows with Supabase @critical @data", () => {
       {
         data: {
           channel: "direct",
-          checkIn: isoDateFromToday(31),
-          checkOut: isoDateFromToday(34),
+          checkIn: isoDateFromToday(dateOffset + 1),
+          checkOut: isoDateFromToday(dateOffset + 4),
           cleaningFee: 50,
           guestEmail: `${updatedGuestName.toLowerCase().replaceAll(" ", ".")}@example.com`,
           guestFullName: updatedGuestName,
@@ -85,6 +90,73 @@ test.describe("operations flows with Supabase @critical @data", () => {
     await page.goto(`/reservations?q=${encodeURIComponent(updatedGuestName)}`);
     await expect(page.getByText(`Mostrando 1 de`)).toBeVisible();
     await expect(page.getByText(updatedGuestName)).toBeVisible();
+  });
+
+  test("rejects overlapping reservations and allows same-day turnover", async ({
+    page,
+  }) => {
+    const dateOffset = uniqueFutureOffset(500);
+    const guestName = uniqueName("E2E Anti Overbooking");
+    const firstReservationResponse = await page.request.post(
+      "/api/reservations",
+      {
+        data: {
+          channel: "direct",
+          checkIn: isoDateFromToday(dateOffset),
+          checkOut: isoDateFromToday(dateOffset + 2),
+          cleaningFee: 35,
+          guestEmail: `${guestName.toLowerCase().replaceAll(" ", ".")}@example.com`,
+          guestFullName: guestName,
+          guestsCount: 2,
+          nightlyRate: 160,
+          propertyId: seedIds.propertyId,
+          securityDeposit: 0,
+          status: "confirmed",
+          taxesAmount: 0,
+        },
+      },
+    );
+    expect(firstReservationResponse.status()).toBe(201);
+
+    const overlapResponse = await page.request.post("/api/reservations", {
+      data: {
+        channel: "booking",
+        checkIn: isoDateFromToday(dateOffset + 1),
+        checkOut: isoDateFromToday(dateOffset + 3),
+        cleaningFee: 35,
+        guestEmail: `${guestName.toLowerCase().replaceAll(" ", ".")}.overlap@example.com`,
+        guestFullName: `${guestName} overlap`,
+        guestsCount: 2,
+        nightlyRate: 165,
+        propertyId: seedIds.propertyId,
+        securityDeposit: 0,
+        status: "confirmed",
+        taxesAmount: 0,
+      },
+    });
+    expect(overlapResponse.status()).toBe(400);
+    const overlapBody = (await overlapResponse.json()) as {
+      error?: { code?: string };
+    };
+    expect(overlapBody.error?.code).toBe("reservation_date_conflict");
+
+    const turnoverResponse = await page.request.post("/api/reservations", {
+      data: {
+        channel: "manual",
+        checkIn: isoDateFromToday(dateOffset + 2),
+        checkOut: isoDateFromToday(dateOffset + 4),
+        cleaningFee: 35,
+        guestEmail: `${guestName.toLowerCase().replaceAll(" ", ".")}.turnover@example.com`,
+        guestFullName: `${guestName} turnover`,
+        guestsCount: 2,
+        nightlyRate: 165,
+        propertyId: seedIds.propertyId,
+        securityDeposit: 0,
+        status: "confirmed",
+        taxesAmount: 0,
+      },
+    });
+    expect(turnoverResponse.status()).toBe(201);
   });
 
   test("creates and updates task, incident and inbox records through authenticated API routes", async ({
@@ -860,8 +932,10 @@ test.describe("operations flows with Supabase @critical @data", () => {
     page,
   }) => {
     const sourceName = uniqueName("E2E iCal");
-    const startDate = isoDateFromToday(120).replaceAll("-", "");
-    const endDate = isoDateFromToday(123).replaceAll("-", "");
+    const dateOffset = uniqueFutureOffset(700);
+    const startDate = isoDateFromToday(dateOffset).replaceAll("-", "");
+    const endDate = isoDateFromToday(dateOffset + 3).replaceAll("-", "");
+    const summary = uniqueName("Busy from Airbnb");
     const icalResponse = await page.request.post("/api/ical/import", {
       data: {
         channel: "airbnb",
@@ -871,7 +945,7 @@ test.describe("operations flows with Supabase @critical @data", () => {
           "BEGIN:VEVENT",
           `DTSTART;VALUE=DATE:${startDate}`,
           `DTEND;VALUE=DATE:${endDate}`,
-          "SUMMARY:Busy from Airbnb",
+          `SUMMARY:${summary}`,
           "END:VEVENT",
           "END:VCALENDAR",
         ].join("\r\n"),
@@ -895,12 +969,13 @@ test.describe("operations flows with Supabase @critical @data", () => {
     page,
   }) => {
     const guestName = uniqueName("E2E Lead Directo");
+    const dateOffset = uniqueFutureOffset(900);
     const inquiryResponse = await page.request.post(
       "/api/book/loft-malaga-centro/inquiries",
       {
         data: {
-          checkIn: isoDateFromToday(60),
-          checkOut: isoDateFromToday(63),
+          checkIn: isoDateFromToday(dateOffset),
+          checkOut: isoDateFromToday(dateOffset + 3),
           consent: true,
           guestEmail: `${guestName.toLowerCase().replaceAll(" ", ".")}@example.com`,
           guestFullName: guestName,

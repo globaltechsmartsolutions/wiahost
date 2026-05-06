@@ -82,6 +82,7 @@
 - Implementado: tests unitarios extra de servicios criticos para importacion iCal, deduplicacion de bloqueos, sync events y enlaces firmados de documentos/Storage con rechazo de rutas inseguras.
 - Implementado: tests unitarios de pagos para checkout demo, Stripe Checkout simulado, rechazo de token invalido y confirmacion Stripe con actualizacion de reserva y evento de sincronizacion.
 - Implementado: validacion local completa de calidad web con 40 unit tests, typecheck limpio y 30 E2E operativos/smoke/seguridad pasando en Playwright.
+- Implementado: matriz de riesgos de testing basada en fallos reales de PMS/channel managers (`docs/TESTING_RISK_MATRIX.md`) y cobertura anti-overbooking con servicio, E2E y constraint SQL.
 - Implementado: CI inicial con typecheck, lint, unit tests, `pnpm quality:ci`, build web, Lighthouse CI no bloqueante y artefactos de reportes JSON/Lighthouse.
 - Implementado: CI valida tambien `build:mobile` y export Expo web para detectar errores de bundling movil antes de publicar.
 - Implementado: snapshots visuales estrictos de primer viewport para dashboard, reservas, calendario, distribucion y pagos en portatil 1366x768.
@@ -127,6 +128,7 @@
 - Implementado: conectores de cuentas externas por canal sobre `channel_accounts`, con estado, modo auth sin secretos, scopes, health, notas y API GET/POST/GET detail/PATCH/DELETE.
 - Implementado: registro de eventos de sincronizacion sobre `channel_sync_events`, con canal, direccion, estado, payload JSON, errores y API GET/POST.
 - Implementado: motor publico de reserva directa `/book/[slug]`, conectado a `property_listings.public_slug`, con formulario de solicitud, creacion segura de guest, reservation en estado `inquiry`, conversation, mensaje inbound y evento de sync directo.
+- Implementado: guard de disponibilidad para reserva directa/manual que bloquea solapes con reservas activas, pendientes o check-in, y tambien bloqueos de calendario importados por canales.
 - Implementado: pipeline comercial `/leads` para revisar solicitudes directas, abrir el hilo de inbox, ver la reserva, preparar pago pendiente `direct_checkout`, generar checkout tokenizado y convertir/cancelar leads mediante Server Action/API.
 - Implementado: export iCal publico `/api/ical/[slug]` para disponibilidad de anuncios publicados, sin exponer datos personales de huespedes.
 - Implementado: import iCal basico `/api/ical/import` y formulario en `/distribution` para convertir VEVENT externos en bloqueos de calendario y registrar sync inbound.

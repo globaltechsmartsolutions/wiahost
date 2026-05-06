@@ -80,4 +80,91 @@ describe("Expo push helpers", () => {
       }),
     );
   });
+
+  it("sends large batches in multiple Expo-compliant requests", async () => {
+    const fetcher = vi.fn(async () =>
+      Response.json({
+        data: [{ id: "ticket", status: "ok" }],
+      }),
+    );
+    const messages = Array.from({ length: 205 }, (_, index) =>
+      buildExpoPushMessage({
+        title: `Operacion ${index}`,
+        token: `ExpoPushToken[token-${index}]`,
+      }),
+    );
+
+    await sendExpoPushNotifications(messages, { fetcher });
+
+    const firstRequest = fetcher.mock.calls[0] as unknown as [
+      string,
+      RequestInit,
+    ];
+    const thirdRequest = fetcher.mock.calls[2] as unknown as [
+      string,
+      RequestInit,
+    ];
+
+    expect(fetcher).toHaveBeenCalledTimes(3);
+    expect(JSON.parse(firstRequest[1].body as string)).toHaveLength(100);
+    expect(JSON.parse(thirdRequest[1].body as string)).toHaveLength(5);
+  });
+
+  it("surfaces Expo ticket errors such as DeviceNotRegistered", async () => {
+    const fetcher = vi.fn(async () =>
+      Response.json({
+        data: [
+          {
+            details: { error: "DeviceNotRegistered" },
+            message: "Device is not registered",
+            status: "error",
+          },
+        ],
+      }),
+    );
+
+    const result = await sendExpoPushNotifications(
+      [
+        buildExpoPushMessage({
+          title: "Inbox urgente",
+          token: "ExpoPushToken[dead-device]",
+        }),
+      ],
+      { fetcher },
+    );
+
+    expect(result.tickets).toEqual([
+      {
+        details: { error: "DeviceNotRegistered" },
+        message: "Device is not registered",
+        status: "error",
+      },
+    ]);
+  });
+
+  it("throws when Expo rejects the whole request", async () => {
+    const fetcher = vi.fn(async () =>
+      Response.json(
+        {
+          errors: [{ code: "TOO_MANY_REQUESTS", message: "Slow down" }],
+        },
+        { status: 429 },
+      ),
+    );
+
+    await expect(
+      sendExpoPushNotifications(
+        [
+          buildExpoPushMessage({
+            title: "Inbox urgente",
+            token: "ExpoPushToken[abc123]",
+          }),
+        ],
+        { fetcher },
+      ),
+    ).rejects.toMatchObject({
+      code: "TOO_MANY_REQUESTS",
+      status: 429,
+    } satisfies Partial<ExpoPushRequestError>);
+  });
 });

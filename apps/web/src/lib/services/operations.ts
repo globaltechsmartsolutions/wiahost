@@ -7,6 +7,10 @@ import type {
   TaskInput,
 } from "@wiahost/shared";
 import type { createSupabaseServerClient } from "@/lib/supabase/server";
+import {
+  assertPropertyDateRangeAvailable,
+  AvailabilityConflictError,
+} from "@/lib/services/availability";
 import { createPaymentCheckoutLink } from "@/lib/services/payments";
 import {
   sendOperationalPushSafely,
@@ -28,6 +32,14 @@ export class OperationMutationError extends Error {
 
 function mutationError(code: string, message: string): never {
   throw new OperationMutationError(code, message);
+}
+
+function mapAvailabilityConflict(error: unknown): never {
+  if (error instanceof AvailabilityConflictError) {
+    mutationError(error.code, error.message);
+  }
+
+  throw error;
 }
 
 async function recordOperationalEvent(
@@ -170,6 +182,16 @@ export async function createManualReservation(
   input: ManualReservationInput,
   userId: string,
 ) {
+  try {
+    await assertPropertyDateRangeAvailable(supabase, {
+      checkIn: input.checkIn,
+      checkOut: input.checkOut,
+      propertyId: input.propertyId,
+    });
+  } catch (error) {
+    mapAvailabilityConflict(error);
+  }
+
   const { data: guest, error: guestError } = await supabase
     .from("guests")
     .insert({
@@ -470,6 +492,17 @@ export async function updateManualReservation(
   input: ManualReservationInput,
   userId: string,
 ) {
+  try {
+    await assertPropertyDateRangeAvailable(supabase, {
+      checkIn: input.checkIn,
+      checkOut: input.checkOut,
+      excludeReservationId: reservationId,
+      propertyId: input.propertyId,
+    });
+  } catch (error) {
+    mapAvailabilityConflict(error);
+  }
+
   const { data: existing, error: existingError } = await supabase
     .from("reservations")
     .select("guest_id")

@@ -340,10 +340,17 @@ export async function importIcalBlocks(
       (block) => `${block.start_date}|${block.end_date}|${block.reason}`,
     ),
   );
-  const newEvents = parsedEvents.filter(
-    (event) =>
-      !existingKeys.has(`${event.startDate}|${event.endDate}|${event.reason}`),
-  );
+  const seenImportKeys = new Set<string>();
+  const newEvents = parsedEvents.filter((event) => {
+    const key = `${event.startDate}|${event.endDate}|${event.reason}`;
+
+    if (existingKeys.has(key) || seenImportKeys.has(key)) {
+      return false;
+    }
+
+    seenImportKeys.add(key);
+    return true;
+  });
 
   if (newEvents.length) {
     const { error: insertError } = await supabase

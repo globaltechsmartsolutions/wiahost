@@ -148,4 +148,69 @@ describe("distribution services", () => {
       code: "ical_import_empty",
     } satisfies Partial<DistributionMutationError>);
   });
+
+  it("deduplicates repeated events inside the same iCal feed", async () => {
+    const { inserts, supabase } = createDistributionSupabaseMock();
+
+    const result = await importIcalBlocks(supabase as never, {
+      channel: "vrbo",
+      icalText: [
+        "BEGIN:VCALENDAR",
+        "BEGIN:VEVENT",
+        "DTSTART;VALUE=DATE:20260520",
+        "DTEND;VALUE=DATE:20260522",
+        "SUMMARY:VRBO reservation",
+        "END:VEVENT",
+        "BEGIN:VEVENT",
+        "DTSTART;VALUE=DATE:20260520",
+        "DTEND;VALUE=DATE:20260522",
+        "SUMMARY:VRBO reservation",
+        "END:VEVENT",
+        "END:VCALENDAR",
+      ].join("\n"),
+      propertyId: "property-1",
+      sourceName: "VRBO",
+    });
+
+    expect(result).toEqual({
+      imported: 1,
+      parsed: 2,
+      skipped: 1,
+    });
+    expect(inserts.calendar_blocks).toHaveLength(1);
+    expect(inserts.calendar_blocks![0]).toHaveLength(1);
+  });
+
+  it("handles folded iCal lines and limits imports to 100 events", async () => {
+    const { inserts, supabase } = createDistributionSupabaseMock();
+    const yyyymmdd = (offset: number) => {
+      const date = new Date("2026-07-01T00:00:00Z");
+      date.setUTCDate(date.getUTCDate() + offset);
+      return date.toISOString().slice(0, 10).replaceAll("-", "");
+    };
+    const events = Array.from({ length: 105 }, (_, index) => {
+      return [
+        "BEGIN:VEVENT",
+        `DTSTART;VALUE=DATE:${yyyymmdd(index)}`,
+        `DTEND;VALUE=DATE:${yyyymmdd(index + 1)}`,
+        "SUMMARY:Very long reservation title that",
+        " continues after line folding",
+        "END:VEVENT",
+      ].join("\n");
+    });
+
+    const result = await importIcalBlocks(supabase as never, {
+      channel: "booking",
+      icalText: ["BEGIN:VCALENDAR", ...events, "END:VCALENDAR"].join("\n"),
+      propertyId: "property-1",
+      sourceName: "Booking",
+    });
+
+    expect(result.parsed).toBe(100);
+    expect(result.imported).toBe(100);
+    expect(inserts.calendar_blocks![0]).toHaveLength(100);
+    expect(
+      (inserts.calendar_blocks![0] as Array<{ reason: string }>)[0]!.reason,
+    ).toBe("iCal Booking: Very long reservation title thatcontinues after line folding");
+  });
 });

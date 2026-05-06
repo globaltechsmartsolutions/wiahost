@@ -143,6 +143,21 @@ if (/using\s*\(\s*true\s*\)/i.test(sql)) {
   );
 }
 
+if (
+  !/reservations_no_active_date_overlap/i.test(sql) ||
+  !/exclude\s+using\s+gist[\s\S]*daterange\s*\(\s*check_in\s*,\s*check_out\s*,\s*'\[\)'\s*\)\s+with\s+&&/i.test(
+    sql,
+  )
+) {
+  addFinding(
+    findings,
+    "critical",
+    "missing_reservation_overlap_guard",
+    "Reservations need a database-level overlap guard to prevent double bookings for active stays.",
+    "public.reservations",
+  );
+}
+
 const blockingFindings = findings.filter((finding) =>
   ["high", "critical"].includes(finding.severity),
 );

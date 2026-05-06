@@ -288,6 +288,34 @@ describe("payment services", () => {
     expect(updates.payments).toBeUndefined();
   });
 
+  it("does not double-process already paid demo checkout confirmations", async () => {
+    const { inserts, supabase, updates } = createPaymentsSupabaseMock(
+      createPaymentRow({
+        metadata: {
+          checkout: {
+            status: "paid",
+            token: "checkout-token-valid-token",
+          },
+        },
+        status: "paid",
+      }),
+    );
+    paymentServiceMocks.adminClient = supabase;
+
+    const result = await confirmDemoCheckoutPayment(
+      "12345678-aaaa-4bbb-8ccc-123456789abc",
+      "checkout-token-valid-token",
+    );
+
+    expect(result).toEqual({
+      id: "12345678-aaaa-4bbb-8ccc-123456789abc",
+      status: "paid",
+    });
+    expect(updates.payments).toBeUndefined();
+    expect(updates.reservations).toBeUndefined();
+    expect(inserts.channel_sync_events).toBeUndefined();
+  });
+
   it("confirms Stripe payments and moves pending reservations to confirmed", async () => {
     const { filters, inserts, supabase, updates } = createPaymentsSupabaseMock(
       createPaymentRow({
@@ -344,5 +372,36 @@ describe("payment services", () => {
       },
       status: "synced",
     });
+  });
+
+  it("does not double-process duplicate Stripe webhook deliveries", async () => {
+    const { inserts, supabase, updates } = createPaymentsSupabaseMock(
+      createPaymentRow({
+        metadata: {
+          checkout: {
+            provider: "stripe",
+            providerPaymentId: "cs_test_123",
+            status: "paid",
+          },
+        },
+        provider_payment_id: "cs_test_123",
+        status: "paid",
+      }),
+    );
+    paymentServiceMocks.adminClient = supabase;
+
+    const result = await confirmStripeCheckoutPayment(
+      "12345678-aaaa-4bbb-8ccc-123456789abc",
+      "cs_test_123",
+    );
+
+    expect(result).toEqual({
+      id: "12345678-aaaa-4bbb-8ccc-123456789abc",
+      provider_payment_id: "cs_test_123",
+      status: "paid",
+    });
+    expect(updates.payments).toBeUndefined();
+    expect(updates.reservations).toBeUndefined();
+    expect(inserts.channel_sync_events).toBeUndefined();
   });
 });

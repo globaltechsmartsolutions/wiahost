@@ -14,6 +14,7 @@ type PaymentMetadata = Record<string, unknown> & {
     createdAt?: string;
     mode?: string;
     provider?: string;
+    providerPaymentId?: string;
     status?: string;
     token?: string;
     url?: string;
@@ -380,6 +381,13 @@ export async function confirmDemoCheckoutPayment(
     );
   }
 
+  if (payment.status === "paid" && checkout.status === "paid") {
+    return {
+      id: payment.id,
+      status: payment.status,
+    };
+  }
+
   const paidAt = new Date().toISOString();
   const { data, error: updateError } = await supabase
     .from("payments")
@@ -447,6 +455,18 @@ export async function confirmStripeCheckoutPayment(
 
   const metadata = paymentMetadata(payment.metadata);
   const checkout = metadata.checkout ?? {};
+
+  if (payment.status === "paid" && checkout.status === "paid") {
+    return {
+      id: payment.id,
+      provider_payment_id:
+        typeof checkout.providerPaymentId === "string"
+          ? checkout.providerPaymentId
+          : providerPaymentId,
+      status: payment.status,
+    };
+  }
+
   const paidAt = new Date().toISOString();
   const { data, error: updateError } = await supabase
     .from("payments")

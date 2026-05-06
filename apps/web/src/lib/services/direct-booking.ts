@@ -1,6 +1,10 @@
 import type { DirectBookingInquiryInput } from "@wiahost/shared";
 
 import { getPublicBookingListing } from "@/lib/data/direct-booking";
+import {
+  assertPropertyDateRangeAvailable,
+  AvailabilityConflictError,
+} from "@/lib/services/availability";
 import { getSupabaseAdminClient } from "@/lib/supabase/admin";
 
 export class DirectBookingMutationError extends Error {
@@ -14,6 +18,14 @@ export class DirectBookingMutationError extends Error {
 
 function mutationError(code: string, message: string): never {
   throw new DirectBookingMutationError(code, message);
+}
+
+function mapAvailabilityConflict(error: unknown): never {
+  if (error instanceof AvailabilityConflictError) {
+    mutationError(error.code, error.message);
+  }
+
+  throw error;
 }
 
 function nightsBetween(checkIn: string, checkOut: string) {
@@ -36,6 +48,17 @@ export async function createDirectBookingInquiry(
   }
 
   const supabase = getSupabaseAdminClient();
+
+  try {
+    await assertPropertyDateRangeAvailable(supabase, {
+      checkIn: input.checkIn,
+      checkOut: input.checkOut,
+      propertyId: listing.propertyId,
+    });
+  } catch (error) {
+    mapAvailabilityConflict(error);
+  }
+
   const nights = nightsBetween(input.checkIn, input.checkOut);
   const totalAmount = nights * listing.basePrice + listing.cleaningFee;
   const sentAt = new Date().toISOString();
