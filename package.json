@@ -41,6 +41,7 @@
     "check:deployment": "node scripts/check-deployment-health.mjs",
     "accounts:check": "node scripts/check-external-accounts.mjs",
     "staging:supabase": "node scripts/setup-supabase-staging.mjs",
+    "staging:seed": "node scripts/seed-supabase-staging.mjs",
     "vercel:env:sync": "node scripts/sync-vercel-env.mjs",
     "vercel:deploy:env": "node scripts/deploy-vercel-with-env.mjs",
     "audit:web": "pnpm --filter web audit:web && pnpm test:visual",

@@ -59,11 +59,13 @@ Preparacion de staging hosted:
 cp .env.staging.example .env.staging.local
 pnpm staging:supabase
 pnpm staging:supabase -- --apply
+pnpm staging:seed
+pnpm staging:seed -- --apply
 pnpm vercel:env:sync -- --file .env.staging.local --environment preview
 pnpm vercel:deploy:env -- --file .env.staging.local --target preview
 ```
 
-`pnpm staging:supabase` hace primero un dry-run de migraciones. Solo `--apply` aplica cambios reales y regenera tipos desde el proyecto linked. `pnpm vercel:env:sync` envia variables persistentes a Vercel sin imprimir valores y bloquea placeholders. Si Vercel no tiene Git conectado y preview exige rama, usar `pnpm vercel:deploy:env` para crear un deployment preview con variables locales de forma segura.
+`pnpm staging:supabase` hace primero un dry-run de migraciones. Solo `--apply` aplica cambios reales y regenera tipos desde el proyecto linked. `pnpm staging:seed` valida el seed demo en seco y `--apply` lo aplica en hosted, verifica usuarios demo, datos minimos y login de operaciones. `pnpm vercel:env:sync` envia variables persistentes a Vercel sin imprimir valores y bloquea placeholders. Si Vercel no tiene Git conectado y preview exige rama, usar `pnpm vercel:deploy:env` para crear un deployment preview con variables locales de forma segura.
 
 Usuarios demo tras `pnpm db:reset`:
 
@@ -71,6 +73,18 @@ Usuarios demo tras `pnpm db:reset`:
 - `operaciones@wiahost.local` / `Password123!`
 - `owner@wiahost.local` / `Password123!`
 - `limpieza@wiahost.local` / `Password123!`
+
+Los mismos usuarios quedan disponibles en staging hosted tras `pnpm staging:seed -- --apply`. La URL verificada actualmente es:
+
+```text
+https://wiahost-2mt44dmsd-globaltechsmartsolutions-projects.vercel.app
+```
+
+Login demo recomendado para revisar el panel:
+
+```text
+operaciones@wiahost.local / Password123!
+```
 
 ## Calidad
 

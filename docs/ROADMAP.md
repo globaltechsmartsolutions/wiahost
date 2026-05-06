@@ -226,4 +226,6 @@
 - Implementado: plantilla `.env.staging.example`, script `pnpm staging:supabase` para link/dry-run/apply de migraciones Supabase hosted y script `pnpm vercel:env:sync` para sincronizar variables en Vercel sin imprimir secretos.
 - Implementado: proyecto Supabase hosted visible, migraciones aplicadas, tipos regenerados desde staging y preview conectado a Supabase hosted en `https://wiahost-2mt44dmsd-globaltechsmartsolutions-projects.vercel.app`.
 - Implementado: `pnpm vercel:deploy:env` para crear previews con variables locales cuando Vercel todavia no tiene Git integration y no permite variables preview persistentes por rama.
+- Implementado: `pnpm staging:seed` para aplicar seed demo idempotente en Supabase hosted, verificar usuarios demo, datos minimos y login real contra staging.
+- Implementado: validacion browser de login demo en preview Vercel hasta `/dashboard` sin errores de consola.
 - Pendiente: conectar GitHub repo en Vercel, configurar secretos `VERCEL_*` en GitHub Actions, backups Supabase hosted, Stripe test, observabilidad externa y cuentas de stores.

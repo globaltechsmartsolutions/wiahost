@@ -114,13 +114,13 @@ values
   ('20000000-0000-0000-0000-000000000002', 'direct', 'direct-demo-2', 'loft-malaga-centro', 'Loft Malaga Centro', 'published', 'http://localhost:3000/book/loft-malaga-centro', false)
 on conflict do nothing;
 
-insert into public.channel_accounts (channel, account_label, external_account_id, auth_mode, status, health_status, scopes, notes, connected_at, last_checked_at)
+insert into public.channel_accounts (id, channel, account_label, external_account_id, auth_mode, status, health_status, scopes, notes, connected_at, last_checked_at)
 values
-  ('airbnb', 'Airbnb WIA Demo', 'airbnb-host-demo', 'partner_api', 'connected', 'synced', '["availability","reservations","messages"]', 'Cuenta demo preparada para mapear anuncios, reservas y mensajes inbound.', now() - interval '12 days', now() - interval '30 minutes'),
-  ('booking', 'Booking Madrid Portfolio', 'booking-hotel-demo', 'partner_api', 'needs_attention', 'failed', '["availability","rates","reservations"]', 'Pendiente validar permisos de mensajeria antes de activar sync automatico.', now() - interval '10 days', now() - interval '2 hours'),
-  ('vrbo', 'Vrbo Villas Demo', null, 'ical_only', 'pending_credentials', 'pending', '["calendar"]', 'Preparado para iCal mientras se solicita acceso API oficial.', null, null),
-  ('direct', 'Web directa WIAHost', 'wiahost-direct', 'manual', 'connected', 'synced', '["booking_engine","payments","inbox"]', 'Canal propio sin dependencia externa.', now() - interval '20 days', now() - interval '15 minutes')
-on conflict do nothing;
+  ('25000000-0000-0000-0000-000000000001', 'airbnb', 'Airbnb WIA Demo', 'airbnb-host-demo', 'partner_api', 'connected', 'synced', '["availability","reservations","messages"]', 'Cuenta demo preparada para mapear anuncios, reservas y mensajes inbound.', now() - interval '12 days', now() - interval '30 minutes'),
+  ('25000000-0000-0000-0000-000000000002', 'booking', 'Booking Madrid Portfolio', 'booking-hotel-demo', 'partner_api', 'needs_attention', 'failed', '["availability","rates","reservations"]', 'Pendiente validar permisos de mensajeria antes de activar sync automatico.', now() - interval '10 days', now() - interval '2 hours'),
+  ('25000000-0000-0000-0000-000000000003', 'vrbo', 'Vrbo Villas Demo', null, 'ical_only', 'pending_credentials', 'pending', '["calendar"]', 'Preparado para iCal mientras se solicita acceso API oficial.', null, null),
+  ('25000000-0000-0000-0000-000000000004', 'direct', 'Web directa WIAHost', 'wiahost-direct', 'manual', 'connected', 'synced', '["booking_engine","payments","inbox"]', 'Canal propio sin dependencia externa.', now() - interval '20 days', now() - interval '15 minutes')
+on conflict (id) do nothing;
 
 insert into public.guests (id, full_name, email, phone, preferred_language, tags)
 values
@@ -154,10 +154,11 @@ insert into public.conversations (id, property_id, reservation_id, guest_id, sta
 values ('50000000-0000-0000-0000-000000000001', '20000000-0000-0000-0000-000000000001', '40000000-0000-0000-0000-000000000001', '30000000-0000-0000-0000-000000000001', 'open', '00000000-0000-0000-0000-000000000002', now())
 on conflict (id) do nothing;
 
-insert into public.conversation_messages (conversation_id, sender_profile_id, channel, direction, body, sent_at)
+insert into public.conversation_messages (id, conversation_id, sender_profile_id, channel, direction, body, sent_at)
 values
-  ('50000000-0000-0000-0000-000000000001', null, 'airbnb', 'inbound', 'Hola, llegaremos sobre las 19:30. Podriamos hacer check-in autonomo?', now() - interval '20 minutes'),
-  ('50000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000002', 'airbnb', 'outbound', 'Si, os enviaremos el codigo una hora antes de la llegada.', now() - interval '10 minutes');
+  ('51000000-0000-0000-0000-000000000001', '50000000-0000-0000-0000-000000000001', null, 'airbnb', 'inbound', 'Hola, llegaremos sobre las 19:30. Podriamos hacer check-in autonomo?', now() - interval '20 minutes'),
+  ('51000000-0000-0000-0000-000000000002', '50000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000002', 'airbnb', 'outbound', 'Si, os enviaremos el codigo una hora antes de la llegada.', now() - interval '10 minutes')
+on conflict (id) do nothing;
 
 insert into public.tasks (id, property_id, reservation_id, assigned_to, created_by, type, status, priority, title, description, due_at)
 values
@@ -169,12 +170,14 @@ insert into public.incidents (id, property_id, reservation_id, reported_by, assi
 values ('70000000-0000-0000-0000-000000000001', '20000000-0000-0000-0000-000000000002', '40000000-0000-0000-0000-000000000002', '00000000-0000-0000-0000-000000000002', null, 'open', 'medium', 'Ruido en aire acondicionado', 'Posible incidencia de mantenimiento antes del proximo check-in.', 90)
 on conflict (id) do nothing;
 
-insert into public.payments (reservation_id, guest_id, status, provider, amount, paid_at)
+insert into public.payments (id, reservation_id, guest_id, status, provider, amount, paid_at)
 values
-  ('40000000-0000-0000-0000-000000000001', '30000000-0000-0000-0000-000000000001', 'authorized', 'airbnb', 645, now()),
-  ('40000000-0000-0000-0000-000000000002', '30000000-0000-0000-0000-000000000002', 'paid', 'stripe', 420, now() - interval '2 days');
+  ('80000000-0000-0000-0000-000000000001', '40000000-0000-0000-0000-000000000001', '30000000-0000-0000-0000-000000000001', 'authorized', 'airbnb', 645, now()),
+  ('80000000-0000-0000-0000-000000000002', '40000000-0000-0000-0000-000000000002', '30000000-0000-0000-0000-000000000002', 'paid', 'stripe', 420, now() - interval '2 days')
+on conflict (id) do nothing;
 
-insert into public.automation_rules (name, trigger, channel, template, enabled, delay_minutes, created_by)
+insert into public.automation_rules (id, name, trigger, channel, template, enabled, delay_minutes, created_by)
 values
-  ('Enviar instrucciones 24h antes', 'checkin_24h', 'email', 'Hola {{guest_name}}, manana empieza tu estancia en {{property_name}}.', true, 0, '00000000-0000-0000-0000-000000000002'),
-  ('Aviso a limpieza tras checkout', 'checkout_time', 'inbox', 'Preparar limpieza de {{property_name}} tras checkout.', true, 30, '00000000-0000-0000-0000-000000000002');
+  ('90000000-0000-0000-0000-000000000001', 'Enviar instrucciones 24h antes', 'checkin_24h', 'email', 'Hola {{guest_name}}, manana empieza tu estancia en {{property_name}}.', true, 0, '00000000-0000-0000-0000-000000000002'),
+  ('90000000-0000-0000-0000-000000000002', 'Aviso a limpieza tras checkout', 'checkout_time', 'inbox', 'Preparar limpieza de {{property_name}} tras checkout.', true, 30, '00000000-0000-0000-0000-000000000002')
+on conflict (id) do nothing;

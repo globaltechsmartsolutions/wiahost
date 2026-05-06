@@ -80,6 +80,7 @@ Staging conectado actual:
 - Proyecto Supabase hosted `ywrmzhudqmmgnjeymkuf`.
 - Migraciones aplicadas en Supabase hosted.
 - Tipos de base de datos regenerados desde el proyecto linked.
+- Seed demo idempotente aplicado y verificado con login de operaciones.
 - Variables Supabase usadas en deployment preview sin imprimir valores.
 
 Pendiente actual para endurecer staging/production:
@@ -152,11 +153,28 @@ Sincronizacion segura desde archivo local:
 cp .env.staging.example .env.staging.local
 pnpm staging:supabase
 pnpm staging:supabase -- --apply
+pnpm staging:seed
+pnpm staging:seed -- --apply
 pnpm vercel:env:sync -- --file .env.staging.local --environment preview
 pnpm vercel:deploy:env -- --file .env.staging.local --target preview
 ```
 
-`staging:supabase` enlaza Supabase hosted, primero en dry-run y despues con `--apply` para aplicar migraciones. `vercel:env:sync` configura variables persistentes en el proyecto Vercel. Si el proyecto Vercel aun no tiene Git repo conectado, `preview` puede exigir rama y fallar; en ese caso usar `vercel:deploy:env`, que crea un deployment con variables de build/runtime desde `.env.staging.local` sin imprimir valores. Estos scripts ignoran claves locales como `SUPABASE_ACCESS_TOKEN`, `SUPABASE_PROJECT_REF` y `SUPABASE_DB_PASSWORD`, y fallan si detectan placeholders.
+`staging:supabase` enlaza Supabase hosted, primero en dry-run y despues con `--apply` para aplicar migraciones. `staging:seed` hace dry-run del seed demo y con `--apply` aplica `supabase/seed.sql`, verifica usuarios Auth, datos minimos y login demo sin imprimir secretos. `vercel:env:sync` configura variables persistentes en el proyecto Vercel. Si el proyecto Vercel aun no tiene Git repo conectado, `preview` puede exigir rama y fallar; en ese caso usar `vercel:deploy:env`, que crea un deployment con variables de build/runtime desde `.env.staging.local` sin imprimir valores. Estos scripts ignoran claves locales como `SUPABASE_ACCESS_TOKEN`, `SUPABASE_PROJECT_REF` y `SUPABASE_DB_PASSWORD`, y fallan si detectan placeholders.
+
+Usuarios demo de staging:
+
+```text
+operaciones@wiahost.local / Password123!
+admin@wiahost.local / Password123!
+owner@wiahost.local / Password123!
+limpieza@wiahost.local / Password123!
+```
+
+La URL preview conectada y validada con login demo es:
+
+```text
+https://wiahost-2mt44dmsd-globaltechsmartsolutions-projects.vercel.app
+```
 
 ## Checklist antes de crear staging
 

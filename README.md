@@ -22,6 +22,8 @@ El objetivo es centralizar propiedades, reservas, calendario multi-canal, mensaj
 - Auditoria de accesibilidad con axe, baseline visual inicial, Lighthouse CI y memoria versionada en `quality/audit-memory`.
 - Paquetes compartidos para tipos y validaciones en `packages/shared`.
 - Paquete de tipos de base de datos en `packages/database`.
+- Staging web online conectado a Supabase hosted y verificado con login demo:
+  `https://wiahost-2mt44dmsd-globaltechsmartsolutions-projects.vercel.app`
 
 Importante: la web mantiene fallback demo para poder navegar sin entorno local, pero con `.env.local` configurado trabaja contra Supabase.
 
@@ -105,6 +107,8 @@ pnpm quality:summary
 pnpm release:check
 pnpm check:deployment -- --url https://tu-preview.vercel.app
 pnpm accounts:check
+pnpm staging:supabase
+pnpm staging:seed
 pnpm audit:web
 pnpm audit:lighthouse
 pnpm supabase:start
