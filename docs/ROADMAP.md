@@ -121,6 +121,7 @@
 - Import/export iCal como paso intermedio si APIs no estan disponibles.
 - Channel sync events.
 - Control de disponibilidad y precios.
+- Roadmap canonico de integraciones API: `docs/CHANNEL_API_ROADMAP.md`.
 
 ### Estado actual de Fase 3
 
@@ -135,6 +136,8 @@
 - Implementado: normalizacion de mensajes entrantes `/api/channels/messages` y formulario en `/inbox` para convertir mensajes de Airbnb/Booking/Vrbo/email/WhatsApp en contacto, conversacion, mensaje inbound y evento de sync.
 - Implementado: control inicial de precios `/pricing` sobre `pricing_observations`, con API GET/POST/GET detail/PATCH/DELETE para precio actual, sugerido, aprobado/final, ocupacion y conversion.
 - Implementado: registro de sincronizacion outbound de precio desde `/pricing` mediante `channel_sync_events.payload.action = price_update` y API POST `/api/pricing/observations/[id]/sync`.
+- Definido: roadmap API tipo channel manager por fases, empezando por core interno, iCal/web directa, Booking Connectivity, Airbnb partner/PMS bridge, Vrbo connectivity, inbox unificado y pricing sync.
+- Pendiente inmediato: crear adapter interface de canales, normalizadores, sync queue idempotente, pantalla de salud por listing y feature flags por canal antes de conectar una API externa real.
 - Pendiente: probar Stripe en entorno real con claves de test, webhook firmado desde Stripe CLI/Dashboard, APIs oficiales por canal y sincronizacion automatica de precios con proveedores externos.
 
 ## Fase 4 - App movil

@@ -17,6 +17,7 @@ Este directorio concentra la documentacion viva del producto. La idea es que cua
 11. `INCIDENT_RESPONSE.md`: guia de respuesta ante fallos de demo/staging/produccion.
 12. `MOBILE.md`: app Expo, entorno movil y Play Store.
 13. `RELEASE.md`: validacion automatica, pruebas manuales pendientes y salida a stores.
+14. `CHANNEL_API_ROADMAP.md`: roadmap de integraciones API, channel manager, iCal y APIs oficiales por canal.
 
 ## Documentos principales
 
@@ -36,6 +37,7 @@ Este directorio concentra la documentacion viva del producto. La idea es que cua
 | `INCIDENT_RESPONSE.md`          | Runbook de severidad, diagnostico, rollback, comunicacion y cierre.            |
 | `RELEASE.md`                    | Gate de release, APK demo, iOS/TestFlight y checklist manual pendiente.        |
 | `AI.md`                         | Documento maestro de IA: producto, arquitectura, datos, fases y guardrails.    |
+| `CHANNEL_API_ROADMAP.md`        | Vision y fases para conectar Airbnb, Booking, Vrbo, web directa y PMS bridge.  |
 
 ## Regla editorial
 

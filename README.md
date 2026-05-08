@@ -137,6 +137,7 @@ Documentos principales:
 - Observabilidad: `docs/OBSERVABILITY.md`
 - Incident response: `docs/INCIDENT_RESPONSE.md`
 - Calidad: `docs/QUALITY_AND_AUDIT_STRATEGY.md`
+- Roadmap Channel API: `docs/CHANNEL_API_ROADMAP.md`
 - Mobile: `docs/MOBILE.md`
 - EAS Build Android: `docs/EAS_BUILD.md`
 - Release y pruebas manuales: `docs/RELEASE.md`

@@ -111,5 +111,6 @@ La UI combina datos demo con primeras integraciones reales:
 - `/audit/:eventId` muestra contexto, actor, referencias tecnicas y metadata JSON del evento para depurar flujos y revisar payloads sin acceder directamente a base de datos.
 - El detalle de inbox permite guardar etiquetas humanas en `message_labels`; esta memoria revisada por personas alimentara reglas, evals y modelos futuros sin automatizar decisiones sensibles.
 - Pricing conecta `/pricing` y `/api/pricing/observations` con `pricing_observations`. Permite guardar recomendaciones manuales o importadas por canal y registrar un `price_update` outbound en `channel_sync_events` antes de conectar PriceLabs, Beyond, Wheelhouse o motores propios.
+- Channel API roadmap queda documentado en `docs/CHANNEL_API_ROADMAP.md`: WIAHost debe actuar como core PMS/channel manager y conectar Airbnb, Booking, Vrbo y web directa mediante adapters, sync queue, mappings, auditoria e idempotencia antes de automatizar cambios en canales reales.
 
 La prioridad tecnica actual es completar acciones moviles sobre los modulos ya conectados en web manteniendo RLS, validadores compartidos y tests.
