@@ -42,6 +42,25 @@ function mapAvailabilityConflict(error: unknown): never {
   throw error;
 }
 
+export function buildDirectLeadStatusSyncPayload(input: {
+  externalReservationId?: string | null;
+  reservationId: string;
+  status: "pending" | "confirmed" | "cancelled";
+}) {
+  return {
+    action:
+      input.status === "confirmed"
+        ? "direct_reservation_confirmed"
+        : "direct_lead_status_updated",
+    externalReservationId: input.externalReservationId ?? null,
+    mode: "local_simulation",
+    reservationId: input.reservationId,
+    source: "direct_booking_pipeline",
+    status: input.status,
+    target: "hostaway_bridge_fake",
+  };
+}
+
 async function recordOperationalEvent(
   supabase: SupabaseServerClient,
   input: {
@@ -342,6 +361,36 @@ export async function updateDirectLeadStatus(
   status: "pending" | "confirmed" | "cancelled",
   userId: string,
 ) {
+  const { data: current, error: currentError } = await supabase
+    .from("reservations")
+    .select(
+      "id,status,property_id,channel,check_in,check_out,external_reservation_id",
+    )
+    .eq("id", reservationId)
+    .eq("channel", "direct")
+    .in("status", ["inquiry", "pending", "confirmed", "cancelled"])
+    .single();
+
+  if (currentError || !current) {
+    mutationError(
+      "lead_update_failed",
+      "No se ha podido actualizar el lead directo.",
+    );
+  }
+
+  if (status === "confirmed") {
+    try {
+      await assertPropertyDateRangeAvailable(supabase, {
+        checkIn: current.check_in,
+        checkOut: current.check_out,
+        excludeReservationId: current.id,
+        propertyId: current.property_id,
+      });
+    } catch (error) {
+      mapAvailabilityConflict(error);
+    }
+  }
+
   const { data, error } = await supabase
     .from("reservations")
     .update({ status })
@@ -356,6 +405,20 @@ export async function updateDirectLeadStatus(
       "lead_update_failed",
       "No se ha podido actualizar el lead directo.",
     );
+  }
+
+  if (status === "confirmed") {
+    await supabase.from("channel_sync_events").insert({
+      channel: "direct",
+      direction: "outbound",
+      payload: buildDirectLeadStatusSyncPayload({
+        externalReservationId: current.external_reservation_id,
+        reservationId: data.id,
+        status,
+      }),
+      property_id: data.property_id,
+      status: "pending",
+    });
   }
 
   await recordOperationalEvent(supabase, {

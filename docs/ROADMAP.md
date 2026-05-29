@@ -117,11 +117,13 @@
 
 - Publicacion directa.
 - Motor de reserva directa.
-- Integraciones con canales mediante API cuando sea viable.
-- Import/export iCal como paso intermedio si APIs no estan disponibles.
+- Partner Website API para conectar cualquier web externa a WIAHost sin cambiar su frontend.
+- Integraciones con canales mediante API, XML, webhooks o bridge aprobado.
+- iCal queda como capacidad legacy aislada, no como fallback estratégico ni vía del piloto WIA.
 - Channel sync events.
 - Control de disponibilidad y precios.
 - Roadmap canonico de integraciones API: `docs/CHANNEL_API_ROADMAP.md`.
+- Guía canónica para conectar cualquier web: `docs/PARTNER_WEBSITE_INTEGRATION.md`.
 
 ### Estado actual de Fase 3
 
@@ -136,8 +138,18 @@
 - Implementado: normalizacion de mensajes entrantes `/api/channels/messages` y formulario en `/inbox` para convertir mensajes de Airbnb/Booking/Vrbo/email/WhatsApp en contacto, conversacion, mensaje inbound y evento de sync.
 - Implementado: control inicial de precios `/pricing` sobre `pricing_observations`, con API GET/POST/GET detail/PATCH/DELETE para precio actual, sugerido, aprobado/final, ocupacion y conversion.
 - Implementado: registro de sincronizacion outbound de precio desde `/pricing` mediante `channel_sync_events.payload.action = price_update` y API POST `/api/pricing/observations/[id]/sync`.
-- Definido: roadmap API tipo channel manager por fases, empezando por core interno, iCal/web directa, Booking Connectivity, Airbnb partner/PMS bridge, Vrbo connectivity, inbox unificado y pricing sync.
-- Pendiente inmediato: crear adapter interface de canales, normalizadores, sync queue idempotente, pantalla de salud por listing y feature flags por canal antes de conectar una API externa real.
+- Implementado: Partner Website API pública v1 para webs externas, con endpoints de listings, disponibilidad, inquiries y consulta de estado por `externalId`.
+- Implementado: piloto WIA local como primer cliente real de la Partner Website API, manteniendo la web real sin tocar.
+- Implementado: idempotencia por `Idempotency-Key` para solicitudes externas y consulta de estado por `GET /api/public/v1/reservations/:externalId`.
+- Implementado: resolución de partner por query, partner apps persistibles en base de datos, claves hasheadas, fallback temporal por entorno y pruebas unitarias de permisos, claves y external IDs.
+- Implementado: pantalla interna `/partner-apps` para gestionar webs conectadas, dominios permitidos, URLs de retorno, webhooks, scopes, rate limit, estado y claves sin guardar secretos en claro.
+- Implementado: rate limit real por partner en la Partner Website API, usando `partner_apps.rate_limit_per_minute` cuando la clave pertenece a una web conectada.
+- Implementado: prueba local reproducible `pnpm wia:demo:local` para validar WIA local -> WIAHost local con partner app activa, rechazo 401 sin clave, creación de inquiry y consulta de estado por `externalId`.
+- Implementado: cierre local del lead creado por Partner API desde `/leads`, con pago `direct_checkout` pendiente, reserva confirmada y evento outbound simulado `direct_reservation_confirmed` en `channel_sync_events`.
+- Implementado: roadmap local `/wia-roadmap` y documentación de migración WIA -> WIAHost sin iCal como fallback.
+- Definido: WIAHost debe poder conectarse a cualquier página o app externa mediante `partnerId`, credenciales, dominios permitidos, mapping y contrato API estable.
+- Definido: roadmap API tipo channel manager por fases, empezando por Partner Website API, web directa, Hostaway Bridge read-only, Booking Connectivity, Airbnb partner/PMS bridge, Vrbo connectivity, inbox unificado y pricing sync.
+- Pendiente inmediato: reactivar o sustituir Supabase staging, aplicar `partner_apps` en preproducción, crear la partner app real de WIA con clave rotada, añadir E2E del flujo WIA local -> WIAHost, adapter interface de canales, normalizadores, sync queue idempotente, pantalla de salud por listing y feature flags por canal antes de conectar una API externa real.
 - Pendiente: probar Stripe en entorno real con claves de test, webhook firmado desde Stripe CLI/Dashboard, APIs oficiales por canal y sincronizacion automatica de precios con proveedores externos.
 
 ## Fase 4 - App movil

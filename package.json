@@ -42,6 +42,8 @@
     "accounts:check": "node scripts/check-external-accounts.mjs",
     "staging:supabase": "node scripts/setup-supabase-staging.mjs",
     "staging:seed": "node scripts/seed-supabase-staging.mjs",
+    "wia:seed:local": "node scripts/seed-wia-local-listings.mjs",
+    "wia:demo:local": "node scripts/check-wia-local-demo.mjs",
     "staging:rotate-db-password": "node scripts/rotate-supabase-db-password.mjs",
     "staging:backup": "node scripts/backup-supabase-staging.mjs",
     "vercel:env:sync": "node scripts/sync-vercel-env.mjs",

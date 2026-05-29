@@ -1290,6 +1290,57 @@ export type Database = {
           },
         ]
       }
+      partner_apps: {
+        Row: {
+          allowed_origins: Json
+          created_at: string
+          display_name: string
+          id: string
+          key_hash: string | null
+          key_prefix: string | null
+          notes: string | null
+          partner_id: string
+          rate_limit_per_minute: number
+          redirect_urls: Json
+          scopes: Json
+          status: string
+          updated_at: string
+          webhook_url: string | null
+        }
+        Insert: {
+          allowed_origins?: Json
+          created_at?: string
+          display_name: string
+          id?: string
+          key_hash?: string | null
+          key_prefix?: string | null
+          notes?: string | null
+          partner_id: string
+          rate_limit_per_minute?: number
+          redirect_urls?: Json
+          scopes?: Json
+          status?: string
+          updated_at?: string
+          webhook_url?: string | null
+        }
+        Update: {
+          allowed_origins?: Json
+          created_at?: string
+          display_name?: string
+          id?: string
+          key_hash?: string | null
+          key_prefix?: string | null
+          notes?: string | null
+          partner_id?: string
+          rate_limit_per_minute?: number
+          redirect_urls?: Json
+          scopes?: Json
+          status?: string
+          updated_at?: string
+          webhook_url?: string | null
+        }
+        Relationships: []
+      }
       pricing_observations: {
         Row: {
           approved_price: number | null

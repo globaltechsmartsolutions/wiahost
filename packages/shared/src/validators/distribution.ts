@@ -32,6 +32,24 @@ const scopesSchema = z.preprocess(
   },
   z.array(z.string().trim().min(1).max(80)).max(20),
 );
+const optionalPartnerKey = z.preprocess(
+  emptyToUndefined,
+  z.string().trim().min(12, "La clave debe tener al menos 12 caracteres.").max(240).optional(),
+);
+const partnerListSchema = (itemSchema: z.ZodString) =>
+  z.preprocess(
+    (value) => {
+      if (typeof value !== "string") {
+        return value ?? [];
+      }
+
+      return value
+        .split(/[\n,]/)
+        .map((item) => item.trim())
+        .filter(Boolean);
+    },
+    z.array(itemSchema).max(20),
+  );
 
 const payloadSchema = z.preprocess(
   (value) => {
@@ -126,7 +144,54 @@ export const channelAccountSchema = z.object({
     .default("planned"),
 });
 
+const partnerAppBaseSchema = z.object({
+  allowedOrigins: partnerListSchema(
+    z.string().trim().url("El dominio permitido no es valido."),
+  ).default([]),
+  apiKey: optionalPartnerKey,
+  displayName: z
+    .string()
+    .trim()
+    .min(2, "El nombre de la web debe tener al menos 2 caracteres.")
+    .max(140, "El nombre de la web es demasiado largo."),
+  notes: optionalText,
+  partnerId: z
+    .string()
+    .trim()
+    .toLowerCase()
+    .regex(
+      /^[a-z0-9][a-z0-9_.-]{1,80}$/,
+      "El partnerId solo puede usar minusculas, numeros, puntos, guiones y guiones bajos.",
+    ),
+  rateLimitPerMinute: z.coerce
+    .number()
+    .int()
+    .min(1, "El limite debe ser positivo.")
+    .max(10000, "El limite es demasiado alto.")
+    .default(60),
+  redirectUrls: partnerListSchema(
+    z.string().trim().url("La URL de retorno no es valida."),
+  ).default([]),
+  scopes: scopesSchema.default([
+    "listings",
+    "availability",
+    "inquiries",
+    "reservations:read",
+  ]),
+  status: z.enum(["draft", "active", "paused", "revoked"]).default("draft"),
+  webhookUrl: optionalUrl,
+});
+
+export const partnerAppSchema = partnerAppBaseSchema
+  .refine((input) => input.status !== "active" || Boolean(input.apiKey), {
+    message: "Para activar una web conectada debes indicar una clave.",
+    path: ["apiKey"],
+  });
+export const partnerAppUpdateSchema = partnerAppBaseSchema;
+
 export type ChannelAccountInput = z.infer<typeof channelAccountSchema>;
 export type ChannelSyncEventInput = z.infer<typeof channelSyncEventSchema>;
 export type IcalImportInput = z.infer<typeof icalImportSchema>;
 export type ListingInput = z.infer<typeof listingSchema>;
+export type PartnerAppInput = z.infer<typeof partnerAppSchema>;
+export type PartnerAppUpdateInput = z.infer<typeof partnerAppUpdateSchema>;

@@ -56,6 +56,7 @@ export async function createDirectBookingInquiryAction(formData: FormData) {
   }
 
   revalidatePath("/reservations");
+  revalidatePath("/leads");
   revalidatePath("/inbox");
   revalidatePath("/distribution");
   redirect(`/book/${slug}?sent=1`);

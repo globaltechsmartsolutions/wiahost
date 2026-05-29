@@ -8,10 +8,12 @@ import {
   ClipboardCheck,
   CreditCard,
   FileText,
+  Globe2,
   Home,
   Inbox,
   KeyRound,
   Landmark,
+  Map,
   MessageSquareWarning,
   MousePointerClick,
   RadioTower,
@@ -35,6 +37,7 @@ const navSections = [
     title: "Control",
     items: [
       { label: "Dashboard", href: "/dashboard", icon: Home },
+      { label: "Roadmap WIA", href: "/wia-roadmap", icon: Map },
       { label: "Calendario", href: "/calendar", icon: CalendarDays },
       { label: "Reservas", href: "/reservations", icon: ClipboardCheck },
       { label: "Inbox", href: "/inbox", icon: Inbox },
@@ -56,6 +59,7 @@ const navSections = [
       { label: "Propietarios", href: "/owners", icon: Landmark },
       { label: "Liquidaciones", href: "/statements", icon: CreditCard },
       { label: "Distribución", href: "/distribution", icon: RadioTower },
+      { label: "Webs conectadas", href: "/partner-apps", icon: Globe2 },
       { label: "Notificaciones", href: "/notifications", icon: Bell },
       { label: "Precios", href: "/pricing", icon: TrendingUp },
       { label: "Automatizaciones", href: "/automations", icon: Bot },
@@ -153,6 +157,7 @@ export async function AppShell({ children }: { children: React.ReactNode }) {
                 className="h-9 rounded-full border-[#dfd2bf] bg-white/70 pl-9 text-sm shadow-sm"
                 name="q"
                 placeholder="Buscar reserva, huésped, propiedad, canal o tarea..."
+                suppressHydrationWarning
               />
             </form>
             <Button

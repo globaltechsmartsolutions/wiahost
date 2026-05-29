@@ -6,7 +6,7 @@ Convertir WIAHost en el centro operativo de las viviendas, igual que un PMS/chan
 
 - Una vivienda se gestiona una vez en WIAHost.
 - La disponibilidad, reservas, precios, mensajes y tareas se sincronizan con canales externos.
-- Cada canal se conecta con el nivel tecnico que permita: API, XML, webhooks, iCal o integracion via PMS intermedio.
+- Cada canal se conecta con el nivel tecnico que permita: API, XML, webhooks o integracion via PMS intermedio aprobado.
 - WIAHost mantiene trazabilidad, auditoria, anti-overbooking y control humano antes de automatizar cambios sensibles.
 
 ## Principio rector
@@ -19,6 +19,7 @@ La situacion real del primer piloto es especial:
 - Hostaway hoy funciona como PMS/channel manager maestro.
 - WIAHost debe migrar esa operativa sin cortar de golpe Airbnb, Booking, Vrbo ni la web actual.
 - La primera conexion no es una OTA: es una migracion desde Hostaway + una API generica para webs externas.
+- La web del socio es el primer cliente real, pero WIAHost debe poder conectarse a cualquier página o app externa con el mismo contrato técnico.
 
 Cada integracion debe pasar por este flujo:
 
@@ -56,6 +57,8 @@ Este core debe ser independiente del canal:
 
 La web del socio sera el primer cliente de nuestra Partner Channel API, pero la API debe valer para cualquier web futura.
 
+Esto implica que `worldinstitutionalassets` es solo un `partnerId` de piloto. El producto final debe aceptar cualquier partner con credenciales, dominios permitidos y mapping propio.
+
 ### Adaptadores por canal
 
 Cada canal tendra su propio adapter:
@@ -63,7 +66,7 @@ Cada canal tendra su propio adapter:
 - `direct`: web propia / booking engine.
 - `partner_app`: cualquier web/app externa que quiera usar WIAHost como backend operativo.
 - `hostaway_bridge`: migracion/coexistencia con Hostaway Public API.
-- `airbnb`: API partner cuando exista acceso; iCal como puente.
+- `airbnb`: API partner cuando exista acceso o bridge PMS aprobado.
 - `booking`: Booking.com Connectivity APIs/XML cuando exista acceso.
 - `vrbo`: Vrbo connectivity provider/API cuando exista acceso.
 - `expedia`: futuro.
@@ -92,9 +95,9 @@ Acceso API completo normalmente requiere pertenecer al programa de software part
 
 Prioridad:
 
-1. iCal import/export para disponibilidad.
-2. Preparar adapter Airbnb con contrato interno.
-3. Solicitar acceso partner o conectar mediante PMS existente si el cliente ya usa uno.
+1. Preparar adapter Airbnb con contrato interno.
+2. Solicitar acceso partner o conectar mediante PMS existente si el cliente ya usa uno.
+3. Si no hay acceso autorizado, mantener Airbnb en Hostaway/PMS bridge hasta tener un camino oficial.
 4. Activar reservas/mensajes/precios por API cuando haya autorizacion.
 
 Limitaciones esperables:
@@ -129,9 +132,9 @@ Vrbo funciona mediante connectivity providers/integrated property managers. La i
 
 Prioridad:
 
-1. iCal como puente inicial.
-2. Preparar mapping y checklist de cuenta.
-3. Conectar por provider/API cuando haya aprobacion.
+1. Preparar mapping y checklist de cuenta.
+2. Conectar por provider/API cuando haya aprobacion.
+3. Si no hay acceso autorizado, mantener Vrbo en Hostaway/PMS bridge hasta tener un camino oficial.
 4. Activar mensajes y pagos solo cuando el flujo este claro.
 
 Limitaciones esperables:
@@ -151,7 +154,7 @@ Prioridad:
 3. Leads y reservas directas.
 4. Pago test/Stripe.
 5. Mensajes en WIAHost.
-6. iCal export para bloquear otros canales.
+6. Sync hacia Hostaway/PMS bridge mientras los canales externos sigan protegidos por ese sistema.
 
 Este canal debe ser nuestro primer caso de uso real porque no depende de permisos externos.
 
@@ -186,14 +189,23 @@ Objetivo:
 - Cualquier web externa puede enviar mensajes iniciales o actualizaciones.
 - Cualquier web externa puede consultar estado de reserva/pago si tiene permisos.
 - WIAHost mantiene el core: disponibilidad, anti-overbooking, auditoria, tareas, inbox y pagos.
+- La web externa puede conservar su diseño, dominio y frontend; WIAHost actúa como backend operativo.
 
 Regla tecnica:
 
 - El adapter se llama `partner_app`.
 - En el core debe distinguirse de `direct` cuando el origen sea una web externa. Hostaway lo modela como Partner Channel y nosotros debemos mantener esa separacion.
 - La identidad de la web concreta vive en `external_account_id`, `external_listing_id`, payload metadata y claves de API, no en el nombre del canal.
+- Cada web conectada debe poder tener dominios permitidos, URLs de retorno, webhooks y reglas propias.
 
 Asi evitamos hacer una integracion "para el socio" y construimos una API reutilizable para cualquier web.
+
+### Modos de conexión para cualquier web
+
+1. API headless server-to-server: la web mantiene toda su UI y llama a WIAHost desde su backend.
+2. Redirección al motor WIAHost: la web lista propiedades y el botón final abre `/book/[slug]`.
+3. Widget embebible futuro: script o iframe para clientes sin equipo técnico.
+4. Staging de migración: copia temporal de la web para validar antes de producción.
 
 ## Fases de ejecucion
 
@@ -205,7 +217,7 @@ Entregables:
 
 - Inventario de viviendas/listings en Hostaway.
 - Canales conectados por vivienda: Airbnb, Booking, Vrbo, web propia u otros.
-- Tipo de conexion por canal: API, XML, iCal, manual o desconocida.
+- Tipo de conexion por canal: API, XML, PMS bridge, manual o desconocida.
 - Reservas futuras, bloqueos, tarifas, mensajes y automatizaciones actuales.
 - Como la web del socio crea reservas hoy: widget, API, formulario, checkout, webhook o plugin.
 - Riesgos de corte: pagos, mensajes, cancelaciones, calendario, limpieza, propietarios.
@@ -244,6 +256,7 @@ Objetivo: que la web/app del socio deje de depender directamente de Hostaway y e
 Entregables:
 
 - API keys por partner app sin guardar secretos en claro.
+- Registro de partner apps con dominios permitidos, URLs de retorno, webhooks y estado de conexión.
 - Endpoints publicos versionados:
   - `GET /api/public/v1/listings`
   - `GET /api/public/v1/availability`
@@ -251,15 +264,19 @@ Entregables:
   - `POST /api/public/v1/messages`
   - `GET /api/public/v1/reservations/:externalId`
 - Firmas HMAC o bearer tokens server-to-server.
+- Tabla `partner_apps` para credenciales persistidas, `key_hash`, scopes, dominios permitidos, URLs de retorno y webhooks.
 - Idempotencia por `Idempotency-Key` y `external_reservation_id`.
 - Rate limit por partner app.
 - Mapping de vivienda externa a `property_id`/`property_listing_id`.
 - Errores consistentes para disponibilidad, permisos, mapping y validacion.
+- Tests unitarios para resolver partner, validar claves, construir external IDs y consultar estado por API pública.
 
 Criterio de salida:
 
 - La web del socio puede crear leads/reservas en WIAHost.
 - La misma API sirve para otra web cambiando credenciales y mappings.
+- Una nueva web puede conectarse sin cambiar código core: solo alta de partner, credenciales y mapping.
+- Las claves pueden validarse desde base de datos sin guardar secretos en claro.
 - WIAHost bloquea solapes antes de crear reservas.
 - Nada depende de codigo especifico del socio.
 
@@ -319,21 +336,21 @@ Criterio de salida:
 - Ningun evento duplicado crea doble reserva.
 - Todo fallo queda visible en `channel_sync_events`.
 
-## Fase 6 - Fallback iCal opcional
+## Fase 6 - Canales sin API: bridge aprobado o espera
 
-Objetivo: usar iCal solo como puente temporal si un canal externo no da acceso API a tiempo.
+Objetivo: evitar caminos debiles para canales que no den acceso API a tiempo. Si un canal no tiene API, XML, webhook o bridge PMS aprobado, no entra todavia en la migracion.
 
 Entregables:
 
-- Import iCal por vivienda/canal si hace falta.
-- Export iCal por listing WIAHost si hace falta.
-- Monitor de ultima importacion y errores.
-- Alerta si un feed no actualiza.
+- Matriz de decision por canal: API directa, XML, webhook, PMS bridge aprobado o espera.
+- Regla de bloqueo: un canal sin camino oficial se queda fuera del piloto.
+- Registro de excepciones aprobadas por operaciones y producto.
+- Plan de continuidad usando Hostaway como sistema maestro mientras el canal no pueda migrarse.
 
 Criterio de salida:
 
-- iCal nunca bloquea el avance del core API-first.
-- iCal no se usa para mensajes, pagos, precios complejos ni automatizaciones sensibles.
+- Ningun canal entra por una via que no soporte auditoria, idempotencia y rollback.
+- WIAHost no asume un canal hasta poder sincronizarlo de forma verificable.
 
 ## Fase 7 - Booking.com API/XML
 
@@ -466,7 +483,7 @@ Criterio de salida:
 ## Riesgos que no debemos ignorar
 
 - API access puede tardar o requerir certificacion/partnership.
-- iCal no es tiempo real y solo sirve para disponibilidad.
+- Un canal sin API o bridge aprobado puede quedarse temporalmente en Hostaway.
 - Mapping incorrecto puede crear bloqueos equivocados.
 - Mensajes externos tienen normas por canal.
 - Datos personales pueden estar limitados por GDPR.
@@ -476,7 +493,6 @@ Criterio de salida:
 
 ## Fuentes de referencia
 
-- Hostaway - tipos de conexion API/XML/iCal: https://support.hostaway.com/hc/en-us/articles/360004131874-Understanding-Channel-Connection-Types
 - Hostaway - requisitos y limitaciones por canal: https://support.hostaway.com/hc/en-us/articles/49780010006043-Channel-Integration-Requirements-and-Limitations
 - Hostaway - unified inbox: https://support.hostaway.com/hc/en-us/articles/1260803557189-Inbox-Overview-and-Key-Features
 - Booking.com Connectivity APIs: https://developers.booking.com/connectivity/docs/

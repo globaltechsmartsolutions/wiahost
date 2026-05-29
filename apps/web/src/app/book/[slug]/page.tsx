@@ -29,7 +29,11 @@ export const dynamic = "force-dynamic";
 type BookingPageProps = {
   params: Promise<{ slug: string }>;
   searchParams?: Promise<{
+    checkIn?: string;
+    checkOut?: string;
     error?: string;
+    guests?: string;
+    listingId?: string;
     sent?: string;
   }>;
 };
@@ -40,6 +44,11 @@ export default async function BookingPage({
 }: BookingPageProps) {
   const [{ slug }, query] = await Promise.all([params, searchParams]);
   const listing = await requirePublicBookingListing(slug);
+  const guests = Number.parseInt(query?.guests ?? "", 10);
+  const defaultGuests =
+    Number.isFinite(guests) && guests > 0
+      ? Math.min(guests, listing.maxGuests)
+      : 2;
 
   return (
     <main className="min-h-screen bg-[#f6efe4] text-[#1b130b]">
@@ -179,10 +188,22 @@ export default async function BookingPage({
                 </div>
                 <div className="grid gap-4 sm:grid-cols-2">
                   <Field id="checkIn" label="Entrada">
-                    <Input id="checkIn" name="checkIn" type="date" required />
+                    <Input
+                      id="checkIn"
+                      name="checkIn"
+                      type="date"
+                      defaultValue={query?.checkIn ?? ""}
+                      required
+                    />
                   </Field>
                   <Field id="checkOut" label="Salida">
-                    <Input id="checkOut" name="checkOut" type="date" required />
+                    <Input
+                      id="checkOut"
+                      name="checkOut"
+                      type="date"
+                      defaultValue={query?.checkOut ?? ""}
+                      required
+                    />
                   </Field>
                 </div>
                 <Field id="guestsCount" label="Numero de huespedes">
@@ -192,7 +213,7 @@ export default async function BookingPage({
                     type="number"
                     min="1"
                     max={listing.maxGuests}
-                    defaultValue="2"
+                    defaultValue={defaultGuests}
                     required
                   />
                 </Field>

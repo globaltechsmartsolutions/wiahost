@@ -6,6 +6,7 @@ type RateLimitBucket = {
 };
 
 type RateLimitRule = {
+  identity?: string;
   limit: number;
   namespace: string;
   windowMs: number;
@@ -86,7 +87,7 @@ export function takeRateLimitToken(
 }
 
 export function checkRateLimit(request: Request, rule: RateLimitRule) {
-  const decision = takeRateLimitToken(clientIp(request), rule);
+  const decision = takeRateLimitToken(rule.identity ?? clientIp(request), rule);
 
   if (decision.allowed) {
     return { ok: true as const };
