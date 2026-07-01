@@ -4,6 +4,7 @@ import {
   assertPropertyDateRangeAvailable,
   AvailabilityConflictError,
   dateRangesOverlap,
+  isBlockingReservationStatus,
 } from "./availability";
 
 type MockTable = "calendar_blocks" | "reservations";
@@ -75,6 +76,14 @@ function createAvailabilitySupabaseMock(input: {
 }
 
 describe("availability guard", () => {
+  it("distinguishes commercial inquiries from calendar-blocking statuses", () => {
+    expect(isBlockingReservationStatus("inquiry")).toBe(false);
+    expect(isBlockingReservationStatus("cancelled")).toBe(false);
+    expect(isBlockingReservationStatus("pending")).toBe(true);
+    expect(isBlockingReservationStatus("confirmed")).toBe(true);
+    expect(isBlockingReservationStatus("checked_in")).toBe(true);
+  });
+
   it("uses half-open date ranges so checkout day can be reused", () => {
     expect(
       dateRangesOverlap({

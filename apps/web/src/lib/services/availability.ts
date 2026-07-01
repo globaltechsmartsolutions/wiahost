@@ -30,6 +30,12 @@ export const blockingReservationStatuses = [
   "checked_in",
 ] as const;
 
+export function isBlockingReservationStatus(status: string) {
+  return blockingReservationStatuses.includes(
+    status as (typeof blockingReservationStatuses)[number],
+  );
+}
+
 export function dateRangesOverlap(input: {
   candidateEnd: string;
   candidateStart: string;

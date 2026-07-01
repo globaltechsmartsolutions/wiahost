@@ -2,14 +2,53 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 const directBookingMocks = vi.hoisted(() => ({
   adminClient: null as unknown,
+  assertAvailable: vi.fn(),
+  listing: {
+    address: "Mallorca, Spain",
+    amenities: [],
+    basePrice: 120,
+    bathrooms: 2,
+    bedrooms: 3,
+    channel: "direct",
+    cleaningFee: 30,
+    description: "Listing for direct booking tests.",
+    externalListingId: "419018",
+    houseRules: "No parties.",
+    id: "listing-1",
+    maxGuests: 4,
+    partnerId: "worldinstitutionalassets",
+    propertyId: "property-1",
+    propertyName: "Enjoy your vacation by the sea",
+    slug: "enjoy-your-vacation-by-the-sea",
+    syncNotes: "Reserva directa gestionada por WIAHost.",
+    thumbnailUrl: "",
+    title: "Enjoy your vacation by the sea",
+  },
 }));
 
 vi.mock("@/lib/supabase/admin", () => ({
   getSupabaseAdminClient: () => directBookingMocks.adminClient,
 }));
 
+vi.mock("@/lib/data/direct-booking", () => ({
+  getPublicBookingListing: vi.fn(() => directBookingMocks.listing),
+}));
+
+vi.mock("@/lib/services/availability", () => ({
+  assertPropertyDateRangeAvailable: directBookingMocks.assertAvailable,
+  AvailabilityConflictError: class AvailabilityConflictError extends Error {
+    code: string;
+
+    constructor(code: string, message: string) {
+      super(message);
+      this.code = code;
+    }
+  },
+}));
+
 import {
   buildPartnerExternalReservationId,
+  createDirectBookingInquiry,
   DirectBookingMutationError,
   getDirectBookingInquiryStatus,
 } from "./direct-booking";
@@ -65,9 +104,85 @@ function createStatusSupabaseMock(input: {
   };
 }
 
+function createInquirySupabaseMock() {
+  const inserts: Record<string, unknown[]> = {};
+  const filters: Array<{ column: string; table: string; value: unknown }> = [];
+
+  class QueryBuilder {
+    private inserted = false;
+
+    constructor(private table: string) {}
+
+    insert(payload: unknown) {
+      this.inserted = true;
+      inserts[this.table] = [...(inserts[this.table] ?? []), payload];
+      return this;
+    }
+
+    select() {
+      return this;
+    }
+
+    eq(column: string, value: unknown) {
+      filters.push({ column, table: this.table, value });
+      return this;
+    }
+
+    maybeSingle() {
+      return {
+        data: null,
+        error: null,
+      };
+    }
+
+    single() {
+      if (this.table === "guests" && this.inserted) {
+        return {
+          data: { id: "guest-1" },
+          error: null,
+        };
+      }
+
+      if (this.table === "reservations" && this.inserted) {
+        return {
+          data: {
+            id: "reservation-1",
+            status: "inquiry",
+            total_amount: 390,
+          },
+          error: null,
+        };
+      }
+
+      if (this.table === "conversations" && this.inserted) {
+        return {
+          data: { id: "conversation-1" },
+          error: null,
+        };
+      }
+
+      return {
+        data: null,
+        error: null,
+      };
+    }
+  }
+
+  return {
+    filters,
+    inserts,
+    supabase: {
+      from(table: string) {
+        return new QueryBuilder(table);
+      },
+    },
+  };
+}
+
 describe("direct booking partner identity", () => {
   afterEach(() => {
     directBookingMocks.adminClient = null;
+    directBookingMocks.assertAvailable.mockReset();
   });
 
   it("builds stable partner-scoped external reservation ids", () => {
@@ -178,5 +293,64 @@ describe("direct booking partner identity", () => {
     ).rejects.toMatchObject({
       code: "direct_booking_status_lookup_failed",
     } satisfies Partial<DirectBookingMutationError>);
+  });
+});
+
+describe("direct booking inquiry pipeline", () => {
+  afterEach(() => {
+    directBookingMocks.adminClient = null;
+    directBookingMocks.assertAvailable.mockReset();
+  });
+
+  it("stores an already-ingested direct inquiry sync event as synced", async () => {
+    const { inserts, supabase } = createInquirySupabaseMock();
+    directBookingMocks.adminClient = supabase;
+
+    await expect(
+      createDirectBookingInquiry("enjoy-your-vacation-by-the-sea", {
+        checkIn: "2034-11-12",
+        checkOut: "2034-11-15",
+        consent: true,
+        guestEmail: "guest@example.test",
+        guestFullName: "Guest Example",
+        guestPhone: "+34 600 000 001",
+        guestsCount: 2,
+        message: "Please confirm availability.",
+      }),
+    ).resolves.toMatchObject({
+      idempotentReplay: false,
+      reservationId: "reservation-1",
+      status: "inquiry",
+      totalAmount: 390,
+    });
+
+    expect(inserts.guests).toHaveLength(1);
+    expect(inserts.reservations).toHaveLength(1);
+    expect(inserts.conversations).toHaveLength(1);
+    expect(inserts.conversation_messages).toHaveLength(1);
+    expect(inserts.operational_events).toEqual([
+      expect.objectContaining({
+        actor_type: "system",
+        conversation_id: "conversation-1",
+        entity_id: "reservation-1",
+        entity_type: "reservation",
+        event_name: "direct_booking.inquiry_received",
+        property_id: "property-1",
+        reservation_id: "reservation-1",
+      }),
+    ]);
+    expect(inserts.channel_sync_events).toEqual([
+      expect.objectContaining({
+        channel: "direct",
+        direction: "inbound",
+        status: "synced",
+        payload: expect.objectContaining({
+          action: "direct_booking_inquiry",
+          conversationId: "conversation-1",
+          reservationId: "reservation-1",
+          source: "public_booking_engine",
+        }),
+      }),
+    ]);
   });
 });

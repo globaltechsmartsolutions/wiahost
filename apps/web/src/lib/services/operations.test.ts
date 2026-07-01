@@ -20,4 +20,30 @@ describe("operations service", () => {
       target: "hostaway_bridge_fake",
     });
   });
+
+  it("builds direct lead status payloads for pending and cancelled leads", () => {
+    expect(
+      buildDirectLeadStatusSyncPayload({
+        reservationId: "reservation-1",
+        status: "pending",
+      }),
+    ).toMatchObject({
+      action: "direct_lead_status_updated",
+      externalReservationId: null,
+      reservationId: "reservation-1",
+      status: "pending",
+    });
+
+    expect(
+      buildDirectLeadStatusSyncPayload({
+        reservationId: "reservation-1",
+        status: "cancelled",
+      }),
+    ).toMatchObject({
+      action: "direct_lead_status_updated",
+      externalReservationId: null,
+      reservationId: "reservation-1",
+      status: "cancelled",
+    });
+  });
 });

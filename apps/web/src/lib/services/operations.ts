@@ -10,7 +10,13 @@ import type { createSupabaseServerClient } from "@/lib/supabase/server";
 import {
   assertPropertyDateRangeAvailable,
   AvailabilityConflictError,
+  isBlockingReservationStatus,
 } from "@/lib/services/availability";
+import {
+  buildDirectLeadStatusSyncPayload,
+  createDirectLeadStatusSyncEvent,
+  isDirectLeadSyncStatus,
+} from "@/lib/services/direct-lead-sync";
 import { createPaymentCheckoutLink } from "@/lib/services/payments";
 import {
   sendOperationalPushSafely,
@@ -42,24 +48,7 @@ function mapAvailabilityConflict(error: unknown): never {
   throw error;
 }
 
-export function buildDirectLeadStatusSyncPayload(input: {
-  externalReservationId?: string | null;
-  reservationId: string;
-  status: "pending" | "confirmed" | "cancelled";
-}) {
-  return {
-    action:
-      input.status === "confirmed"
-        ? "direct_reservation_confirmed"
-        : "direct_lead_status_updated",
-    externalReservationId: input.externalReservationId ?? null,
-    mode: "local_simulation",
-    reservationId: input.reservationId,
-    source: "direct_booking_pipeline",
-    status: input.status,
-    target: "hostaway_bridge_fake",
-  };
-}
+export { buildDirectLeadStatusSyncPayload };
 
 async function recordOperationalEvent(
   supabase: SupabaseServerClient,
@@ -201,14 +190,16 @@ export async function createManualReservation(
   input: ManualReservationInput,
   userId: string,
 ) {
-  try {
-    await assertPropertyDateRangeAvailable(supabase, {
-      checkIn: input.checkIn,
-      checkOut: input.checkOut,
-      propertyId: input.propertyId,
-    });
-  } catch (error) {
-    mapAvailabilityConflict(error);
+  if (isBlockingReservationStatus(input.status)) {
+    try {
+      await assertPropertyDateRangeAvailable(supabase, {
+        checkIn: input.checkIn,
+        checkOut: input.checkOut,
+        propertyId: input.propertyId,
+      });
+    } catch (error) {
+      mapAvailabilityConflict(error);
+    }
   }
 
   const { data: guest, error: guestError } = await supabase
@@ -304,6 +295,34 @@ export async function updateReservationStatus(
   status: string,
   userId: string,
 ) {
+  const { data: current, error: currentError } = await supabase
+    .from("reservations")
+    .select(
+      "id,status,property_id,channel,check_in,check_out,external_reservation_id",
+    )
+    .eq("id", reservationId)
+    .single();
+
+  if (currentError || !current) {
+    mutationError(
+      "reservation_update_failed",
+      "No se ha podido actualizar la reserva.",
+    );
+  }
+
+  if (isBlockingReservationStatus(status)) {
+    try {
+      await assertPropertyDateRangeAvailable(supabase, {
+        checkIn: current.check_in,
+        checkOut: current.check_out,
+        excludeReservationId: current.id,
+        propertyId: current.property_id,
+      });
+    } catch (error) {
+      mapAvailabilityConflict(error);
+    }
+  }
+
   const { data, error } = await supabase
     .from("reservations")
     .update({ status })
@@ -324,12 +343,26 @@ export async function updateReservationStatus(
     eventName: "reservation.status_updated",
     metadata: {
       channel: data.channel,
+      previousStatus: current.status,
       status: data.status,
     },
     propertyId: data.property_id,
     reservationId: data.id,
     userId,
   });
+
+  if (
+    data.channel === "direct" &&
+    current.status !== status &&
+    isDirectLeadSyncStatus(status)
+  ) {
+    await createDirectLeadStatusSyncEvent(supabase, {
+      externalReservationId: current.external_reservation_id,
+      propertyId: data.property_id,
+      reservationId: data.id,
+      status,
+    });
+  }
 
   if (
     ["confirmed", "checked_in", "checked_out", "cancelled"].includes(status)
@@ -378,7 +411,7 @@ export async function updateDirectLeadStatus(
     );
   }
 
-  if (status === "confirmed") {
+  if (isBlockingReservationStatus(status)) {
     try {
       await assertPropertyDateRangeAvailable(supabase, {
         checkIn: current.check_in,
@@ -407,17 +440,12 @@ export async function updateDirectLeadStatus(
     );
   }
 
-  if (status === "confirmed") {
-    await supabase.from("channel_sync_events").insert({
-      channel: "direct",
-      direction: "outbound",
-      payload: buildDirectLeadStatusSyncPayload({
-        externalReservationId: current.external_reservation_id,
-        reservationId: data.id,
-        status,
-      }),
-      property_id: data.property_id,
-      status: "pending",
+  if (current.status !== status) {
+    await createDirectLeadStatusSyncEvent(supabase, {
+      externalReservationId: current.external_reservation_id,
+      propertyId: data.property_id,
+      reservationId: data.id,
+      status,
     });
   }
 
@@ -427,6 +455,7 @@ export async function updateDirectLeadStatus(
     eventName: "lead.status_updated",
     metadata: {
       channel: data.channel,
+      previousStatus: current.status,
       status: data.status,
     },
     propertyId: data.property_id,
@@ -444,7 +473,9 @@ export async function prepareDirectLeadPayment(
 ) {
   const { data: reservation, error: reservationError } = await supabase
     .from("reservations")
-    .select("id,property_id,guest_id,status,total_amount,currency")
+    .select(
+      "id,property_id,guest_id,status,total_amount,currency,check_in,check_out,external_reservation_id",
+    )
     .eq("id", reservationId)
     .eq("channel", "direct")
     .in("status", ["inquiry", "pending", "confirmed"])
@@ -504,10 +535,53 @@ export async function prepareDirectLeadPayment(
   }
 
   if (reservation.status === "inquiry") {
-    await supabase
+    try {
+      await assertPropertyDateRangeAvailable(supabase, {
+        checkIn: reservation.check_in,
+        checkOut: reservation.check_out,
+        excludeReservationId: reservation.id,
+        propertyId: reservation.property_id,
+      });
+    } catch (error) {
+      mapAvailabilityConflict(error);
+    }
+
+    const { data: pendingReservation, error: pendingError } = await supabase
       .from("reservations")
       .update({ status: "pending" })
-      .eq("id", reservationId);
+      .eq("id", reservationId)
+      .eq("status", "inquiry")
+      .select("id,status,property_id")
+      .single();
+
+    if (pendingError || !pendingReservation) {
+      mutationError(
+        "lead_payment_status_update_failed",
+        "No se ha podido bloquear provisionalmente el lead para el pago.",
+      );
+    }
+
+    await createDirectLeadStatusSyncEvent(supabase, {
+      externalReservationId: reservation.external_reservation_id,
+      propertyId: pendingReservation.property_id,
+      reservationId,
+      status: "pending",
+    });
+
+    await recordOperationalEvent(supabase, {
+      entityId: reservationId,
+      entityType: "reservation",
+      eventName: "lead.status_updated",
+      metadata: {
+        channel: "direct",
+        previousStatus: reservation.status,
+        source: "payment_request",
+        status: pendingReservation.status,
+      },
+      propertyId: pendingReservation.property_id,
+      reservationId,
+      userId,
+    });
   }
 
   await supabase.from("channel_sync_events").insert({
@@ -555,15 +629,17 @@ export async function updateManualReservation(
   input: ManualReservationInput,
   userId: string,
 ) {
-  try {
-    await assertPropertyDateRangeAvailable(supabase, {
-      checkIn: input.checkIn,
-      checkOut: input.checkOut,
-      excludeReservationId: reservationId,
-      propertyId: input.propertyId,
-    });
-  } catch (error) {
-    mapAvailabilityConflict(error);
+  if (isBlockingReservationStatus(input.status)) {
+    try {
+      await assertPropertyDateRangeAvailable(supabase, {
+        checkIn: input.checkIn,
+        checkOut: input.checkOut,
+        excludeReservationId: reservationId,
+        propertyId: input.propertyId,
+      });
+    } catch (error) {
+      mapAvailabilityConflict(error);
+    }
   }
 
   const { data: existing, error: existingError } = await supabase

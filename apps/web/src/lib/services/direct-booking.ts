@@ -127,6 +127,38 @@ async function findExistingInquiry(
   return data;
 }
 
+async function recordDirectInquiryEvent(
+  supabase: ReturnType<typeof getSupabaseAdminClient>,
+  input: {
+    conversationId?: string;
+    guestId: string;
+    propertyId: string;
+    reservationId: string;
+    source: "partner_channel_api" | "public_booking_engine";
+    totalAmount: number | string | null;
+  },
+) {
+  try {
+    await supabase.from("operational_events").insert({
+      actor_type: "system",
+      conversation_id: input.conversationId ?? null,
+      entity_id: input.reservationId,
+      entity_type: "reservation",
+      event_name: "direct_booking.inquiry_received",
+      metadata: {
+        guestId: input.guestId,
+        source: input.source,
+        totalAmount: Number(input.totalAmount ?? 0),
+      },
+      property_id: input.propertyId,
+      reservation_id: input.reservationId,
+      source: "public_booking_engine",
+    });
+  } catch {
+    // Audit events should never block the public booking flow.
+  }
+}
+
 function mapInquiryStatus(row: DirectBookingStatusRow) {
   const guest = one(row.guests);
   const property = one(row.properties);
@@ -352,7 +384,16 @@ export async function createDirectBookingInquiry(
       source,
     },
     property_id: listing.propertyId,
-    status: "pending",
+    status: "synced",
+  });
+
+  await recordDirectInquiryEvent(supabase, {
+    conversationId: conversation?.id,
+    guestId: guest.id,
+    propertyId: listing.propertyId,
+    reservationId: reservation.id,
+    source,
+    totalAmount: reservation.total_amount,
   });
 
   return {

@@ -1,6 +1,7 @@
 import type { PaymentInput } from "@wiahost/shared";
 import { randomUUID } from "node:crypto";
 import type { createSupabaseServerClient } from "@/lib/supabase/server";
+import { createDirectLeadStatusSyncEvent } from "@/lib/services/direct-lead-sync";
 import { getSupabaseAdminClient } from "@/lib/supabase/admin";
 import { getStripeClient, isStripeConfigured } from "@/lib/stripe/server";
 
@@ -137,6 +138,56 @@ async function createCheckoutSyncEvent(
     property_id: input.propertyId,
     status: input.status,
   });
+}
+
+async function recordCheckoutConfirmationEvents(
+  supabase: SupabaseServerClient,
+  input: {
+    amount: number;
+    paymentId: string;
+    propertyId: string | null;
+    provider: string;
+    reservationId: string;
+  },
+) {
+  try {
+    await supabase.from("operational_events").insert([
+      {
+        actor_type: "system",
+        entity_id: input.reservationId,
+        entity_type: "reservation",
+        event_name: "reservation.status_updated",
+        metadata: {
+          paymentId: input.paymentId,
+          paymentStatus: "paid",
+          previousStatus: "pending",
+          provider: input.provider,
+          source: "direct_checkout",
+          status: "confirmed",
+        },
+        property_id: input.propertyId,
+        reservation_id: input.reservationId,
+        source: "direct_checkout",
+      },
+      {
+        actor_type: "system",
+        entity_id: input.paymentId,
+        entity_type: "payment",
+        event_name: "payment.checkout_paid",
+        metadata: {
+          amount: input.amount,
+          provider: input.provider,
+          reservationId: input.reservationId,
+          status: "paid",
+        },
+        property_id: input.propertyId,
+        reservation_id: input.reservationId,
+        source: "direct_checkout",
+      },
+    ]);
+  } catch {
+    // Audit events must never block payment confirmation.
+  }
 }
 
 export async function createPayment(
@@ -362,7 +413,7 @@ export async function confirmDemoCheckoutPayment(
   const { data: payment, error } = await supabase
     .from("payments")
     .select(
-      "id,reservation_id,status,amount,metadata,reservations(property_id,status)",
+      "id,reservation_id,status,amount,metadata,reservations(property_id,status,external_reservation_id)",
     )
     .eq("id", paymentId)
     .single();
@@ -414,15 +465,36 @@ export async function confirmDemoCheckoutPayment(
     );
   }
 
-  await supabase
+  const { data: confirmedReservation } = await supabase
     .from("reservations")
     .update({ status: "confirmed" })
     .eq("id", payment.reservation_id)
-    .in("status", ["inquiry", "pending"]);
+    .eq("status", "pending")
+    .select("id,property_id,external_reservation_id")
+    .maybeSingle();
 
   const reservation = Array.isArray(payment.reservations)
     ? payment.reservations[0]
     : payment.reservations;
+
+  if (confirmedReservation) {
+    await createDirectLeadStatusSyncEvent(supabase as SupabaseServerClient, {
+      externalReservationId:
+        confirmedReservation.external_reservation_id ??
+        reservation?.external_reservation_id,
+      propertyId: confirmedReservation.property_id,
+      reservationId: payment.reservation_id,
+      status: "confirmed",
+    });
+
+    await recordCheckoutConfirmationEvents(supabase as SupabaseServerClient, {
+      amount: Number(payment.amount ?? 0),
+      paymentId: payment.id,
+      propertyId: confirmedReservation.property_id,
+      provider: "direct_checkout",
+      reservationId: payment.reservation_id,
+    });
+  }
 
   await createCheckoutSyncEvent(supabase as SupabaseServerClient, {
     action: "direct_checkout_paid",
@@ -444,7 +516,7 @@ export async function confirmStripeCheckoutPayment(
   const { data: payment, error } = await supabase
     .from("payments")
     .select(
-      "id,reservation_id,status,amount,metadata,reservations(property_id,status)",
+      "id,reservation_id,status,amount,metadata,reservations(property_id,status,external_reservation_id)",
     )
     .eq("id", paymentId)
     .single();
@@ -497,15 +569,36 @@ export async function confirmStripeCheckoutPayment(
     );
   }
 
-  await supabase
+  const { data: confirmedReservation } = await supabase
     .from("reservations")
     .update({ status: "confirmed" })
     .eq("id", payment.reservation_id)
-    .in("status", ["inquiry", "pending"]);
+    .eq("status", "pending")
+    .select("id,property_id,external_reservation_id")
+    .maybeSingle();
 
   const reservation = Array.isArray(payment.reservations)
     ? payment.reservations[0]
     : payment.reservations;
+
+  if (confirmedReservation) {
+    await createDirectLeadStatusSyncEvent(supabase as SupabaseServerClient, {
+      externalReservationId:
+        confirmedReservation.external_reservation_id ??
+        reservation?.external_reservation_id,
+      propertyId: confirmedReservation.property_id,
+      reservationId: payment.reservation_id,
+      status: "confirmed",
+    });
+
+    await recordCheckoutConfirmationEvents(supabase as SupabaseServerClient, {
+      amount: Number(payment.amount ?? 0),
+      paymentId: payment.id,
+      propertyId: confirmedReservation.property_id,
+      provider: "stripe",
+      reservationId: payment.reservation_id,
+    });
+  }
 
   await createCheckoutSyncEvent(supabase as SupabaseServerClient, {
     action: "stripe_checkout_paid",

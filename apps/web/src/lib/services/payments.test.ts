@@ -36,6 +36,7 @@ type PaymentRow = {
   provider_payment_id?: string | null;
   reservation_id: string;
   reservations: {
+    external_reservation_id?: string | null;
     guests?: { email?: string; full_name?: string };
     property_id: string;
     properties?: { name?: string };
@@ -53,6 +54,7 @@ function createPaymentRow(overrides: Partial<PaymentRow> = {}): PaymentRow {
     provider_payment_id: null,
     reservation_id: "reservation-1",
     reservations: {
+      external_reservation_id: "partner:worldinstitutionalassets:wia-001",
       guests: {
         email: "sofia@example.com",
         full_name: "Sofia Martin",
@@ -109,6 +111,22 @@ function createPaymentsSupabaseMock(payment: PaymentRow) {
       filters[this.table] = filters[this.table] ?? [];
       filters[this.table]!.push({ column, value });
       return this;
+    }
+
+    maybeSingle() {
+      if (this.table === "reservations" && this.operation === "update") {
+        return {
+          data: {
+            external_reservation_id:
+              payment.reservations.external_reservation_id ?? null,
+            id: payment.reservation_id,
+            property_id: payment.reservations.property_id,
+          },
+          error: null,
+        };
+      }
+
+      return { data: null, error: null };
     }
 
     single() {
@@ -307,7 +325,7 @@ describe("payment services", () => {
       "checkout-token-valid-token",
     );
 
-    expect(result).toEqual({
+    expect(result).toMatchObject({
       id: "12345678-aaaa-4bbb-8ccc-123456789abc",
       status: "paid",
     });
@@ -360,17 +378,204 @@ describe("payment services", () => {
     });
     expect(filters.reservations).toContainEqual({
       column: "status",
-      value: ["inquiry", "pending"],
+      value: "pending",
     });
+    expect(inserts.channel_sync_events).toEqual([
+      expect.objectContaining({
+        payload: expect.objectContaining({
+          action: "direct_reservation_confirmed",
+          externalReservationId: "partner:worldinstitutionalassets:wia-001",
+          reservationId: "reservation-1",
+          source: "direct_booking_pipeline",
+          status: "confirmed",
+        }),
+        status: "pending",
+      }),
+      expect.objectContaining({
+        payload: {
+          action: "stripe_checkout_paid",
+          amount: 420,
+          paymentId: "12345678-aaaa-4bbb-8ccc-123456789abc",
+          reservationId: "reservation-1",
+          source: "direct_checkout",
+        },
+        status: "synced",
+      }),
+    ]);
+    expect(inserts.operational_events?.[0]).toEqual([
+      expect.objectContaining({
+        actor_type: "system",
+        entity_id: "reservation-1",
+        entity_type: "reservation",
+        event_name: "reservation.status_updated",
+        property_id: "property-1",
+        reservation_id: "reservation-1",
+        source: "direct_checkout",
+        metadata: expect.objectContaining({
+          paymentId: "12345678-aaaa-4bbb-8ccc-123456789abc",
+          previousStatus: "pending",
+          provider: "stripe",
+          status: "confirmed",
+        }),
+      }),
+      expect.objectContaining({
+        actor_type: "system",
+        entity_id: "12345678-aaaa-4bbb-8ccc-123456789abc",
+        entity_type: "payment",
+        event_name: "payment.checkout_paid",
+        property_id: "property-1",
+        reservation_id: "reservation-1",
+        source: "direct_checkout",
+        metadata: expect.objectContaining({
+          amount: 420,
+          provider: "stripe",
+          status: "paid",
+        }),
+      }),
+    ]);
+  });
+
+  it("confirms demo payments and records direct reservation confirmation", async () => {
+    const { filters, inserts, supabase, updates } = createPaymentsSupabaseMock(
+      createPaymentRow({
+        metadata: {
+          checkout: {
+            status: "created",
+            token: "checkout-token-valid-token",
+          },
+        },
+      }),
+    );
+    paymentServiceMocks.adminClient = supabase;
+
+    const result = await confirmDemoCheckoutPayment(
+      "12345678-aaaa-4bbb-8ccc-123456789abc",
+      "checkout-token-valid-token",
+    );
+
+    expect(result).toMatchObject({
+      id: "12345678-aaaa-4bbb-8ccc-123456789abc",
+      status: "paid",
+    });
+    expect(updates.payments![0]).toMatchObject({
+      paid_at: expect.any(String),
+      status: "paid",
+    });
+    expect(updates.reservations).toEqual([{ status: "confirmed" }]);
+    expect(filters.reservations).toContainEqual({
+      column: "status",
+      value: "pending",
+    });
+    expect(inserts.channel_sync_events).toEqual([
+      expect.objectContaining({
+        payload: expect.objectContaining({
+          action: "direct_reservation_confirmed",
+          reservationId: "reservation-1",
+        }),
+        status: "pending",
+      }),
+      expect.objectContaining({
+        payload: {
+          action: "direct_checkout_paid",
+          amount: 420,
+          paymentId: "12345678-aaaa-4bbb-8ccc-123456789abc",
+          reservationId: "reservation-1",
+          source: "direct_checkout",
+        },
+        status: "synced",
+      }),
+    ]);
+    expect(inserts.operational_events?.[0]).toEqual([
+      expect.objectContaining({
+        actor_type: "system",
+        entity_id: "reservation-1",
+        entity_type: "reservation",
+        event_name: "reservation.status_updated",
+        property_id: "property-1",
+        reservation_id: "reservation-1",
+        source: "direct_checkout",
+        metadata: expect.objectContaining({
+          paymentId: "12345678-aaaa-4bbb-8ccc-123456789abc",
+          previousStatus: "pending",
+          provider: "direct_checkout",
+          status: "confirmed",
+        }),
+      }),
+      expect.objectContaining({
+        actor_type: "system",
+        entity_id: "12345678-aaaa-4bbb-8ccc-123456789abc",
+        entity_type: "payment",
+        event_name: "payment.checkout_paid",
+        property_id: "property-1",
+        reservation_id: "reservation-1",
+        source: "direct_checkout",
+        metadata: expect.objectContaining({
+          amount: 420,
+          provider: "direct_checkout",
+          status: "paid",
+        }),
+      }),
+    ]);
+  });
+
+  it("keeps checkout sync events when pending reservation confirmation is absent", async () => {
+    const { inserts, supabase, updates } = createPaymentsSupabaseMock(
+      createPaymentRow({
+        metadata: {
+          checkout: {
+            status: "created",
+            token: "checkout-token-valid-token",
+          },
+        },
+      }),
+    );
+    const originalFrom = supabase.from.bind(supabase);
+    supabase.from = ((table: string) => {
+      const builder = originalFrom(table);
+      if (table === "reservations") {
+        builder.maybeSingle = () => ({ data: null, error: null });
+      }
+      return builder;
+    }) as typeof supabase.from;
+    paymentServiceMocks.adminClient = supabase;
+
+    await confirmDemoCheckoutPayment(
+      "12345678-aaaa-4bbb-8ccc-123456789abc",
+      "checkout-token-valid-token",
+    );
+
+    expect(updates.payments![0]).toMatchObject({ status: "paid" });
+    expect(inserts.channel_sync_events).toEqual([
+      expect.objectContaining({
+        payload: {
+          action: "direct_checkout_paid",
+          amount: 420,
+          paymentId: "12345678-aaaa-4bbb-8ccc-123456789abc",
+          reservationId: "reservation-1",
+          source: "direct_checkout",
+        },
+        status: "synced",
+      }),
+    ]);
+    expect(inserts.operational_events).toBeUndefined();
+  });
+
+  it("records checkout link creation sync payloads", async () => {
+    const { inserts, supabase } = createPaymentsSupabaseMock(
+      createPaymentRow(),
+    );
+
+    await createPaymentCheckoutLink(supabase as never, "pay-1");
+
     expect(inserts.channel_sync_events![0]).toMatchObject({
       payload: {
-        action: "stripe_checkout_paid",
+        action: "direct_checkout_link_created",
         amount: 420,
         paymentId: "12345678-aaaa-4bbb-8ccc-123456789abc",
         reservationId: "reservation-1",
         source: "direct_checkout",
       },
-      status: "synced",
+      status: "pending",
     });
   });
 
